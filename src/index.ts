@@ -13,7 +13,7 @@ export interface Validator<T = any> {
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
-type Validation<V extends Validator = Validator> = V | (() => V) | null
+type Validation<V extends Validator = Validator> = V | (() => V) | boolean | null
 
 /** Infer the type returned by a `Validator`'s own `validate` function. */
 type InferValidationType<V extends Validation> =
@@ -21,26 +21,44 @@ type InferValidationType<V extends Validation> =
   V extends ObjectValidator ? Record<string, any> :
   V extends () => Validator<infer T> ? T :
   V extends Validator<infer T> ? T :
-  null
+  V extends false ? false :
+  V extends true ? true :
+  V extends null ? null :
+  never
 
+/** Return the `Validator` for the given `Validation`. */
+function validator(validation: Validation): Validator {
+  if (typeof validation === 'function') validation = validation()
+
+  if (validation === null) return nullValidator
+  if (validation === true) return trueValidator
+  if (validation === false) return falseValidator
+
+  if (validation && (typeof validation.validate === 'function')) return validation
+
+  throw new TypeError('Invalid validation (no validator???)')
+}
 
 /* ========================================================================== *
- * BASIC VALIDATION (ANY, NULL)                                               *
+ * BASIC VALIDATION (ANY, NULL, BOOLEANS)                                     *
  * ========================================================================== */
 
 /** The utility `Validator` for `any` type. */
-const anyValidator: Validator = {
+export const any: Validator<any> = {
   validate(value: any): any {
     return value
   },
 }
 
-/** A function returning a `Validator` for `any` type. */
-export function any(): Validator {
-  return anyValidator
+/** The utility `Validator` for the `boolean` type. */
+export const boolean: Validator<boolean> = {
+  validate: (value: any): boolean => {
+    if (typeof value === 'boolean') return value
+    throw new TypeError('Not a "boolean"')
+  },
 }
 
-/* ========================================================================== */
+/* -------------------------------------------------------------------------- */
 
 /** The utility `Validator` for the `null` type. */
 const nullValidator: Validator<null> = {
@@ -50,27 +68,24 @@ const nullValidator: Validator<null> = {
   },
 }
 
-
-/* ========================================================================== *
- * PRIMITIVE VALIDATION (BOOLEAN, NUMBER, STRING)                             *
- * ========================================================================== */
-
-/** The utility `Validator` for the `boolean` type. */
-const booleanValidator: Validator<boolean> = {
-  validate: (value: any): boolean => {
-    if (typeof value === 'boolean') return value
-    throw new TypeError('Not a "boolean"')
+const trueValidator: Validator<true> = {
+  validate(value: any): true {
+    if (value === true) return true
+    throw new TypeError('Not "true"')
   },
 }
 
-/** A function returning a `Validator` for the `boolean` type. */
-export function boolean(): Validator<boolean>
-export function boolean<B extends boolean>(): Validator<B>
-export function boolean(): Validator<boolean> {
-  return booleanValidator
+const falseValidator: Validator<false> = {
+  validate(value: any): false {
+    if (value === false) return false
+    throw new TypeError('Not "false"')
+  },
 }
 
-/* ========================================================================== */
+
+/* ========================================================================== *
+ * BRANDED PRIMITIVE VALIDATION (NUMBER, STRING)                              *
+ * ========================================================================== */
 
 /**
  * Constraints to validate a `number` with.
@@ -168,24 +183,8 @@ export function array<V extends Validation>(constraints: ArrayConstraints<V>): V
 
 // Overloaded `array(...)` function
 export function array(options?: Validation | ArrayConstraints<Validation>): Validator<any[]> {
-  // Extract `items` and the rest of the constraints from options
-  const { items, ...constraints } =
-    // Specifically "null" means validate Array<null>
-    options === null ? { items: nullValidator } :
-    // Specifically "undefined" means validate Array<any>
-    options === undefined ? { items: anyValidator } :
-    // If options is a function, it generates an items validator
-    typeof options === 'function' ? { items: options() } :
-    // If options has a `validate` key, then it's a `Validator`
-    'validate' in options ? { items: options } :
-    // Anything else should be an "constraints" instance
-    options
-
-  // Our `items` above can be a `Validator` or a function creating one
-  const validator = typeof items === 'function' ? items() : items
-  void validator, constraints
-
   // TODO: implement me!
+  void options
   return <any> null
 }
 
@@ -237,43 +236,6 @@ type InferValidators<S extends Schema> = {
     S[key] extends Validation ? InferValidationType<S[key]> : never
 }
 
-type InferReadonlyModifiers<S extends Schema> = {
-  readonly [ key in keyof S as
-    key extends string ?
-      S[key] extends OptionalModifier<Validator> ? never :
-      S[key] extends ReadonlyModifier<Validator> ? key :
-      never :
-    never
-  ] :
-    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
-}
-
-type InferOptionalModifiers<S extends Schema> = {
-  [ key in keyof S as
-    key extends string ?
-      S[key] extends ReadonlyModifier<Validator> ? never :
-      S[key] extends OptionalModifier<Validator> ? key :
-      never :
-    never
-  ] ? :
-    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
-}
-
-type InferCombinedModifiers<S extends Schema> = {
-  readonly [ key in keyof S as
-    key extends string ?
-      S[key] extends CombinedModifier ? key :
-      never :
-    never
-  ] ? :
-    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
-}
-
-type InferAdditionaProperties<S extends Schema> =
-  S extends { [ allowAdditionalProperties ]: Validator<infer V> } ? Record<string, V> :
-  S extends { [ allowAdditionalProperties ]: true } ? Record<string, any> :
-  {}
-
 /** Infer the type validated by a `Schema` */
 type InferSchema<S extends Schema> =
   InferValidators<S> &
@@ -289,6 +251,15 @@ type InferSchema<S extends Schema> =
 interface AdditionalProperties<V extends Validator | boolean> {
   [ allowAdditionalProperties ]: V
 }
+
+/* -------------------------------------------------------------------------- */
+
+type InferAdditionaProperties<S extends Schema> =
+  S extends { [ allowAdditionalProperties ]: Validator<infer V> } ? Record<string, V> :
+  S extends { [ allowAdditionalProperties ]: true } ? Record<string, any> :
+  {}
+
+/* -------------------------------------------------------------------------- */
 
 export function additionalProperties(): AdditionalProperties<true>
 export function additionalProperties(allow: true): AdditionalProperties<true>
@@ -328,6 +299,8 @@ extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
   optional: true,
 }
 
+/* -------------------------------------------------------------------------- */
+
 type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
   M1 extends ReadonlyModifier ?
     M2 extends ReadonlyModifier<infer V> ? ReadonlyModifier<V> :
@@ -338,6 +311,42 @@ type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
     M2 extends OptionalModifier<infer V> ? OptionalModifier<V> :
     never :
   never
+
+/* -------------------------------------------------------------------------- */
+
+type InferReadonlyModifiers<S extends Schema> = {
+  readonly [ key in keyof S as
+    key extends string ?
+      S[key] extends OptionalModifier<Validator> ? never :
+      S[key] extends ReadonlyModifier<Validator> ? key :
+      never :
+    never
+  ] :
+    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
+}
+
+type InferOptionalModifiers<S extends Schema> = {
+  [ key in keyof S as
+    key extends string ?
+      S[key] extends ReadonlyModifier<Validator> ? never :
+      S[key] extends OptionalModifier<Validator> ? key :
+      never :
+    never
+  ] ? :
+    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
+}
+
+type InferCombinedModifiers<S extends Schema> = {
+  readonly [ key in keyof S as
+    key extends string ?
+      S[key] extends CombinedModifier ? key :
+      never :
+    never
+  ] ? :
+    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
+}
+
+/* -------------------------------------------------------------------------- */
 
 export function readonly(): ReadonlyModifier<any>
 export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidationType<V>>>
