@@ -1,8 +1,6 @@
 /**
  * The `Validator` interface defines an object capable of validating a given
  * _value_ and (possibly) converting it the required `Type`.
- *
- * @public
  */
 export interface Validator<T = any> {
   /**
@@ -24,6 +22,7 @@ type InferValidationType<V extends Validation | null> =
   V extends () => Validator<infer T> ? T :
   V extends Validator<infer T> ? T :
   null
+
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, NULL)                                               *
@@ -50,6 +49,7 @@ const nullValidator: Validator<null> = {
     throw new TypeError('Not "null"')
   },
 }
+
 
 /* ========================================================================== *
  * PRIMITIVE VALIDATION (BOOLEAN, NUMBER, STRING)                             *
@@ -127,6 +127,7 @@ export function string(constraints?: StringConstraints): Validator<string> {
   return <any> null
 }
 
+
 /* ========================================================================== *
  * ARRAY VALIDATION                                                           *
  * ========================================================================== */
@@ -196,7 +197,7 @@ const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties
 
 interface Schema {
-  [ key: string ] : Validation | null
+  [ key: string ] : Validation | Modifier | null
   [ allowAdditionalProperties ]?: Validator | boolean
 }
 
@@ -206,6 +207,19 @@ interface SchemaValidator<T, S extends Schema> extends Validator<T> {
 
 interface ObjectValidator extends SchemaValidator<Record<string, any>, {}> {
   [ allowAdditionalProperties ]: true
+}
+
+/* -------------------------------------------------------------------------- */
+
+export function object(): ObjectValidator // <any, undefined>
+export function object<S extends Schema>(schema: S): SchemaValidator<InferSchema<S>, S>
+export function object<S extends Schema>(schema?: S): SchemaValidator<InferSchema<S>, S> {
+  return {
+    schema: <S> schema,
+    validate: (value: any): InferSchema<S> => {
+      return value
+    },
+  }
 }
 
 /* -------------------------------------------------------------------------- *
@@ -220,9 +234,39 @@ type InferValidators<S extends Schema> = {
         never :
       never
   ] :
-    S[key] extends () => ObjectValidator ? Record<string, any> :
-    S[key] extends ObjectValidator ? Record<string, any> :
     S[key] extends Validation | null ? InferValidationType<S[key]> : never
+}
+
+type InferReadonlyModifiers<S extends Schema> = {
+  readonly [ key in keyof S as
+    key extends string ?
+      S[key] extends OptionalModifier<Validator> ? never :
+      S[key] extends ReadonlyModifier<Validator> ? key :
+      never :
+    never
+  ] :
+    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
+}
+
+type InferOptionalModifiers<S extends Schema> = {
+  [ key in keyof S as
+    key extends string ?
+      S[key] extends ReadonlyModifier<Validator> ? never :
+      S[key] extends OptionalModifier<Validator> ? key :
+      never :
+    never
+  ] ? :
+    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
+}
+
+type InferCombinedModifiers<S extends Schema> = {
+  readonly [ key in keyof S as
+    key extends string ?
+      S[key] extends CombinedModifier ? key :
+      never :
+    never
+  ] ? :
+    S[key] extends Modifier<infer V> ? InferValidationType<V> : never
 }
 
 type InferAdditionaProperties<S extends Schema> =
@@ -233,20 +277,10 @@ type InferAdditionaProperties<S extends Schema> =
 /** Infer the type validated by a `Schema` */
 type InferSchema<S extends Schema> =
   InferValidators<S> &
+  InferReadonlyModifiers<S> &
+  InferOptionalModifiers<S> &
+  InferCombinedModifiers<S> &
   InferAdditionaProperties<S>
-
-// /* -------------------------------------------------------------------------- */
-
-export function object(): ObjectValidator // <any, undefined>
-export function object<S extends Schema>(schema: S): SchemaValidator<InferSchema<S>, S>
-export function object<S extends Schema>(schema?: S): SchemaValidator<InferSchema<S>, S> {
-  return {
-    schema: <S> schema,
-    validate: (value: any): InferSchema<S> => {
-      return value
-    },
-  }
-}
 
 /* -------------------------------------------------------------------------- *
  * Schema additions for extra properties                                      *
@@ -270,6 +304,75 @@ export function additionalProperties(allow?: null | boolean | Validation): Addit
   }
 }
 
+/* -------------------------------------------------------------------------- *
+ * Schema modifiers                                                           *
+ * -------------------------------------------------------------------------- */
+
+interface Modifier<V extends Validator = Validator> {
+  validator: V
+  readonly?: true,
+  optional?: true,
+}
+
+interface ReadonlyModifier<V extends Validator = Validator> extends Modifier<V> {
+  readonly: true,
+}
+
+interface OptionalModifier<V extends Validator = Validator> extends Modifier<V> {
+  optional: true,
+}
+
+interface CombinedModifier<V extends Validator = Validator>
+extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
+  readonly: true,
+  optional: true,
+}
+
+type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
+  M1 extends ReadonlyModifier ?
+    M2 extends ReadonlyModifier<infer V> ? ReadonlyModifier<V> :
+    M2 extends OptionalModifier<infer V> ? CombinedModifier<V> :
+    never :
+  M1 extends OptionalModifier ?
+    M2 extends ReadonlyModifier<infer V> ? CombinedModifier<V> :
+    M2 extends OptionalModifier<infer V> ? OptionalModifier<V> :
+    never :
+  never
+
+export function readonly(): ReadonlyModifier<any>
+export function readonly<V extends Validation | null>(validation: V): ReadonlyModifier<Validator<InferValidationType<V>>>
+export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
+
+export function readonly(modifier?: Modifier<any> | Validation): any {
+  void modifier
+  return <any> null
+}
+
+export function optional(): OptionalModifier<any>
+export function optional<V extends Validation | null>(validation: V): OptionalModifier<Validator<InferValidationType<V>>>
+export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
+
+export function optional(modifier?: Modifier<any> | Validation): any {
+  void modifier
+  return <any> null
+}
+
+const a = readonly(string)
+const b = optional(a)
+const a1 = optional(number)
+const b1 = readonly(a1)
+
+a.readonly
+a.optional
+b.readonly
+b.optional
+const c = b.validator.validate(null)
+
+a1.readonly
+a1.optional
+b1.readonly
+b1.optional
+const c1 = b.validator.validate(null)
 
 // /**
 //  * A schema addition allowing extra properties in an `Object`.
