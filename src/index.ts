@@ -13,10 +13,10 @@ export interface Validator<T = any> {
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
-type Validation<V extends Validator = Validator> = V | (() => V)
+type Validation<V extends Validator = Validator> = V | (() => V) | null
 
 /** Infer the type returned by a `Validator`'s own `validate` function. */
-type InferValidationType<V extends Validation | null> =
+type InferValidationType<V extends Validation> =
   V extends () => ObjectValidator ? Record<string, any> :
   V extends ObjectValidator ? Record<string, any> :
   V extends () => Validator<infer T> ? T :
@@ -133,7 +133,7 @@ export function string(constraints?: StringConstraints): Validator<string> {
  * ========================================================================== */
 
 /** Constraints to validate an `Array` with. */
-interface ArrayConstraints<V extends Validation | null> {
+interface ArrayConstraints<V extends Validation> {
   /** The _maximum_ number of elements a valid `Array`: `value.length <= maxItems` */
   maxItems?: number,
   /** The _minimum_ number of elements a valid `Array`: `value.length >= minItems` */
@@ -157,17 +157,17 @@ export function array(): Validator<any[]>
  * @param validation - A `Validator` (or generator thereof) validating each
  *                     of the _items_ in the `Array`
  */
-export function array<V extends Validation | null>(validation: V): Validator<InferValidationType<V>[]>
+export function array<V extends Validation>(validation: V): Validator<InferValidationType<V>[]>
 
 /**
  * A function returning a `Validator` for an `Array`.
  *
  * @param constraints - Optional constraints to validate the `Array` with.
  */
-export function array<V extends Validation | null>(constraints: ArrayConstraints<V>): Validator<InferValidationType<V>[]>
+export function array<V extends Validation>(constraints: ArrayConstraints<V>): Validator<InferValidationType<V>[]>
 
 // Overloaded `array(...)` function
-export function array(options?: Validation | ArrayConstraints<Validation | null> | null): Validator<any[]> {
+export function array(options?: Validation | ArrayConstraints<Validation>): Validator<any[]> {
   // Extract `items` and the rest of the constraints from options
   const { items, ...constraints } =
     // Specifically "null" means validate Array<null>
@@ -197,7 +197,7 @@ const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties
 
 interface Schema {
-  [ key: string ] : Validation | Modifier | null
+  [ key: string ] : Validation | Modifier
   [ allowAdditionalProperties ]?: Validator | boolean
 }
 
@@ -230,11 +230,11 @@ export function object<S extends Schema>(schema?: S): SchemaValidator<InferSchem
 type InferValidators<S extends Schema> = {
   [ key in keyof S as
       key extends string ?
-        S[key] extends Validation | null ? key :
+        S[key] extends Validation ? key :
         never :
       never
   ] :
-    S[key] extends Validation | null ? InferValidationType<S[key]> : never
+    S[key] extends Validation ? InferValidationType<S[key]> : never
 }
 
 type InferReadonlyModifiers<S extends Schema> = {
@@ -293,9 +293,9 @@ interface AdditionalProperties<V extends Validator | boolean> {
 export function additionalProperties(): AdditionalProperties<true>
 export function additionalProperties(allow: true): AdditionalProperties<true>
 export function additionalProperties(allow: false): AdditionalProperties<false>
-export function additionalProperties(allow: null): AdditionalProperties<Validator<null>>
+// export function additionalProperties(allow: null): AdditionalProperties<Validator<null>>
 export function additionalProperties<V extends Validation>(validation: V): AdditionalProperties<Validator<InferValidationType<V>>>
-export function additionalProperties(allow?: null | boolean | Validation): AdditionalProperties<Validator | boolean> {
+export function additionalProperties(allow?: Validation | boolean): AdditionalProperties<Validator | boolean> {
   return { [allowAdditionalProperties]:
     typeof allow === 'function' ? allow() :
     allow === null ? nullValidator :
@@ -340,7 +340,7 @@ type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
   never
 
 export function readonly(): ReadonlyModifier<any>
-export function readonly<V extends Validation | null>(validation: V): ReadonlyModifier<Validator<InferValidationType<V>>>
+export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidationType<V>>>
 export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
 
 export function readonly(modifier?: Modifier<any> | Validation): any {
@@ -349,7 +349,7 @@ export function readonly(modifier?: Modifier<any> | Validation): any {
 }
 
 export function optional(): OptionalModifier<any>
-export function optional<V extends Validation | null>(validation: V): OptionalModifier<Validator<InferValidationType<V>>>
+export function optional<V extends Validation>(validation: V): OptionalModifier<Validator<InferValidationType<V>>>
 export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
 
 export function optional(modifier?: Modifier<any> | Validation): any {
