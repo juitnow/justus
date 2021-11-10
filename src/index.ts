@@ -1,6 +1,8 @@
 /**
  * The `Validator` interface defines an object capable of validating a given
  * _value_ and (possibly) converting it the required `Type`.
+ *
+ * @public
  */
 export interface Validator<T = any> {
   /**
@@ -12,23 +14,20 @@ export interface Validator<T = any> {
   validate: (value: any) => T,
 }
 
-/** Extract the `Type` returned by a `Validator`'s own `validate` function. */
-type ValidatorType<V extends Validator> =
-  V extends Validator<infer T> ? T : never
+/** The `Validation` type defines a `Validator` or a function creating one. */
+type Validation<V extends Validator = Validator> = V | (() => V)
+
+/** Infer the type returned by a `Validator`'s own `validate` function. */
+type InferValidationType<V extends Validation | null> =
+  V extends () => ObjectValidator ? Record<string, any> :
+  V extends ObjectValidator ? Record<string, any> :
+  V extends () => Validator<infer T> ? T :
+  V extends Validator<infer T> ? T :
+  null
 
 /* ========================================================================== *
- * BASIC VALIDATION (NULL, ANY, BOOLEAN, STRING, NUMBER)                      *
+ * BASIC VALIDATION (ANY, NULL)                                               *
  * ========================================================================== */
-
-/** The utility `Validator` for the `null` type. */
-const nullValidator: Validator<null> = {
-  validate(value: any): null {
-    if (value === null) return null
-    throw new TypeError('Not "null"')
-  },
-}
-
-/* ========================================================================== */
 
 /** The utility `Validator` for `any` type. */
 const anyValidator: Validator = {
@@ -44,6 +43,18 @@ export function any(): Validator {
 
 /* ========================================================================== */
 
+/** The utility `Validator` for the `null` type. */
+const nullValidator: Validator<null> = {
+  validate(value: any): null {
+    if (value === null) return null
+    throw new TypeError('Not "null"')
+  },
+}
+
+/* ========================================================================== *
+ * PRIMITIVE VALIDATION (BOOLEAN, NUMBER, STRING)                             *
+ * ========================================================================== */
+
 /** The utility `Validator` for the `boolean` type. */
 const booleanValidator: Validator<boolean> = {
   validate: (value: any): boolean => {
@@ -53,8 +64,42 @@ const booleanValidator: Validator<boolean> = {
 }
 
 /** A function returning a `Validator` for the `boolean` type. */
+export function boolean(): Validator<boolean>
+export function boolean<B extends boolean>(): Validator<B>
 export function boolean(): Validator<boolean> {
   return booleanValidator
+}
+
+/* ========================================================================== */
+
+/**
+ * Constraints to validate a `number` with.
+ * @internal
+ */
+interface NumberConstraints {
+  /** The value for which a `number` must be multiple of for it to be valid */
+  multipleOf?: number,
+  /** The _inclusive_ maximum value for a valid `number`: `value <= maximum` */
+  maximum?: number,
+  /** The _inclusive_ minimum value for a valid `number`: `value >= minimum` */
+  minimum?: number,
+  /** The _exclusive_ maximum value for a valid `number`: `value < exclusiveMaximum` */
+  exclusiveMaximum?: number,
+  /** The _exclusive_ minimum value for a valid `number`: `value > exclusiveMaximum` */
+  exclusiveMinumum?: number,
+}
+
+/**
+ * A function returning a `Validator` for the `number` type.
+ *
+ * @param constraints - Optional constraints to validate the `number` with.
+ */
+export function number(constraints?: NumberConstraints): Validator<number>
+export function number<N extends number>(constraints?: NumberConstraints): Validator<N>
+export function number(constraints?: NumberConstraints): Validator<number> {
+  // TODO: implement me!
+  void constraints
+  return <any> null
 }
 
 /* ========================================================================== */
@@ -74,49 +119,12 @@ interface StringConstraints {
  *
  * @param constraints - Optional constraints to validate the `string` with.
  */
-export function string<S extends string>(constraints?: StringConstraints): Validator<S> {
+export function string(constraints?: StringConstraints): Validator<string>
+export function string<S extends string>(constraints?: StringConstraints): Validator<S>
+export function string(constraints?: StringConstraints): Validator<string> {
   // TODO: implement me!
   void constraints
-
-  return {
-    validate: (value: any): S => {
-      if (typeof value === 'string') return <S> value
-      throw new TypeError('Not a "string"')
-    },
-  }
-}
-
-/* ========================================================================== */
-
-/** Constraints to validate a `number` with. */
-interface NumberConstraints {
-  /** The value for which a `number` must be multiple of for it to be valid */
-  multipleOf?: number,
-  /** The _inclusive_ maximum value for a valid `number`: `value <= maximum` */
-  maximum?: number,
-  /** The _inclusive_ minimum value for a valid `number`: `value >= minimum` */
-  minimum?: number,
-  /** The _exclusive_ maximum value for a valid `number`: `value < exclusiveMaximum` */
-  exclusiveMaximum?: number,
-  /** The _exclusive_ minimum value for a valid `number`: `value > exclusiveMaximum` */
-  exclusiveMinumum?: number,
-}
-
-/**
- * A function returning a `Validator` for the `number` type.
- *
- * @param constraints - Optional constraints to validate the `number` with.
- */
-export function number(constraints?: NumberConstraints): Validator<number> {
-  // TODO: implement me!
-  void constraints
-
-  return {
-    validate: (value: any): number => {
-      if (typeof value === 'number') return value
-      throw new TypeError('Not a "number"')
-    },
-  }
+  return <any> null
 }
 
 /* ========================================================================== *
@@ -124,7 +132,7 @@ export function number(constraints?: NumberConstraints): Validator<number> {
  * ========================================================================== */
 
 /** Constraints to validate an `Array` with. */
-interface ArrayConstraints<V extends Validator> {
+interface ArrayConstraints<V extends Validation | null> {
   /** The _maximum_ number of elements a valid `Array`: `value.length <= maxItems` */
   maxItems?: number,
   /** The _minimum_ number of elements a valid `Array`: `value.length >= minItems` */
@@ -132,7 +140,7 @@ interface ArrayConstraints<V extends Validator> {
   /** A flag indicating whether an `Array`'s elements must be unique */
   uniqueItems?: boolean,
   /** A `Validator` validating each individual item in an `Array` */
-  items?: V | (() => V) | null,
+  items?: V,
 }
 
 /* -------------------------------------------------------------------------- */
@@ -143,33 +151,22 @@ interface ArrayConstraints<V extends Validator> {
 export function array(): Validator<any[]>
 
 /**
- * A function returning a `Validator` for an `Array` containing only `null`s.
- */
-export function array(validator: null): Validator<null[]>
-
-/**
  * A function returning a `Validator` for an `Array`.
  *
- * @param validator - A `Validator` validating each of the _items_ in the `Array`
+ * @param validation - A `Validator` (or generator thereof) validating each
+ *                     of the _items_ in the `Array`
  */
-export function array<V extends Validator>(validator: V): Validator<ValidatorType<V>[]>
-
-/**
- * A function returning a `Validator` for an `Array`.
- *
- * @param validator - A function returning a `Validator` validating each of the _items_ in the `Array`
- */
-export function array<V extends Validator>(validator: () => V): Validator<ValidatorType<V>[]>
+export function array<V extends Validation | null>(validation: V): Validator<InferValidationType<V>[]>
 
 /**
  * A function returning a `Validator` for an `Array`.
  *
  * @param constraints - Optional constraints to validate the `Array` with.
  */
-export function array<V extends Validator>(constraints: ArrayConstraints<V>): Validator<ValidatorType<V>[]>
+export function array<V extends Validation | null>(constraints: ArrayConstraints<V>): Validator<InferValidationType<V>[]>
 
 // Overloaded `array(...)` function
-export function array<V extends Validator>(options?: V | (() => V) | ArrayConstraints<V> | null): Validator<any[]> {
+export function array(options?: Validation | ArrayConstraints<Validation | null> | null): Validator<any[]> {
   // Extract `items` and the rest of the constraints from options
   const { items, ...constraints } =
     // Specifically "null" means validate Array<null>
@@ -180,56 +177,35 @@ export function array<V extends Validator>(options?: V | (() => V) | ArrayConstr
     typeof options === 'function' ? { items: options() } :
     // If options has a `validate` key, then it's a `Validator`
     'validate' in options ? { items: options } :
-    // If options has a `items` key, then it's an `ArrayOptions`
-    'items' in options ? options :
-    // We should never get here with proper types, but...
-    { items: undefined }
+    // Anything else should be an "constraints" instance
+    options
 
   // Our `items` above can be a `Validator` or a function creating one
   const validator = typeof items === 'function' ? items() : items
   void validator, constraints
 
-  return {
-    validate: (value: any): ValidatorType<V>[] => {
-      // TODO: implement me!
-      void value
-      return <any> null
-    },
-  }
+  // TODO: implement me!
+  return <any> null
 }
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
 
-/**
- * A unique symbol used as a key in our `Schema` whose associated value
- * indicates how extra properties are handled.
- */
-const extraProperties = Symbol('extraProperties')
- /** The type ouf our `extraProperties` symbol */
- type extraProperties = typeof extraProperties
+const allowAdditionalProperties = Symbol('additionalProperties')
+type allowAdditionalProperties = typeof allowAdditionalProperties
 
- /** The `Schema` interface describes how an `Object` is validated. */
- interface Schema {
-   /** Each key (a `string`) defines its own validation method */
-   [ key: string ] :
-     Validator | (() => Validator) | // validator for the key
-     Optional | (() => Optional) | // declare key as optional with validator
-     readonly any[] | // an enum of const values
-     null // the "null" type
-
-   /** Instruct the validator how to treat extra properties (default: `forbid`) */
-   [ extraProperties ]? : 'allow' | 'forbid' | 'ignore'
+interface Schema {
+  [ key: string ] : Validation | null
+  [ allowAdditionalProperties ]?: Validator | boolean
 }
 
-/** The `SchemaValidator` defines a `Validator` associated with a `Schema`. */
-interface SchemaValidator<T, S extends Schema | undefined> extends Validator<T> {
-   schema: S
+interface SchemaValidator<T, S extends Schema> extends Validator<T> {
+  schema: S
 }
 
-interface NoSchemaValidator extends SchemaValidator<any, {}> {
-  [ extraProperties ]? : 'allow'
+interface ObjectValidator extends SchemaValidator<Record<string, any>, {}> {
+  [ allowAdditionalProperties ]: true
 }
 
 /* -------------------------------------------------------------------------- *
@@ -239,85 +215,30 @@ interface NoSchemaValidator extends SchemaValidator<any, {}> {
 /** Infer the type of keys associated with `Validator`s */
 type InferValidators<S extends Schema> = {
   [ key in keyof S as
-    S[key] extends () => NoSchemaValidator ? key :
-    S[key] extends () => Validator ? key :
-    S[key] extends Validator ? key :
-    never
+      key extends string ?
+        S[key] extends Validation | null ? key :
+        never :
+      never
   ] :
-  S[key] extends () => NoSchemaValidator ? Record<string, any> :
-  S[key] extends () => Validator<infer T> ? T :
-  S[key] extends Validator<infer T> ? T :
-  never
+    S[key] extends () => ObjectValidator ? Record<string, any> :
+    S[key] extends ObjectValidator ? Record<string, any> :
+    S[key] extends Validation | null ? InferValidationType<S[key]> : never
 }
 
-/** Infer the type of (optional) keys associated `Optional`s */
-type InferOptionals<S extends Schema> = {
-  [ key in keyof S as
-    S[key] extends () => Optional ? key :
-    S[key] extends Optional ? key :
-    never
-  ] ? :
-  S[key] extends () => Optional<infer V> ? ValidatorType<V> :
-  S[key] extends Optional<infer V> ? ValidatorType<V> :
-  never
-}
-
-/** Infer the type of keys associated `null`s */
-type ExtractNulls<S extends Schema> = {
-  [ key in keyof S as S[key] extends null ? key : never ] : null
-}
-
-/** Infer the type of `Array` members (remark: enum types) */
-type InferEnumMemberType<T> =
-  T extends (() => Validator<infer T1>) ? T1 :
-  T extends Validator<infer T2> ? T2 :
-  T
-
-/** Combine the types of `Array` members (remark: combine enum types) */
-type InferEnumType<E> =
-  E extends readonly [ infer T, ...infer M ] ? InferEnumMemberType<T> | InferEnumType<M> :
-  E extends Array<infer T> ? InferEnumMemberType<T> :
-  never
-
-/** Infer the type of keys associated `Array`s (remark: enumerations) */
-type InferEnums<S extends Schema> = {
-  [ key in keyof S as
-    S[key] extends readonly any[] ? key :
-    never
-  ] : InferEnumType<S[key]>
-}
-
-/** Infer whether the `Schema` allows extra properties to be returned */
-type InferAllowExtraProperties<S extends Schema> =
-  S[extraProperties] extends 'allow' ? Record<string, any> : {}
+type InferAdditionaProperties<S extends Schema> =
+  S extends { [ allowAdditionalProperties ]: Validator<infer V> } ? Record<string, V> :
+  S extends { [ allowAdditionalProperties ]: true } ? Record<string, any> :
+  {}
 
 /** Infer the type validated by a `Schema` */
-type InferSchema<S> =
-  S extends Schema ?
-    InferAllowExtraProperties<S> &
-    InferOptionals<S> &
-    InferValidators<S> &
-    ExtractNulls<S> &
-    InferEnums<S> :
-  S extends undefined ?
-    any :
-  never
+type InferSchema<S extends Schema> =
+  InferValidators<S> &
+  InferAdditionaProperties<S>
 
-/* -------------------------------------------------------------------------- */
+// /* -------------------------------------------------------------------------- */
 
-/**
-  * A function returning a `Validator` for an `Object` not conforming to any `Schema`.
-  */
-export function object(): NoSchemaValidator // <any, undefined>
-
-/**
-  * A function returning a `Validator` for an `Object` conforming to a `Schema`.
-  *
-  * @param schema A `Schema` defining the keys to be validated in the `Object`
-  */
-export function object<S extends Schema | undefined>(schema: S): SchemaValidator<InferSchema<S>, S>
-
-// Overloaded `object(...)` function
+export function object(): ObjectValidator // <any, undefined>
+export function object<S extends Schema>(schema: S): SchemaValidator<InferSchema<S>, S>
 export function object<S extends Schema>(schema?: S): SchemaValidator<InferSchema<S>, S> {
   return {
     schema: <S> schema,
@@ -331,102 +252,121 @@ export function object<S extends Schema>(schema?: S): SchemaValidator<InferSchem
  * Schema additions for extra properties                                      *
  * -------------------------------------------------------------------------- */
 
-/**
- * A schema addition allowing extra properties in an `Object`.
- *
- * Any extra key found in the object will be allowed and its value will be
- * returned unmodified and typed with `any`.
- */
-export const allowExtraProperties = { [extraProperties]: 'allow' } as const
-
-/**
- * A schema addition forbidding extra properties in an `Object` (default).
- *
- * Any extra key found in the object will be forbidden and will trigger a
- * validation error.
- */
-export const forbidExtraProperties = { [extraProperties]: 'forbid' } as const
-
-/**
- * A schema addition ignoring extra properties in an `Object`.
- *
- * Any extra key found in the object will be ignored and its value stripped
- * from the resulting object.
- */
-export const ignoreExtraProperties = { [extraProperties]: 'ignore' } as const
-
-/* -------------------------------------------------------------------------- *
- * Optional Keys for Objects                                                  *
- * -------------------------------------------------------------------------- */
-
-/** The `Optional` interface marks an _optional_ key in a `Schema`. */
-interface Optional<V extends Validator = Validator> {
-  optional: V,
+interface AdditionalProperties<V extends Validator | boolean> {
+  [ allowAdditionalProperties ]: V
 }
 
-/**
- * A function returning an `Optional` validating `any` type.
- */
-export function optional(): Optional
-
-/**
- * A function returning an `Optional` validating the `null` type.
- */
-export function optional(validator: null): Optional<Validator<null>>
-
-/**
- * A function returning an `Optional` using the specified `Validator`.
- */
-export function optional<V extends Validator>(validator: V): Optional<V>
-
-/**
- * A function returning an `Optional` using the `Validator` returned by the
- * specified function.
- */
-export function optional<V extends Validator>(validator: () => V): Optional<V>
-
-// Overloaded `optional(...)` function
-export function optional<V extends Validator>(options?: V | (() => V) | null): Optional<V | Validator | Validator<null>> {
-  const optional =
-    options === null ? nullValidator :
-    options === undefined ? anyValidator :
-    typeof options === 'function' ? options() :
-    'validate' in options ? options :
-    undefined
-
-  if (! optional) throw new TypeError('Wrong optional validation validator')
-
-  return { optional }
-}
-
-/* ========================================================================== *
- * EXTRA VALIDATORS                                                           *
- * ========================================================================== */
-
-/** Constraints to validate a `Date` with. */
-interface DateConstraints {
-  /** The minimum value for a valid `Date`: `value.getTime() >= new Date(from).getTime()` */
-  from?: number | Date | string,
-  /** The maximum value for a valid `Date`: `value.getTime() <= new Date(until).getTime()` */
-  until?: number | Date | string,
-}
-
-export function date(constraints?: DateConstraints): Validator<Date> {
-  // TODO: implement me!
-  void constraints
-  return <any> null
+export function additionalProperties(): AdditionalProperties<true>
+export function additionalProperties(allow: true): AdditionalProperties<true>
+export function additionalProperties(allow: false): AdditionalProperties<false>
+export function additionalProperties(allow: null): AdditionalProperties<Validator<null>>
+export function additionalProperties<V extends Validation>(validation: V): AdditionalProperties<Validator<InferValidationType<V>>>
+export function additionalProperties(allow?: null | boolean | Validation): AdditionalProperties<Validator | boolean> {
+  return { [allowAdditionalProperties]:
+    typeof allow === 'function' ? allow() :
+    allow === null ? nullValidator :
+    allow === undefined ? true :
+    allow,
+  }
 }
 
 
-const o = object({
-  testO: object,
-  testOO: optional(object),
-  testN: number,
-  testA: any,
-})
+// /**
+//  * A schema addition allowing extra properties in an `Object`.
+//  *
+//  * Any extra key found in the object will be allowed and its value will be
+//  * returned unmodified and typed with `any`.
+//  */
+// export const allowExtraProperties = { [extraProperties]: 'allow' } as const
 
-const p = o.validate(null)
-p.testO.fxxx
-p.testOO
-p.testN
-p.testA
+// /**
+//  * A schema addition forbidding extra properties in an `Object` (default).
+//  *
+//  * Any extra key found in the object will be forbidden and will trigger a
+//  * validation error.
+//  */
+// export const forbidExtraProperties = { [extraProperties]: 'forbid' } as const
+
+// /**
+//  * A schema addition ignoring extra properties in an `Object`.
+//  *
+//  * Any extra key found in the object will be ignored and its value stripped
+//  * from the resulting object.
+//  */
+// export const ignoreExtraProperties = { [extraProperties]: 'ignore' } as const
+
+// /* -------------------------------------------------------------------------- *
+//  * Optional Keys for Objects                                                  *
+//  * -------------------------------------------------------------------------- */
+
+// /** The `Optional` interface marks an _optional_ key in a `Schema`. */
+// interface Optional<V extends Validator = Validator> {
+//   optional: V,
+// }
+
+// /**
+//  * A function returning an `Optional` validating `any` type.
+//  */
+// export function optional(): Optional
+
+// /**
+//  * A function returning an `Optional` validating the `null` type.
+//  */
+// export function optional(validator: null): Optional<Validator<null>>
+
+// /**
+//  * A function returning an `Optional` using the specified `Validator`.
+//  */
+// export function optional<V extends Validator>(validator: V): Optional<V>
+
+// /**
+//  * A function returning an `Optional` using the `Validator` returned by the
+//  * specified function.
+//  */
+// export function optional<V extends Validator>(validator: () => V): Optional<V>
+
+// // Overloaded `optional(...)` function
+// export function optional<V extends Validator>(options?: V | (() => V) | null): Optional<V | Validator | Validator<null>> {
+//   const optional =
+//     options === null ? nullValidator :
+//     options === undefined ? anyValidator :
+//     typeof options === 'function' ? options() :
+//     'validate' in options ? options :
+//     undefined
+
+//   if (! optional) throw new TypeError('Wrong optional validation validator')
+
+//   return { optional }
+// }
+
+// /* ========================================================================== *
+//  * EXTRA VALIDATORS                                                           *
+//  * ========================================================================== */
+
+// /** Constraints to validate a `Date` with. */
+// interface DateConstraints {
+//   /** The minimum value for a valid `Date`: `value.getTime() >= new Date(from).getTime()` */
+//   from?: number | Date | string,
+//   /** The maximum value for a valid `Date`: `value.getTime() <= new Date(until).getTime()` */
+//   until?: number | Date | string,
+// }
+
+// export function date(constraints?: DateConstraints): Validator<Date> {
+//   // TODO: implement me!
+//   void constraints
+//   return <any> null
+// }
+
+
+// const o = object({
+//   testO: object,
+//   testOO: optional(object),
+//   testN: number,
+//   testA: any,
+// })
+
+// const p = o.validate(null)
+// p.testO.fxxx
+// p.testOO
+// p.testN
+// p.testA
