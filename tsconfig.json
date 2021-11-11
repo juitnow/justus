@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": [ "es2020" ],
+    "removeComments": false,
+    "noImplicitAny": true,
+    "outDir": "./build",
+    "rootDir": ".",
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "allowJs": false
+  },
+  "include": [ "src", "test" ],
+  "exclude": []
+}

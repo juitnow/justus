@@ -1,4 +1,6 @@
-<p align="center"><img src="LOGO.svg" alt="logo"></p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/juitnow/justus/main/LOGO.svg" alt="logo">
+</p>
 
 JUSTUS
 ======

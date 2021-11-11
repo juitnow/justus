@@ -1,0 +1,9 @@
+
+*.bak
+*.svg
+*.tgz
+.*
+api-extractor.json
+build/
+node_modules/
+test/
