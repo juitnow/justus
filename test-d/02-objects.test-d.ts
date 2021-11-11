@@ -1,4 +1,4 @@
-import { expectAssignable, expectError, expectType, printType } from 'tsd'
+import { expectAssignable, expectType, printType } from 'tsd'
 import {
   any,
   array,
@@ -44,8 +44,6 @@ expectAssignable<{
   o: Record<string, any>,
 }>(o1)
 
-expectError(o1.extra)
-
 // -------------------------------------------------------------------------- //
 // constructed validators
 const o2 = validate(object({
@@ -66,8 +64,6 @@ expectAssignable<{
   a: boolean[],
   o: { x : boolean },
 }>(o2)
-
-expectError(o2.extra)
 
 // -------------------------------------------------------------------------- //
 // constants
@@ -94,10 +90,8 @@ expectAssignable<{
   s: 'xyz',
 }>(o3)
 
-expectError(o3.extra)
-
 // -------------------------------------------------------------------------- //
-// simple constants (here need for "as const" on numbers and strings)
+// simple constants (here we need "as const" on numbers and strings)
 
 const o4 = validate(object({
   z: null,
@@ -121,8 +115,6 @@ expectAssignable<{
   s: 'xyz',
 }>(o4)
 
-expectError(o4.extra)
-
 // -------------------------------------------------------------------------- //
 // "branded" primitives
 
@@ -138,5 +130,3 @@ expectAssignable<{
   n: BrandedNumber,
   s: BrandedString,
 }>(o5)
-
-expectError(o5.extra)
