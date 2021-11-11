@@ -13,7 +13,7 @@ export interface Validator<T = any> {
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
-type Validation<V extends Validator = Validator> = V | (() => V) | boolean | null
+type Validation<V extends Validator = Validator> = V | (() => V) | boolean | string | number | null
 
 /** Infer the type returned by a `Validator`'s own `validate` function. */
 type InferValidationType<V extends Validation> =
@@ -192,7 +192,7 @@ const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties
 
 interface Schema {
-  [ key: string ] : Validation | Modifier
+  [ key: string ] : Validation | Modifier | string
   [ allowAdditionalProperties ]?: Validator | boolean
 }
 
@@ -229,10 +229,8 @@ type InferValidators<S extends Schema> = {
         never :
       never
   ] :
-  S[key] extends string ? S[key] :
-  // S[key] extends Validation ? InferValidationType<S[key]> : never
-  S[key] extends Validation ? InferValidationType<S[key]> :
-  never
+    S[key] extends Validation ? InferValidationType<S[key]> :
+    never
 }
 
 /** Infer the type validated by a `Schema` */
