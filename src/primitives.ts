@@ -1,6 +1,26 @@
 import type { Validator } from './basics'
 
 /* ========================================================================== *
+ * BASIC VALIDATION (ANY, BOOLEANS)                                           *
+ * ========================================================================== */
+
+/** The utility `Validator` for `any` type. */
+export const any: Validator<any> = {
+  validate(value: any): any {
+    return value
+  },
+}
+
+/** The utility `Validator` for the `boolean` type. */
+export const boolean: Validator<boolean> = {
+  validate: (value: any): boolean => {
+    if (typeof value === 'boolean') return value
+    throw new TypeError('Not a "boolean"')
+  },
+}
+
+
+/* ========================================================================== *
  * BRANDED NUMBERS VALIDATION                                                 *
  * ========================================================================== */
 
@@ -59,4 +79,19 @@ export function string(constraints?: StringConstraints): Validator<string> {
   // TODO: implement me!
   void constraints
   return <any> null
+}
+
+
+/* ========================================================================== *
+ * CONSTANTS VALIDATION                                                       *
+ * ========================================================================== */
+
+/** Create a `Validator` validating the specified constant */
+export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
+  return {
+    validate: (value: any): T => {
+      if (constant === value) return value
+      throw new TypeError('Not a "boolean"')
+    },
+  }
 }

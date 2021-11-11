@@ -1,9 +1,12 @@
-import type { InferValidationType, Validation, Validator } from './basics'
+import type {
+  InferValidationType,
+  Validation,
+  Validator,
+} from './basics'
 
 /* ========================================================================== *
  * CONSTANTS AND UNIONS VALIDATION                                            *
  * ========================================================================== */
-
 
 type CompoundType = Validation | string | number
 

@@ -1,5 +1,10 @@
-import type { InferValidationType, Validation, Validator } from './basics'
-import { validator } from './basics'
+import type {
+  InferValidationType,
+  Validation,
+  Validator,
+} from './basics'
+
+import { getValidator } from './basics'
 
 const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties
@@ -37,7 +42,7 @@ export function additionalProperties(options?: Validation | boolean): Additional
   const allow =
     typeof options === 'boolean' ? options :
     options === undefined ? true :
-    validator(options)
+    getValidator(options)
 
   return { [allowAdditionalProperties]: allow }
 }

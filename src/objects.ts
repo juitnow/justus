@@ -1,4 +1,9 @@
-import type { ObjectValidator, SchemaValidator, Schema, InferSchema } from './schemas'
+import type {
+  InferSchema,
+  ObjectValidator,
+  Schema,
+  SchemaValidator,
+} from './schemas'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *

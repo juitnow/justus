@@ -1,5 +1,15 @@
-import { Validation, Validator, InferValidationType, validator } from './basics'
-import { isFunction, isPrimitive, isValidator } from './utils'
+import type {
+  InferValidationType,
+  Validation,
+  Validator,
+} from './basics'
+
+import {
+  getValidator,
+  isFunction,
+  isPrimitive,
+  isValidator,
+} from './basics'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -43,10 +53,10 @@ export function array<V extends Validation>(constraints: ArrayConstraints<V>): V
 
 export function array(options: Validation | ArrayConstraints<Validation> = {}): Validator<any[]> {
   const { items, ...constraints } =
-    isFunction(options) ? { items: validator(options) } :
-    isPrimitive(options) ? { items: validator(options) } :
-    isValidator(options) ? { items: validator(options) } :
-    { ...options, items: validator(options.items) }
+    isFunction(options) ? { items: getValidator(options) } :
+    isPrimitive(options) ? { items: getValidator(options) } :
+    isValidator(options) ? { items: getValidator(options) } :
+    { ...options, items: getValidator(options.items) }
 
   void items, constraints
 
