@@ -1,6 +1,6 @@
 {
   "name": "justus",
-  "version": "0.0.0",
+  "version": "0.0.0-alpha.0",
   "description": "A JavaScript validation library, with types!",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
