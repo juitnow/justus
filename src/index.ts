@@ -21,23 +21,20 @@ type InferValidationType<V extends Validation> =
   V extends ObjectValidator ? Record<string, any> :
   V extends () => Validator<infer T> ? T :
   V extends Validator<infer T> ? T :
-  V extends false ? false :
-  V extends true ? true :
-  V extends null ? null :
-  never
+  V // boolean, number, string or null constants
 
 /** Return the `Validator` for the given `Validation`. */
-function validator(validation: Validation): Validator {
-  if (typeof validation === 'function') validation = validation()
+// function validator(validation: Validation): Validator {
+//   if (typeof validation === 'function') validation = validation()
 
-  if (validation === null) return nullValidator
-  if (validation === true) return trueValidator
-  if (validation === false) return falseValidator
+//   if (validation === null) return nullValidator
+//   if (validation === true) return trueValidator
+//   if (validation === false) return falseValidator
 
-  if (validation && (typeof validation.validate === 'function')) return validation
+//   if (validation && (typeof validation.validate === 'function')) return validation
 
-  throw new TypeError('Invalid validation (no validator???)')
-}
+//   throw new TypeError('Invalid validation (no validator???)')
+// }
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, NULL, BOOLEANS)                                     *
@@ -68,20 +65,19 @@ const nullValidator: Validator<null> = {
   },
 }
 
-const trueValidator: Validator<true> = {
-  validate(value: any): true {
-    if (value === true) return true
-    throw new TypeError('Not "true"')
-  },
-}
+// const trueValidator: Validator<true> = {
+//   validate(value: any): true {
+//     if (value === true) return true
+//     throw new TypeError('Not "true"')
+//   },
+// }
 
-const falseValidator: Validator<false> = {
-  validate(value: any): false {
-    if (value === false) return false
-    throw new TypeError('Not "false"')
-  },
-}
-
+// const falseValidator: Validator<false> = {
+//   validate(value: any): false {
+//     if (value === false) return false
+//     throw new TypeError('Not "false"')
+//   },
+// }
 
 /* ========================================================================== *
  * BRANDED PRIMITIVE VALIDATION (NUMBER, STRING)                              *
@@ -233,7 +229,10 @@ type InferValidators<S extends Schema> = {
         never :
       never
   ] :
-    S[key] extends Validation ? InferValidationType<S[key]> : never
+  S[key] extends string ? S[key] :
+  // S[key] extends Validation ? InferValidationType<S[key]> : never
+  S[key] extends Validation ? InferValidationType<S[key]> :
+  never
 }
 
 /** Infer the type validated by a `Schema` */
@@ -363,5 +362,121 @@ export function optional<M extends Modifier>(modifier: M): CombineModifiers<Opti
 
 export function optional(modifier?: Modifier<any> | Validation): any {
   void modifier
+  return <any> null
+}
+
+/* ========================================================================== *
+ * CONSTANTS AND UNIONS VALIDATION                                            *
+ * ========================================================================== */
+
+export function constant<T extends string | number | boolean | null>(value: T): Validator<T> {
+  // TODO
+  void value
+  return <any> null
+}
+
+type CompoundType = Validation | string | number
+
+type InferCompoundValidator<T extends CompoundType> =
+  T extends Validation ? Validator<InferValidationType<T>> :
+  T extends string ? Validator<T> :
+  T extends number ? Validator<T> :
+  never
+
+/* -------------------------------------------------------------------------- */
+
+export function oneOf<
+  A extends CompoundType,
+>(a: A): InferCompoundValidator<A>
+
+export function oneOf<
+  A extends CompoundType,
+  B extends CompoundType,
+>(a: A, b: B): InferCompoundValidator<A | B>
+
+export function oneOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+>(a: A, b: B, c: C): InferCompoundValidator<A | B | C>
+
+export function oneOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+  D extends CompoundType,
+>(a: A, b: B, c: C, d: D): InferCompoundValidator<A | B | C | D>
+
+export function oneOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+  D extends CompoundType,
+  E extends CompoundType,
+>(a: A, b: B, c: C, d: D, e: E): InferCompoundValidator<A | B | C | D | E>
+
+export function oneOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+  D extends CompoundType,
+  E extends CompoundType,
+  F extends CompoundType,
+>(a: A, b: B, c: C, d: D, e: E, f: F): InferCompoundValidator<A | B | C | D | E | F>
+
+export function oneOf<A extends readonly any[]>(...args: A): Validator<A> // TODO infer [A,B] => A|B
+
+export function oneOf(...args: any[]): Validator {
+  // TODO
+  void args
+  return <any> null
+}
+
+/* -------------------------------------------------------------------------- */
+
+export function allOf<
+  A extends CompoundType,
+>(a: A): InferCompoundValidator<A>
+
+export function allOf<
+  A extends CompoundType,
+  B extends CompoundType,
+>(a: A, b: B): InferCompoundValidator<A & B>
+
+export function allOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+>(a: A, b: B, c: C): InferCompoundValidator<A & B & C>
+
+export function allOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+  D extends CompoundType,
+>(a: A, b: B, c: C, d: D): InferCompoundValidator<A & B & C & D>
+
+export function allOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+  D extends CompoundType,
+  E extends CompoundType,
+>(a: A, b: B, c: C, d: D, e: E): InferCompoundValidator<A & B & C & D & E>
+
+export function allOf<
+  A extends CompoundType,
+  B extends CompoundType,
+  C extends CompoundType,
+  D extends CompoundType,
+  E extends CompoundType,
+  F extends CompoundType,
+>(a: A, b: B, c: C, d: D, e: E, f: F): InferCompoundValidator<A & B & C & D & E & F>
+
+export function allOf<A extends readonly any[]>(...args: A): Validator<A> // TODO infer [A,B] => A&B
+
+export function allOf(...args: any[]): Validator {
+  // TODO
+  void args
   return <any> null
 }
