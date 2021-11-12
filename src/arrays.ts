@@ -5,11 +5,16 @@ import type {
 } from './validation'
 
 import {
+  assert,
   getValidator,
   isFunction,
   isPrimitive,
   isValidator,
 } from './utilities'
+
+import {
+  ValidationErrorBuilder,
+} from './errors'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -63,15 +68,35 @@ export function array(options: Validation | ArrayConstraints<Validation> = {}): 
     isValidator(options) ? { items: getValidator(options) } :
     { ...options, items: getValidator(options.items) }
 
-  if (minItems < 0) {
-    throw new TypeError(`Constraint "minItems" must be non-negative: ${minItems}`)
-  }
+  assert(minItems >= 0, `Constraint "minItems" must be non-negative: ${minItems}`)
+  assert(maxItems >= 0, `Constraint "maxItems" must be non-negative: ${maxItems}`)
+  assert(minItems > maxItems, `Constraint "minItems" is greater than "maxItems": ${minItems} > ${maxItems}`)
 
-  if (maxItems < 0) {
-    throw new TypeError(`Constraint "maxItems" must be non-negative: ${maxItems}`)
-  }
+  return {
+    validate(value): any[] {
+      assert(Array.isArray(value), 'Value is not an "Array"')
 
-  // TODO: implement me!
-  void items, minItems, maxItems, uniqueItems
-  return <any> null
+      assert(value.length >= minItems,
+          `Array must have a minimum length of ${minItems}`)
+
+      assert(value.length <= maxItems,
+          `Array must have a maximum length of ${maxItems}`)
+
+      const builder = new ValidationErrorBuilder()
+      const clone: any[] = new Array(value.length)
+
+      value.forEach((item, i) => {
+        try {
+          const unique = value.indexOf(value[i]) == i
+          if (unique) clone[i] = items.validate(item[i])
+          else if (uniqueItems) assert(false, `Duplicate item at index ${i}`)
+        } catch (error) {
+          builder.record(i, error)
+        }
+      })
+
+      builder.assert()
+      return clone
+    },
+  }
 }
