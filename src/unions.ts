@@ -20,10 +20,6 @@ type InferCompoundValidator<T extends CompoundType> =
 
 export function oneOf<
   A extends CompoundType,
->(a: A): InferCompoundValidator<A>
-
-export function oneOf<
-  A extends CompoundType,
   B extends CompoundType,
 >(a: A, b: B): InferCompoundValidator<A | B>
 
@@ -66,10 +62,6 @@ export function oneOf(...args: any[]): Validator {
 }
 
 /* -------------------------------------------------------------------------- */
-
-export function allOf<
-  A extends CompoundType,
->(a: A): InferCompoundValidator<A>
 
 export function allOf<
   A extends CompoundType,
