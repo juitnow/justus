@@ -10,15 +10,18 @@ export class ValidationError extends Error {
   }
 }
 
-
 export class ValidationErrorBuilder {
   readonly errors: ValidationErrors = []
 
   record(key: string | number, error: any): void {
     if (error instanceof ValidationError) {
-      error.errors.forEach(({ key, message }) => {
-        // TODO: combine keys!
-        this.errors.push({ key, message })
+      error.errors.forEach(({ key: subkey, message }) => {
+        const newkey =
+            typeof subkey == 'number' ? `${key}[${subkey}]` :
+            key ? `${key}.${subkey}` :
+            subkey
+
+        this.errors.push({ key: newkey, message })
       })
     } else {
       this.errors.push({ key, message: error.toString() })
