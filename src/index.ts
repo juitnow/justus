@@ -6,7 +6,8 @@ export { object } from './objects'
 export { additionalProperties, readonly, optional, never } from './schemas'
 export { allOf, oneOf } from './unions'
 
-import { getValidator, InferValidationType, Validation } from './validation'
+import { InferValidationType, Validation } from './validation'
+import { getValidator } from './utilities'
 
 export function validate<V extends Validation>(validator: V, value: any): InferValidationType<V> {
   if (getValidator(validator).validate(value, <any> null)) {

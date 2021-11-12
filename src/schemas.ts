@@ -4,7 +4,7 @@ import type {
   Validator,
 } from './validation'
 
-import { getValidator } from './validation'
+import { getValidator } from './utilities'
 
 const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties

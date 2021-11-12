@@ -9,7 +9,7 @@ import {
   isFunction,
   isPrimitive,
   isValidator,
-} from './validation'
+} from './utilities'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
