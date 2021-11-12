@@ -1,10 +1,12 @@
 import { expectError, expectType, printType } from 'tsd'
 import {
-  object,
-  validate,
   additionalProperties,
+  boolean,
   number,
+  never,
+  object,
   string,
+  validate,
 } from '../src/index'
 
 printType(void '04-addprops')
@@ -35,20 +37,55 @@ expectType<number>(validate(object({ ...additionalProperties(number()) }), null)
 expectType<'hello'>(validate(object({ ...additionalProperties('hello') }), null).extra)
 
 // -------------------------------------------------------------------------- //
+// combining schemas
 
-const s1 = object({
+const s0 = object({
   a: number,
   b: number,
+  ...additionalProperties(boolean),
 })
 
-const s2 = object({
-  ...s1.schema,
+const s1 = object({
+  ...s0.schema,
   b: string,
   c: string,
 })
 
-const o = validate(s2, null)
+const o1 = validate(s1, null)
 
-expectType<number>(o.a)
-expectType<string>(o.b)
-expectType<string>(o.c)
+expectType<number>(o1.a)
+expectType<string>(o1.b)
+expectType<string>(o1.c)
+expectType<boolean>(o1.extra)
+
+// -------------------------------------------------------------------------- //
+// never
+
+const s2 = object({
+  a: number,
+  b: never,
+  c: string,
+})
+
+const o2 = validate(s2, null)
+
+expectType<number>(o2.a)
+expectError(o2.b) // does not exist on the returned object
+expectType<string>(o2.c)
+expectError(o2.extra) // no additional properties
+
+// never with "additionalProperties"
+
+const s3 = object({
+  a: number,
+  b: never,
+  c: string,
+  ...additionalProperties(boolean),
+})
+
+const o3 = validate(s3, null)
+
+expectType<number>(o3.a)
+expectType<never>(o3.b) // forcedly removed from the resulting object
+expectType<string>(o3.c)
+expectType<boolean>(o3.extra) // defined in additionalProperties
