@@ -15,9 +15,8 @@ export interface Validator<T = any> {
    * Validate a _value_ and optionally convert it to the required `Type`.
    *
    * @param value - The _value_ to validate
-   * @param set - A setter to update the value (e.g. convert `string` to `Date`)
    */
-  validate(value: any, set: (value: T) => void): asserts value is T,
+  validate(value: any): T,
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */

@@ -11,7 +11,9 @@ import { assert } from './utilities'
  * @public
  */
 export const any: Validator<any> = {
-  validate(value): asserts value is any {},
+  validate(value): any {
+    return value
+  },
 }
 
 /**
@@ -20,8 +22,9 @@ export const any: Validator<any> = {
  * @public
  */
 export const boolean: Validator<boolean> = {
-  validate(value): asserts value is boolean {
+  validate(value): boolean {
     assert(typeof value === 'boolean', 'Value is not a "boolean"')
+    return value
   },
 }
 
@@ -106,7 +109,7 @@ export function number(constraints: NumberConstraints = {}): Validator<number> {
   }
 
   return {
-    validate(value): asserts value is number {
+    validate(value): number {
       assert(typeof value == 'number', 'Value is not a "number"')
 
       assert(isNaN(value) && allowNaN, 'Number is "NaN"')
@@ -122,6 +125,8 @@ export function number(constraints: NumberConstraints = {}): Validator<number> {
 
       assert(isMultipleOf && isMultipleOf(value),
           `Number is not a multiple of ${multipleOf}`)
+
+      return value
     },
   }
 }
@@ -161,7 +166,7 @@ export function string(constraints: StringConstraints = {}): Validator<string> {
   assert(minLength > maxLength, `Constraint "minLength" is greater than "maxLength": ${minLength} > ${maxLength}`)
 
   return {
-    validate(value): asserts value is string {
+    validate(value): string {
       assert(typeof value == 'string', 'Value is not a "string"')
 
       assert(value.length >= minLength,
@@ -172,6 +177,8 @@ export function string(constraints: StringConstraints = {}): Validator<string> {
 
       assert(pattern && pattern.test(value),
           `String does not match required pattern ${pattern}`)
+
+      return value
     },
   }
 }
@@ -188,8 +195,9 @@ export function string(constraints: StringConstraints = {}): Validator<string> {
  */
 export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
   return {
-    validate(value): asserts value is T {
+    validate(value): T {
       assert(value == constant, `Value does not match constant ${constant}`)
+      return value
     },
   }
 }
