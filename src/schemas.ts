@@ -121,10 +121,10 @@ export const never: Never = { never: true }
 
 /** Infer the type validated by a `Schema` */
 export type InferSchema<S extends Schema> =
-  InferRemovedProperties<S> &
   InferReadonlyModifiers<S> &
   InferOptionalModifiers<S> &
-  InferCombinedModifiers<S> & (
+  InferCombinedModifiers<S> &
+  (
     S extends AdditionalProperties<Validator<infer V>> ?
       Record<string, V> &
       InferRemovedProperties<S> &
