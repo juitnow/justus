@@ -1,21 +1,30 @@
-import type { Validator } from './basics'
+import type { Validator } from './validation'
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, BOOLEANS)                                           *
  * ========================================================================== */
 
-/** The utility `Validator` for `any` type. */
+/**
+ * The utility `Validator` for `any` type.
+ *
+ * @public
+ */
 export const any: Validator<any> = {
-  validate(value: any): any {
-    return value
+  validate(value): value is any {
+    return true
   },
 }
 
-/** The utility `Validator` for the `boolean` type. */
+/**
+ * The utility `Validator` for `boolean`s.
+ *
+ * @public
+ */
 export const boolean: Validator<boolean> = {
-  validate: (value: any): boolean => {
-    if (typeof value === 'boolean') return value
-    throw new TypeError('Not a "boolean"')
+  validate: (value, context): value is boolean => {
+    if (typeof value === 'boolean') return true
+    context.fail('Value is not a "boolean"')
+    return false
   },
 }
 
@@ -26,7 +35,6 @@ export const boolean: Validator<boolean> = {
 
 /**
  * Constraints to validate a `number` with.
- * @internal
  */
 export interface NumberConstraints {
   /** The value for which a `number` must be multiple of for it to be valid */
@@ -39,12 +47,15 @@ export interface NumberConstraints {
   exclusiveMaximum?: number,
   /** The _exclusive_ minimum value for a valid `number`: `value > exclusiveMaximum` */
   exclusiveMinumum?: number,
+  /** Whether to allow `NaN` or not (default: `false`) */
+  allowNaN?: boolean,
 }
 
 /**
  * A function returning a `Validator` for `number`s.
  *
  * @param constraints - Optional constraints to validate the `number` with.
+ * @public
  */
 export function number(constraints?: NumberConstraints): Validator<number>
 export function number<N extends number>(constraints?: NumberConstraints): Validator<N>
@@ -72,6 +83,7 @@ export interface StringConstraints {
  * A function returning a `Validator` for the `string` type.
  *
  * @param constraints - Optional constraints to validate the `string` with.
+ * @public
  */
 export function string(constraints?: StringConstraints): Validator<string>
 export function string<S extends string>(constraints?: StringConstraints): Validator<S>
@@ -86,12 +98,13 @@ export function string(constraints?: StringConstraints): Validator<string> {
  * CONSTANTS VALIDATION                                                       *
  * ========================================================================== */
 
-/** Create a `Validator` validating the specified constant */
+/**
+ * Create a `Validator` validating the specified constant.
+ *
+ * @public
+ */
 export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
-  return {
-    validate: (value: any): T => {
-      if (constant === value) return value
-      throw new TypeError('Not a "boolean"')
-    },
-  }
+  // TODO: implement me!
+  void constant
+  return <any> null
 }

@@ -2,9 +2,9 @@ import type {
   InferValidationType,
   Validation,
   Validator,
-} from './basics'
+} from './validation'
 
-import { getValidator } from './basics'
+import { getValidator } from './validation'
 
 const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties

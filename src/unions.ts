@@ -2,7 +2,7 @@ import type {
   InferValidationType,
   Validation,
   Validator,
-} from './basics'
+} from './validation'
 
 /* ========================================================================== *
  * CONSTANTS AND UNIONS VALIDATION                                            *

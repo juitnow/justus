@@ -2,14 +2,14 @@ import type {
   InferValidationType,
   Validation,
   Validator,
-} from './basics'
+} from './validation'
 
 import {
   getValidator,
   isFunction,
   isPrimitive,
   isValidator,
-} from './basics'
+} from './validation'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
