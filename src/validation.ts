@@ -15,9 +15,9 @@ export interface Validator<T = any> {
    * Validate a _value_ and optionally convert it to the required `Type`.
    *
    * @param value - The _value_ to validate
-   * @returns The validated _value_, optionally converted to the reqired `Type`
+   * @param set - A setter to update the value (e.g. convert `string` to `Date`)
    */
-  validate(value: any, context: ValidationContext): asserts value is T,
+  validate(value: any, set: (value: T) => void): asserts value is T,
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
@@ -32,15 +32,6 @@ export type InferValidationType<V extends Validation> =
   V extends () => Validator<infer T> ? T :
   V extends Validator<infer T> ? T :
   V // boolean, number, string or null
-
-/* ========================================================================== *
- * VALIDATION CONTEXT                                                         *
- * ========================================================================== */
-
-export interface ValidationContext {
-  invalid(message: string): this
-  assert(): void
-}
 
 /* ========================================================================== *
  * VALIDATE                                                                   *
