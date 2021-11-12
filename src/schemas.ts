@@ -14,7 +14,7 @@ type allowAdditionalProperties = typeof allowAdditionalProperties
  * ========================================================================== */
 
 export interface Schema {
-  [ key: string ] : Validation | Modifier | string
+  [ key: string ] : Validation | Modifier | Never
   [ allowAdditionalProperties ]?: Validator | boolean
 }
 
@@ -106,16 +106,35 @@ export function optional(modifier?: Modifier<any> | Validation): any {
 }
 
 /* ========================================================================== *
+ * NEVER PSEUDO-MODIFIER                                                      *
+ * ========================================================================== */
+
+interface Never {
+  never: true
+}
+
+export const never: Never = { never: true }
+
+/* ========================================================================== *
  * INFER OBJECT TYPE FROM SCHEMA                                              *
  * ========================================================================== */
 
 /** Infer the type validated by a `Schema` */
 export type InferSchema<S extends Schema> =
-  InferValidators<S> &
+  InferRemovedProperties<S> &
   InferReadonlyModifiers<S> &
   InferOptionalModifiers<S> &
-  InferCombinedModifiers<S> &
-  InferAdditionalProperties<S>
+  InferCombinedModifiers<S> & (
+    S extends AdditionalProperties<Validator<infer V>> ?
+      Record<string, V> &
+      InferRemovedProperties<S> &
+      InferValidators<S> :
+    S extends AdditionalProperties<true> ?
+      Record<string, any> &
+      InferRemovedProperties<S> &
+      InferValidators<S> :
+    InferValidators<S>
+  )
 
 /* -------------------------------------------------------------------------- */
 
@@ -130,11 +149,6 @@ type InferValidators<S extends Schema> = {
     S[key] extends Validation ? InferValidationType<S[key]> :
     never
 }
-
-type InferAdditionalProperties<S extends Schema> =
-  S extends AdditionalProperties<Validator<infer V>> ? Record<string, V> :
-  S extends AdditionalProperties<true> ? Record<string, any> :
-  {}
 
 /* -------------------------------------------------------------------------- */
 
@@ -169,3 +183,14 @@ type InferCombinedModifiers<S extends Schema> = {
   ] ? :
     S[key] extends CombinedModifier<infer V> ? InferValidationType<V> : never
 }
+
+/* -------------------------------------------------------------------------- */
+
+type InferRemovedProperties<S extends Schema> =
+  { [ key in keyof S as
+      key extends string ?
+        S[key] extends Never ? key :
+        never :
+      never
+    ] : never
+  }
