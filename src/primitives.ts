@@ -1,4 +1,5 @@
 import type { Validator } from './validation'
+import { assert } from './utilities'
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, BOOLEANS)                                           *
@@ -10,8 +11,7 @@ import type { Validator } from './validation'
  * @public
  */
 export const any: Validator<any> = {
-  // TODO
-  validate: () => <any> null,
+  validate(value): asserts value is any {},
 }
 
 /**
@@ -20,13 +20,9 @@ export const any: Validator<any> = {
  * @public
  */
 export const boolean: Validator<boolean> = {
-  // validate: (value, context): asserts value is boolean => {
-  //   if (typeof value === 'boolean') return true
-  //   context.fail('Value is not a "boolean"')
-  //   return false
-  // },
-  // TODO
-  validate: () => <any> null,
+  validate(value): asserts value is boolean {
+    assert(typeof value === 'boolean', 'Value is not a "boolean"')
+  },
 }
 
 
@@ -61,76 +57,75 @@ export interface NumberConstraints {
 export function number(constraints?: NumberConstraints): Validator<number>
 export function number<N extends number>(constraints?: NumberConstraints): Validator<N>
 export function number(constraints: NumberConstraints = {}): Validator<number> {
-  // let isMultipleOf: undefined | ((value: number) => boolean)
+  let isMultipleOf: undefined | ((value: number) => boolean)
 
-  // const {
-  //   multipleOf,
-  //   maximum = Number.POSITIVE_INFINITY,
-  //   minimum = Number.NEGATIVE_INFINITY,
-  //   exclusiveMaximum,
-  //   exclusiveMinumum,
-  //   allowNaN,
-  // } = xconstraints
+  const {
+    multipleOf,
+    maximum = Number.POSITIVE_INFINITY,
+    minimum = Number.NEGATIVE_INFINITY,
+    exclusiveMaximum,
+    exclusiveMinumum,
+    allowNaN,
+  } = constraints
 
-  // if (multipleOf !== undefined) {
-  //   if (multipleOf <= 0) {
-  //     throw new TypeError(`Constraint "multipleOf" must be greater than zero: ${multipleOf}`)
-  //   }
+  assert(minimum > maximum, `Constraint "minimum" is greater than "maximum": ${minimum} > ${maximum}`)
 
-  //   // Split the multiple of in integer and fraction
-  //   const integer = Math.trunc(multipleOf) // 1.05 -> 1.00
-  //   const fraction = multipleOf - integer //  1.05 -> 0.05
+  if (exclusiveMaximum !== undefined) {
+    assert(minimum >= exclusiveMaximum,
+        `Constraint "exclusiveMaximum" must be greater than "minimum": ${exclusiveMaximum} <= ${minimum}`)
+  }
 
-  //   if (fraction === 0) {
-  //     // Easy case is when we only have to deal with integers...
-  //     isMultipleOf = (value): boolean => ! (value % multipleOf)
-  //   } else if (fraction >= 0.000001) {
-  //     // We have some "fractional" part (max 6 decimal digits), multiply...
-  //     const bigMultipleOf = Math.trunc(multipleOf * 1000000)
-  //     isMultipleOf = (value): boolean => ! (Math.trunc(value * 1000000) % bigMultipleOf)
-  //   } else {
-  //     // Required precision was too much (more than 6 decimal digits)
-  //     throw new TypeError(`Constraint "multipleOf" requires too much precision: ${multipleOf}`)
-  //   }
-  // }
+  if (exclusiveMinumum !== undefined) {
+    assert(exclusiveMinumum >= maximum,
+        `Constraint "maximum" must be greater than "exclusiveMinumum": ${maximum} <= ${exclusiveMinumum}`)
+  }
 
-  // return {
-  //   validate(value, context): value is number {
-  //     if (typeof value !== 'number') {
-  //       return context.fail('Not a "number"')
-  //     }
+  if ((exclusiveMinumum != undefined) && (exclusiveMaximum !== undefined)) {
+    assert(exclusiveMinumum >= exclusiveMaximum,
+        `Constraint "exclusiveMaximum" must be greater than "exclusiveMinumum": ${exclusiveMaximum} <= ${exclusiveMinumum}`)
+  }
 
-  //     if (isNaN(value) && (! allowNaN)) {
-  //       return context.fail('Number is "NaN"')
-  //     }
+  if (multipleOf !== undefined) {
+    assert(multipleOf > 0, `Constraint "multipleOf" must be greater than zero: ${multipleOf}`)
 
-  //     if (value < minimum) {
-  //       return context.fail(`Number is less than ${minimum}`)
-  //     }
+    // Split the multiple of in integer and fraction
+    const integer = Math.trunc(multipleOf) // 1.05 -> 1.00
+    const fraction = multipleOf - integer //  1.05 -> 0.05
 
-  //     if (value > maximum) {
-  //       return context.fail(`Number is greater than ${minimum}`)
-  //     }
+    if (fraction === 0) {
+      // Easy case is when we only have to deal with integers...
+      isMultipleOf = (value): boolean => ! (value % multipleOf)
+    } else if (fraction >= 0.000001) {
+      // We have some "fractional" part (max 6 decimal digits), multiply...
+      const bigMultipleOf = Math.trunc(multipleOf * 1000000)
+      isMultipleOf = (value): boolean => ! (Math.trunc(value * 1000000) % bigMultipleOf)
+    } else {
+      // Required precision was too much (more than 6 decimal digits)
+      assert(false, `Constraint "multipleOf" requires too much precision: ${multipleOf}`)
+    }
+  }
 
-  //     if ((exclusiveMinumum !== undefined) && (value <= exclusiveMinumum)) {
-  //       return context.fail(`Number is less than or equal to ${exclusiveMinumum}`)
-  //     }
+  return {
+    validate(value): asserts value is number {
+      assert(typeof value == 'number', 'Value is not a "number"')
 
-  //     if ((exclusiveMaximum !== undefined) && (value >= exclusiveMaximum)) {
-  //       return context.fail(`Number is greater than or equal to ${exclusiveMaximum}`)
-  //     }
+      assert(isNaN(value) && allowNaN, 'Number is "NaN"')
 
-  //     if (isMultipleOf && (! isMultipleOf(value))) {
-  //       return context.fail(`Number is not multiple of ${multipleOf}`)
-  //     }
+      assert(value >= minimum, `Number is less than ${minimum}`)
+      assert(value <= maximum, `Number is greater than ${minimum}`)
 
-  //     return true
-  //   },
-  // }
-  // TODO
-  void constraints
-  return <any> null
+      assert((exclusiveMinumum !== undefined) && (value > exclusiveMinumum),
+          `Number is less than or equal to ${exclusiveMinumum}`)
+
+      assert((exclusiveMaximum !== undefined) && (value < exclusiveMaximum),
+          `Number is greater than or equal to ${exclusiveMaximum}`)
+
+      assert(isMultipleOf && isMultipleOf(value),
+          `Number is not a multiple of ${multipleOf}`)
+    },
+  }
 }
+
 
 /* ========================================================================== *
  * BRANDED STRINGS VALIDATION                                                 *
@@ -155,42 +150,30 @@ export interface StringConstraints {
 export function string(constraints?: StringConstraints): Validator<string>
 export function string<S extends string>(constraints?: StringConstraints): Validator<S>
 export function string(constraints: StringConstraints = {}): Validator<string> {
-  // const {
-  //   minLength = 0,
-  //   maxLength = Number.MAX_SAFE_INTEGER,
-  //   pattern,
-  // } = constraints
+  const {
+    minLength = 0,
+    maxLength = Number.MAX_SAFE_INTEGER,
+    pattern,
+  } = constraints
 
-  // if (minLength < 0) {
-  //   throw new TypeError(`Constraint "minLength" must be non-negative: ${minLength}`)
-  // }
+  assert(minLength >= 0, `Constraint "minLength" must be non-negative: ${minLength}`)
+  assert(maxLength >= 0, `Constraint "maxLength" must be non-negative: ${maxLength}`)
+  assert(minLength > maxLength, `Constraint "minLength" is greater than "maxLength": ${minLength} > ${maxLength}`)
 
-  // if (maxLength < 0) {
-  //   throw new TypeError(`Constraint "maxLength" must be non-negative: ${maxLength}`)
-  // }
+  return {
+    validate(value): asserts value is string {
+      assert(typeof value == 'string', 'Value is not a "string"')
 
-  // return {
-  //   validate(value, { fail }): value is string {
-  //     if (typeof value !== 'string') return fail('Not a "string"')
+      assert(value.length >= minLength,
+          `String must have a minimum length of ${minLength}`)
 
-  //     if (value.length < minLength) {
-  //       return fail(`String must have a minimum length of ${minLength}`)
-  //     }
+      assert(value.length <= maxLength,
+          `String must have a maximum length of ${maxLength}`)
 
-  //     if (value.length > maxLength) {
-  //       return fail(`String must have a maximum length of ${maxLength}`)
-  //     }
-
-  //     if (pattern && (! pattern.test(value))) {
-  //       return fail(`String does not match required pattern ${pattern}`)
-  //     }
-
-  //     return true
-  //   },
-  // }
-  // TODO
-  void constraints
-  return <any> null
+      assert(pattern && pattern.test(value),
+          `String does not match required pattern ${pattern}`)
+    },
+  }
 }
 
 
@@ -204,15 +187,9 @@ export function string(constraints: StringConstraints = {}): Validator<string> {
  * @public
  */
 export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
-  // return {
-  //   validate(value, { fail }): value is T {
-  //     if (value !== constant) {
-  //       return fail(`Value does not match constant ${constant}`)
-  //     }
-  //     return true
-  //   },
-  // }
-  // TODO
-  void constant
-  return <any> null
+  return {
+    validate(value): asserts value is T {
+      assert(value == constant, `Value does not match constant ${constant}`)
+    },
+  }
 }
