@@ -17,7 +17,7 @@ export interface Validator<T = any> {
    * @param value - The _value_ to validate
    * @returns The validated _value_, optionally converted to the reqired `Type`
    */
-  validate: (value: any, context: ValidationContext) => value is T,
+  validate(value: any, context: ValidationContext): asserts value is T,
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
@@ -38,7 +38,23 @@ export type InferValidationType<V extends Validation> =
  * ========================================================================== */
 
 export interface ValidationContext {
-  fail(message: string): void
-  warn(message: string): void
-  set(value: any): void
+  invalid(message: string): this
+  assert(): void
+}
+
+/* ========================================================================== *
+ * VALIDATE                                                                   *
+ * ========================================================================== */
+
+// import { getValidator } from './utilities'
+
+export function validate<V extends Validation>(validator: V, value: any): InferValidationType<V> {
+  // if (getValidator(validator).validate(value)) {
+  //   return value
+  // } else {
+  //   throw new Error('Invalid')
+  // }
+  // TODO
+  void validator, value
+  return <any> null
 }
