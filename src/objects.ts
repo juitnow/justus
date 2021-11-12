@@ -11,11 +11,8 @@ import type {
 
 export function object(): ObjectValidator // <any, undefined>
 export function object<S extends Schema>(schema: S): SchemaValidator<InferSchema<S>, S>
-export function object<S extends Schema>(schema?: S): SchemaValidator<InferSchema<S>, S> {
-  return {
-    schema: <S> schema,
-    validate: (value: any): InferSchema<S> => {
-      return value
-    },
-  }
+export function object(schema?: Schema): SchemaValidator<any, Schema> {
+  // TODO: implement me
+  void schema
+  return <any> null
 }
