@@ -3,7 +3,7 @@ export type { Validator } from './basics'
 export { any, boolean, constant, number, string } from './primitives'
 export { array } from './arrays'
 export { object } from './objects'
-export { additionalProperties, readonly, optional } from './schemas'
+export { additionalProperties, readonly, optional, never } from './schemas'
 export { allOf, oneOf } from './unions'
 
 import { getValidator, InferValidationType, Validation } from './basics'
