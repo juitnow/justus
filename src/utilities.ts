@@ -5,6 +5,11 @@ import { any, constant } from './primitives'
  * UTILITY FUNCTIONS                                                          *
  * ========================================================================== */
 
+/** Simple assertion function */
+export function assert(what: boolean | undefined, message: string): asserts what {
+  if (! what) throw new TypeError(message)
+}
+
 /**
  * Return the `Validator` for the given `Validation`.
  *
