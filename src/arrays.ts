@@ -73,7 +73,7 @@ export function array(options: Validation | ArrayConstraints<Validation> = {}): 
   assert(minItems > maxItems, `Constraint "minItems" is greater than "maxItems": ${minItems} > ${maxItems}`)
 
   return {
-    validate(value): any[] {
+    validate(value, options): any[] {
       assert(Array.isArray(value), 'Value is not an "array"')
 
       assert(value.length >= minItems,
@@ -88,7 +88,7 @@ export function array(options: Validation | ArrayConstraints<Validation> = {}): 
       value.forEach((item, i) => {
         try {
           const unique = value.indexOf(value[i]) == i
-          if (unique) clone[i] = items.validate(item[i])
+          if (unique) clone[i] = items.validate(item[i], options)
           else if (uniqueItems) assert(false, `Duplicate item at index ${i}`)
         } catch (error) {
           builder.record(i, error)

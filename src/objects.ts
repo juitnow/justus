@@ -49,7 +49,7 @@ export function object(schema: Schema = {}): SchemaValidator<any, Schema> {
 
   return {
     schema,
-    validate(value): any {
+    validate(value, options): any {
       assert(typeof value == 'object', 'Value is not an "object"')
       assert(value !== null, 'Value is "null"')
 
@@ -61,7 +61,7 @@ export function object(schema: Schema = {}): SchemaValidator<any, Schema> {
 
         try {
           assert(value[key] !== undefined, 'Required value is "undefined"')
-          clone[key] = validator.validate(value[key])
+          clone[key] = validator.validate(value[key], options)
         } catch (error) {
           builder.record(key, error)
         }
@@ -71,7 +71,9 @@ export function object(schema: Schema = {}): SchemaValidator<any, Schema> {
         const validator = requiredProperties[key]
 
         try {
-          if (value[key] !== undefined) clone[key] = validator.validate(value[key])
+          if (value[key] !== undefined) {
+            clone[key] = validator.validate(value[key], options)
+          }
         } catch (error) {
           builder.record(key, error)
         }
@@ -91,7 +93,7 @@ export function object(schema: Schema = {}): SchemaValidator<any, Schema> {
 
         keys.filter((k) => value[k] !== undefined).forEach((key) => {
           try {
-            clone[key] = additionalProperties.validate(value[key])
+            clone[key] = additionalProperties.validate(value[key], options)
           } catch (error) {
             builder.record(key, error)
           }

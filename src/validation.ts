@@ -17,7 +17,7 @@ export interface Validator<T = any> {
    *
    * @param value - The _value_ to validate
    */
-  validate(value: any): T,
+  validate(value: any, options: Readonly<ValidationOptions>): T,
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
@@ -37,8 +37,21 @@ export type InferValidationType<V extends Validation> =
  * VALIDATE                                                                   *
  * ========================================================================== */
 
-// import { getValidator } from './utilities'
+export interface ValidationOptions {
+  maximumFailures: number,
+  stripAdditionalProperties: boolean,
+}
 
-export function validate<V extends Validation>(validator: V, value: any): InferValidationType<V> {
-  return getValidator(validator).validate(value)
+export function validate<V extends Validation>(
+    validator: V,
+    value: any,
+    options: Partial<ValidationOptions> = {},
+): InferValidationType<V> {
+  const opts: ValidationOptions = {
+    maximumFailures: Number.POSITIVE_INFINITY,
+    stripAdditionalProperties: false,
+    ...options,
+  }
+
+  return getValidator(validator).validate(value, opts)
 }
