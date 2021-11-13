@@ -17,7 +17,7 @@ export interface Validator<T = any> {
    *
    * @param value - The _value_ to validate
    */
-  validate(value: any, options: Readonly<ValidationOptions>): T,
+  validate(value: any, options: ValidationOptions): T,
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */

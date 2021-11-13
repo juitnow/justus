@@ -23,9 +23,9 @@ export class ValidationError extends Error {
 
 export class ValidationErrorBuilder {
   readonly errors: ValidationErrors = []
-  readonly #options: Readonly<ValidationOptions>
+  readonly #options: ValidationOptions
 
-  constructor(options: Readonly<ValidationOptions>) {
+  constructor(options: ValidationOptions) {
     this.#options = options
   }
 
