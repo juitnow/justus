@@ -74,7 +74,7 @@ export function array(options: Validation | ArrayConstraints<Validation> = {}): 
 
   return {
     validate(value): any[] {
-      assert(Array.isArray(value), 'Value is not an "Array"')
+      assert(Array.isArray(value), 'Value is not an "array"')
 
       assert(value.length >= minItems,
           `Array must have a minimum length of ${minItems}`)
