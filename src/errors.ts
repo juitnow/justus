@@ -1,12 +1,22 @@
-type ValidationErrors = { key: string | number, message: string }[]
+import { assert } from './utilities'
+
+type ValidationErrors = { key: string, message: string }[]
 
 export class ValidationError extends Error {
   readonly errors: ValidationErrors
 
-  constructor(errors: any[]) {
+  constructor(errors: ValidationErrors) {
+    assert(errors.length > 0, 'Attempting to build a "ValidationError" with no errors')
+
     super(`Found ${errors.length} validation errors`)
     this.errors = errors
+
+    const details = errors
+        .map(({ key, message }) => `${key} : ${message}`)
+        .join('\n  ')
+
     Error.captureStackTrace(this, ValidationError)
+    this.stack = this.stack!.replace('\n', `\n  ${details}\n`)
   }
 }
 
@@ -23,6 +33,8 @@ export class ValidationErrorBuilder {
 
         this.errors.push({ key: newkey, message })
       })
+    } else if (typeof key === 'number') {
+      this.errors.push({ key: `[${key}]`, message: error.toString() })
     } else {
       this.errors.push({ key, message: error.toString() })
     }
