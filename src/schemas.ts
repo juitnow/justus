@@ -4,9 +4,10 @@ import type {
   Validator,
 } from './validation'
 
-import { getValidator } from './utilities'
+import { getValidator, isPrimitive, isValidator } from './utilities'
+import { any } from '.'
 
-const allowAdditionalProperties = Symbol('additionalProperties')
+export const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties
 
 /* ========================================================================== *
@@ -53,9 +54,9 @@ export function additionalProperties(options?: Validation | boolean): Additional
  * ========================================================================== */
 
 interface Modifier<V extends Validator = Validator> {
-  validator: V
   readonly?: true,
   optional?: true,
+  modifier: V
 }
 
 interface ReadonlyModifier<V extends Validator = Validator> extends Modifier<V> {
@@ -92,8 +93,12 @@ export function readonly<V extends Validation>(validation: V): ReadonlyModifier<
 export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
 
 export function readonly(modifier?: Modifier<any> | Validation): any {
-  void modifier
-  return <any> null
+  const validator =
+    isPrimitive(modifier) ? getValidator(modifier) :
+    isValidator(modifier) ? getValidator(modifier) :
+    modifier ? modifier : any
+
+  return { modifier: validator, readonly: true }
 }
 
 export function optional(): OptionalModifier<any>
@@ -101,8 +106,12 @@ export function optional<V extends Validation>(validation: V): OptionalModifier<
 export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
 
 export function optional(modifier?: Modifier<any> | Validation): any {
-  void modifier
-  return <any> null
+  const validator =
+    isPrimitive(modifier) ? getValidator(modifier) :
+    isValidator(modifier) ? getValidator(modifier) :
+    modifier ? modifier : any
+
+  return { modifier: validator, optional: true }
 }
 
 /* ========================================================================== *
