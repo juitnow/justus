@@ -38,14 +38,18 @@ export type InferValidationType<V extends Validation> =
  * ========================================================================== */
 
 export interface ValidationOptions {
-  maximumFailures: number,
-  stripAdditionalProperties: boolean,
+  readonly maximumFailures: number,
+  readonly stripAdditionalProperties: boolean,
+}
+
+type PartialValidationOptions = {
+  -readonly [ key in keyof ValidationOptions ]?: ValidationOptions[key] | undefined
 }
 
 export function validate<V extends Validation>(
     validator: V,
     value: any,
-    options: Partial<ValidationOptions> = {},
+    options: PartialValidationOptions = {},
 ): InferValidationType<V> {
   const opts: ValidationOptions = {
     maximumFailures: Number.POSITIVE_INFINITY,
