@@ -1,4 +1,5 @@
 import type { ObjectValidator } from './schemas'
+import { getValidator } from './utilities'
 
 /* ========================================================================== *
  * BASIC TYPES                                                                *
@@ -39,12 +40,5 @@ export type InferValidationType<V extends Validation> =
 // import { getValidator } from './utilities'
 
 export function validate<V extends Validation>(validator: V, value: any): InferValidationType<V> {
-  // if (getValidator(validator).validate(value)) {
-  //   return value
-  // } else {
-  //   throw new Error('Invalid')
-  // }
-  // TODO
-  void validator, value
-  return <any> null
+  return getValidator(validator).validate(value)
 }
