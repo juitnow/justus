@@ -23,6 +23,7 @@ export class ValidationError extends Error {
 
 export class ValidationErrorBuilder {
   readonly errors: ValidationErrors = []
+  readonly #options: Readonly<ValidationOptions>
 
   constructor(options: Readonly<ValidationOptions>) {
     this.#options = options
@@ -42,6 +43,10 @@ export class ValidationErrorBuilder {
       this.errors.push({ key: `[${key}]`, message: error.toString() })
     } else {
       this.errors.push({ key, message: error.toString() })
+    }
+
+    if (this.errors.length > this.#options.maximumFailures) {
+      throw new ValidationError(this.errors)
     }
   }
 
