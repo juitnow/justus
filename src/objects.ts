@@ -53,7 +53,7 @@ export function object(schema: Schema = {}): SchemaValidator<any, Schema> {
       assert(typeof value == 'object', 'Value is not an "object"')
       assert(value !== null, 'Value is "null"')
 
-      const builder = new ValidationErrorBuilder()
+      const builder = new ValidationErrorBuilder(options)
       const clone: Record<string, any> = {}
 
       for (const key of Object.keys(requiredProperties)) {

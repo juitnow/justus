@@ -1,4 +1,5 @@
 import { assert } from './utilities'
+import { ValidationOptions } from './validation'
 
 type ValidationErrors = { key: string, message: string }[]
 
@@ -22,6 +23,10 @@ export class ValidationError extends Error {
 
 export class ValidationErrorBuilder {
   readonly errors: ValidationErrors = []
+
+  constructor(options: Readonly<ValidationOptions>) {
+    this.#options = options
+  }
 
   record(key: string | number, error: any): void {
     if (error instanceof ValidationError) {

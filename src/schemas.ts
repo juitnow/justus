@@ -5,7 +5,7 @@ import type {
 } from './validation'
 
 import { getValidator, isPrimitive, isValidator } from './utilities'
-import { any } from '.'
+import { any } from './primitives'
 
 export const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties

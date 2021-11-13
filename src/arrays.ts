@@ -82,7 +82,7 @@ export function array(options: Validation | ArrayConstraints<Validation> = {}): 
       assert(value.length <= maxItems,
           `Array must have a maximum length of ${maxItems}`)
 
-      const builder = new ValidationErrorBuilder()
+      const builder = new ValidationErrorBuilder(options)
       const clone: any[] = new Array(value.length)
 
       value.forEach((item, i) => {
