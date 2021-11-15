@@ -9,6 +9,7 @@
     "sourceMap": true,
     "inlineSourceMap": false,
     "strict": true,
+    "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
     "allowJs": false
