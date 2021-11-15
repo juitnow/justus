@@ -1,107 +1,131 @@
-import type { Validator } from './validation'
+import { ValidationOptions, Validator } from './validation'
 
 import {
   allowAdditionalProperties,
   InferSchema,
-  ObjectValidator,
+  AdditionalProperties,
   Schema,
-  SchemaValidator,
 } from './schemas'
 
 import { assert, getValidator, isPrimitive, isValidator } from './utilities'
 
-import { any } from './primitives'
+import { AnyValidator } from './primitives'
 import { ValidationErrorBuilder } from './errors'
+import { AbstractValidator } from './validator'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
 
-export function object(): ObjectValidator // <any, undefined>
-export function object<S extends Schema>(schema: S): SchemaValidator<InferSchema<S>, S>
-export function object(schema: Schema = {}): SchemaValidator<any, Schema> {
-  const { [allowAdditionalProperties]: additional = false, ...properties } = schema
+export class ObjectValidator extends AbstractValidator<Record<string, any>>
+  implements AdditionalProperties<AnyValidator> {
+  [allowAdditionalProperties]: any
 
-  const additionalProperties =
-    additional === false ? undefined :
-    additional === true ? any :
-    getValidator(additional)
+  validate(value: unknown): Record<string, any> {
+    assert(typeof value == 'object', 'Value is not an "object"')
+    assert(value !== null, 'Value is "null"')
+    return value
+  }
+}
 
-  const requiredProperties: Record<string, Validator<any>> = {}
-  const optionalProperties: Record<string, Validator<any>> = {}
-  const neverProperties: string[] = []
+export class SchemaValidator<S extends Schema> extends AbstractValidator<InferSchema<S>> {
+  readonly schema: S
 
-  for (const key of Object.keys(properties)) {
-    const definition = properties[key]
+  #additionalProperties?: Validator
+  #requiredProperties: Record<string, Validator<any>> = {}
+  #optionalProperties: Record<string, Validator<any>> = {}
+  #neverProperties: string[] = []
 
-    if (isPrimitive(definition)) {
-      requiredProperties[key] = getValidator(definition)
-    } else if (isValidator(definition)) {
-      requiredProperties[key] = getValidator(definition)
-    } else if ('modifier' in definition) {
-      (definition.optional ? optionalProperties : requiredProperties)[key] = definition.modifier
-    } else if ('never' in definition) {
-      neverProperties.push(key)
-    } else {
-      requiredProperties[key] = getValidator(definition)
+  constructor(schema: S) {
+    super()
+    const { [allowAdditionalProperties]: additional, ...properties } = schema
+
+    this.#additionalProperties = additional && getValidator(additional)
+
+    for (const key of Object.keys(properties)) {
+      const definition = properties[key]
+
+      if (isPrimitive(definition)) {
+        this.#requiredProperties[key] = getValidator(definition)
+      } else if (isValidator(definition)) {
+        this.#requiredProperties[key] = getValidator(definition)
+      } else if ('modifier' in definition) {
+        (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition.modifier
+      } else if ('never' in definition) {
+        this.#neverProperties.push(key)
+      } else {
+        this.#requiredProperties[key] = getValidator(definition)
+      }
     }
+
+    this.schema = schema
   }
 
-  return {
-    schema,
-    validate(value, options): any {
-      assert(typeof value == 'object', 'Value is not an "object"')
-      assert(value !== null, 'Value is "null"')
+  validate(value: any, options: ValidationOptions): InferSchema<S> {
+    assert(typeof value == 'object', 'Value is not an "object"')
+    assert(value !== null, 'Value is "null"')
 
-      const builder = new ValidationErrorBuilder(options)
-      const clone: Record<string, any> = {}
+    const builder = new ValidationErrorBuilder(options)
+    const clone: Record<string, any> = {}
 
-      for (const key of Object.keys(requiredProperties)) {
-        const validator = requiredProperties[key]
+    for (const key of Object.keys(this.#requiredProperties)) {
+      const validator = this.#requiredProperties[key]
 
-        try {
-          assert(value[key] !== undefined, 'Required value is "undefined"')
+      try {
+        assert(value[key] !== undefined, 'Required value is "undefined"')
+        clone[key] = validator.validate(value[key], options)
+      } catch (error) {
+        builder.record(key, error)
+      }
+    }
+
+    for (const key of Object.keys(this.#optionalProperties)) {
+      const validator = this.#requiredProperties[key]
+
+      try {
+        if (value[key] !== undefined) {
           clone[key] = validator.validate(value[key], options)
-        } catch (error) {
-          builder.record(key, error)
         }
+      } catch (error) {
+        builder.record(key, error)
       }
+    }
 
-      for (const key of Object.keys(optionalProperties)) {
-        const validator = requiredProperties[key]
+    for (const key of this.#neverProperties) {
+      try {
+        assert(value[key] == undefined, 'Forbidden property found')
+      } catch (error) {
+        builder.record(key, error)
+      }
+    }
 
+    const cloned = Object.keys(clone)
+    const additionalKeys = Object.keys(value).filter((k) => ! cloned.includes(k))
+    const additional = this.#additionalProperties
+
+    if (additional) {
+      additionalKeys.forEach((key) => {
+        if (value[key] === undefined) return
         try {
-          if (value[key] !== undefined) {
-            clone[key] = validator.validate(value[key], options)
-          }
+          clone[key] = additional.validate(value[key], options)
         } catch (error) {
           builder.record(key, error)
         }
-      }
+      })
+    } else {
+      additionalKeys.forEach((key) => {
+        if (value[key] !== undefined) builder.record(key, 'Unknown property found')
+      })
+    }
 
-      for (const key of neverProperties) {
-        try {
-          assert(value[key] == undefined, 'Forbidden property found')
-        } catch (error) {
-          builder.record(key, error)
-        }
-      }
-
-      if (additionalProperties) {
-        const cloned = Object.keys(clone)
-        const keys = Object.keys(value).filter((k) => ! cloned.includes(k))
-
-        keys.filter((k) => value[k] !== undefined).forEach((key) => {
-          try {
-            clone[key] = additionalProperties.validate(value[key], options)
-          } catch (error) {
-            builder.record(key, error)
-          }
-        })
-      }
-
-      builder.assert()
-      return clone
-    },
+    builder.assert()
+    return <any> clone
   }
+}
+
+export function object(): ObjectValidator // <any, undefined>
+export function object<S extends Schema>(schema: S): SchemaValidator<S>
+export function object(schema?: Schema): ObjectValidator | SchemaValidator<Schema> {
+  if (! schema) return new ObjectValidator()
+  return new SchemaValidator(schema)
 }

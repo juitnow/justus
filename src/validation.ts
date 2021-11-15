@@ -1,4 +1,4 @@
-import type { ObjectValidator } from './schemas'
+import type { ObjectValidator } from './objects'
 import { getValidator } from './utilities'
 
 /* ========================================================================== *
@@ -17,7 +17,7 @@ export interface Validator<T = any> {
    *
    * @param value - The _value_ to validate
    */
-  validate(value: any, options: ValidationOptions): T,
+  validate(value: unknown, options: ValidationOptions): T,
 }
 
 /** The `Validation` type defines a `Validator` or a function creating one. */

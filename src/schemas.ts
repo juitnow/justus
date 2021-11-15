@@ -5,7 +5,7 @@ import type {
 } from './validation'
 
 import { getValidator, isPrimitive, isValidator } from './utilities'
-import { any } from './primitives'
+import { any, AnyValidator } from './primitives'
 
 export const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties
@@ -16,35 +16,25 @@ type allowAdditionalProperties = typeof allowAdditionalProperties
 
 export interface Schema {
   [ key: string ] : Validation | Modifier | Never
-  [ allowAdditionalProperties ]?: Validator | boolean
-}
-
-export interface SchemaValidator<T, S extends Schema> extends Validator<T> {
-  schema: S
-}
-
-export interface ObjectValidator extends SchemaValidator<Record<string, any>, {}> {
-  [ allowAdditionalProperties ]: true
+  [ allowAdditionalProperties ]?: Validator
 }
 
 /* ========================================================================== *
  * ADDITIONAL PROPERTIES IN SCHEMAS                                           *
  * ========================================================================== */
 
-export interface AdditionalProperties<V extends Validator | boolean> {
+export interface AdditionalProperties<V extends Validator> {
   [ allowAdditionalProperties ]: V
 }
 
-export function additionalProperties(): AdditionalProperties<true>
-export function additionalProperties(allow: true): AdditionalProperties<true>
-export function additionalProperties(allow: false): AdditionalProperties<false>
+export function additionalProperties(): AdditionalProperties<AnyValidator>
+export function additionalProperties(allow: true): AdditionalProperties<AnyValidator>
+export function additionalProperties(allow: false): AdditionalProperties<never>
 export function additionalProperties<V extends Validation>(validation: V): AdditionalProperties<Validator<InferValidationType<V>>>
-export function additionalProperties(options?: Validation | boolean): AdditionalProperties<Validator | boolean> {
-  const allow =
-    typeof options === 'boolean' ? options :
-    options === undefined ? true :
-    getValidator(options)
+export function additionalProperties(options?: Validation | boolean): AdditionalProperties<Validator> {
+  if (options === false) return {} as AdditionalProperties<never>
 
+  const allow = options === true ? any : getValidator(options)
   return { [allowAdditionalProperties]: allow }
 }
 
@@ -134,14 +124,16 @@ export type InferSchema<S extends Schema> =
   InferOptionalModifiers<S> &
   InferCombinedModifiers<S> &
   (
+    S extends AdditionalProperties<never> ?
+      InferValidators<S> :
     S extends AdditionalProperties<Validator<infer V>> ?
       Record<string, V> &
       InferRemovedProperties<S> &
       InferValidators<S> :
-    S extends AdditionalProperties<true> ?
-      Record<string, any> &
-      InferRemovedProperties<S> &
-      InferValidators<S> :
+    // S extends AdditionalProperties<true> ?
+    //   Record<string, any> &
+    //   InferRemovedProperties<S> &
+    //   InferValidators<S> :
     InferValidators<S>
   )
 
