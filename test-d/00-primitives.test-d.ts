@@ -8,7 +8,7 @@ import {
   validate,
 } from '../src/index'
 
-printType(void '00-primitives')
+printType('__file_marker__')
 
 // plain exports
 expectType<any>(validate(any, null))

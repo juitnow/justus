@@ -9,7 +9,7 @@ import {
   validate,
 } from '../src/index'
 
-printType(void '04-addprops')
+printType('__file_marker__')
 
 // -------------------------------------------------------------------------- //
 

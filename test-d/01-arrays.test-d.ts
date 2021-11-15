@@ -9,10 +9,10 @@ import {
   validate,
 } from '../src/index'
 
+printType('__file_marker__')
+
 type BrandedNumber = number & { __branded_number: never }
 type BrandedString = string & { __branded_string: never }
-
-printType(void '01-primitives')
 
 // plain exports
 expectType<any[]>(validate(array, null))

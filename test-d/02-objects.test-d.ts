@@ -10,10 +10,10 @@ import {
   validate,
 } from '../src/index'
 
+printType('__file_marker__')
+
 type BrandedNumber = number & { __branded_number: never }
 type BrandedString = string & { __branded_string: never }
-
-printType(void '02-objects')
 
 // -------------------------------------------------------------------------- //
 // plain exports
