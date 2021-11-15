@@ -1,5 +1,5 @@
 import { Validator } from './validator'
-import { assert } from './utilities'
+import { assert } from './errors'
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, BOOLEANS)                                           *

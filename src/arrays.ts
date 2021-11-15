@@ -2,7 +2,8 @@ import { InferValidationType, Validation, ValidationOptions } from './validation
 import { ValidationErrorBuilder } from './errors'
 import { Validator } from './validator'
 import { any } from './primitives'
-import { assert, getValidator, isFunction, isPrimitive } from './utilities'
+import { assert } from './errors'
+import { getValidator, isFunction, isPrimitive } from './utilities'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *

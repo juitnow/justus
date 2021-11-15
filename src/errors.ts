@@ -1,22 +1,29 @@
 import { ValidationOptions } from './validation'
-import { assert } from './utilities'
+// import { assert } from './utilities'
 
 type ValidationErrors = { key: string, message: string }[]
 
-export class ValidationError extends Error {
-  readonly errors: ValidationErrors
+/** Simple assertion function */
+export function assert(what: boolean | undefined, message: string): asserts what {
+  if (! what) throw new ValidationError(message, assert)
+}
 
-  constructor(errors: ValidationErrors) {
-    assert(errors.length > 0, 'Attempting to build a "ValidationError" with no errors')
+export class ValidationError extends Error {
+  readonly errors!: ValidationErrors
+
+  constructor(message: string, constructor?: Function)
+  constructor(errors: ValidationErrors, constructor?: Function)
+  constructor(errors: ValidationErrors | string, constructor?: Function) {
+    if (typeof errors === 'string') errors = [ { key: '', message: errors } ]
 
     super(`Found ${errors.length} validation errors`)
-    this.errors = errors
+    Object.defineProperty(this, 'errors', { value: errors })
 
     const details = errors
-        .map(({ key, message }) => `${key} : ${message}`)
+        .map(({ key, message }) => key ? `${key} : ${message}` : message)
         .join('\n  ')
 
-    Error.captureStackTrace(this, ValidationError)
+    Error.captureStackTrace(this, constructor || ValidationError)
     this.stack = this.stack!.replace('\n', `\n  ${details}\n`)
   }
 }
@@ -51,6 +58,6 @@ export class ValidationErrorBuilder {
   }
 
   assert(): void {
-    if (this.errors.length > 0) throw new ValidationError(this.errors)
+    if (this.errors.length > 0) throw new ValidationError(this.errors, this.assert)
   }
 }

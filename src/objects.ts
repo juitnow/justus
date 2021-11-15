@@ -3,7 +3,8 @@ import { AnyValidator, any } from './primitives'
 import { ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
 import { Validator } from './validator'
-import { assert, getValidator, isPrimitive } from './utilities'
+import { assert } from './errors'
+import { getValidator, isPrimitive } from './utilities'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
