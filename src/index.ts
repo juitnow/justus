@@ -1,4 +1,5 @@
-export { Validator, validate } from './validation'
+export { Validator } from './validator'
+export { validate } from './validation'
 export { any, boolean, constant, number, string } from './primitives'
 export { array } from './arrays'
 export { object } from './objects'

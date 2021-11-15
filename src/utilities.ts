@@ -1,4 +1,5 @@
-import type { Validation, Validator } from './validation'
+import { Validation } from './validation'
+import { Validator } from './validator'
 import { any, constant } from './primitives'
 
 /* ========================================================================== *
@@ -19,12 +20,14 @@ export function getValidator(validation?: Validation): Validator {
   // Undefined maps to `any`
   if (validation === undefined) return any
 
+  // Validator instances are simply returned
+  if (validation instanceof Validator) return validation
+
   // Constant values
   if (isPrimitive(validation)) return constant(validation)
 
   // Validator instances (or function creating one)
   if (isFunction(validation)) validation = validation()
-  if (isValidator(validation)) return validation
 
   // Something bad happened!
   throw new TypeError('Invalid validation (no validator???)')
@@ -46,12 +49,4 @@ export function isPrimitive(what: any): what is boolean | string | number | null
 /** Type guard for _functions_. */
 export function isFunction(what: any): what is Function {
   return typeof what === 'function'
-}
-
-/** Type guard for `Validator` instances. */
-export function isValidator(what: any): what is Validator {
-  return what &&
-    (typeof what === 'object') &&
-    ('validate' in what) &&
-    (typeof what.validate === 'function')
 }

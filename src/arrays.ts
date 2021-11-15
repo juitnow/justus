@@ -1,23 +1,8 @@
-import type {
-  InferValidationType,
-  Validation,
-  ValidationOptions,
-  Validator,
-} from './validation'
-
-import {
-  assert,
-  getValidator,
-  isFunction,
-  isPrimitive,
-  isValidator,
-} from './utilities'
-
-import {
-  ValidationErrorBuilder,
-} from './errors'
-import { AbstractValidator } from './validator'
+import { InferValidationType, Validation, ValidationOptions } from './validation'
+import { ValidationErrorBuilder } from './errors'
+import { Validator } from './validator'
 import { any } from './primitives'
+import { assert, getValidator, isFunction, isPrimitive } from './utilities'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -35,7 +20,7 @@ export interface ArrayConstraints<V extends Validation> {
   items?: V,
 }
 
-export class ArrayValidator<T> extends AbstractValidator<T[]> {
+export class ArrayValidator<T> extends Validator<T[]> {
   #maxItems: number
   #minItems: number
   #uniqueItems: boolean
@@ -116,7 +101,7 @@ export function array(options: Validation | ArrayConstraints<Validation> = {}): 
   const resolvedOptions =
     isFunction(options) ? { items: getValidator(options) } :
     isPrimitive(options) ? { items: getValidator(options) } :
-    isValidator(options) ? { items: options } :
+    options instanceof Validator ? { items: options } :
     { ...options, items: getValidator(options.items) }
 
   return new ArrayValidator(resolvedOptions)

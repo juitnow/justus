@@ -1,24 +1,10 @@
-import type { ObjectValidator } from './objects'
+import { ObjectValidator } from './objects'
+import { Validator } from './validator'
 import { getValidator } from './utilities'
 
 /* ========================================================================== *
  * BASIC TYPES                                                                *
  * ========================================================================== */
-
-/**
- * The `Validator` interface defines an object capable of validating a given
- * _value_ and (possibly) converting it the required `Type`.
- *
- * @public
- */
-export interface Validator<T = any> {
-  /**
-   * Validate a _value_ and optionally convert it to the required `Type`.
-   *
-   * @param value - The _value_ to validate
-   */
-  validate(value: unknown, options: ValidationOptions): T,
-}
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
 export type Validation<V extends Validator = Validator> =

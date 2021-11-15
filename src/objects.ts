@@ -1,25 +1,17 @@
-import { ValidationOptions, Validator } from './validation'
-
-import {
-  allowAdditionalProperties,
-  InferSchema,
-  AdditionalProperties,
-  Schema,
-} from './schemas'
-
-import { assert, getValidator, isPrimitive, isValidator } from './utilities'
-
-import { AnyValidator } from './primitives'
+import { AdditionalProperties, InferSchema, Schema, allowAdditionalProperties } from './schemas'
+import { AnyValidator, any } from './primitives'
 import { ValidationErrorBuilder } from './errors'
-import { AbstractValidator } from './validator'
+import { ValidationOptions } from './validation'
+import { Validator } from './validator'
+import { assert, getValidator, isPrimitive } from './utilities'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
 
-export class ObjectValidator extends AbstractValidator<Record<string, any>>
+export class ObjectValidator extends Validator<Record<string, any>>
   implements AdditionalProperties<AnyValidator> {
-  [allowAdditionalProperties]: any
+  [allowAdditionalProperties] = any
 
   validate(value: unknown): Record<string, any> {
     assert(typeof value == 'object', 'Value is not an "object"')
@@ -28,7 +20,7 @@ export class ObjectValidator extends AbstractValidator<Record<string, any>>
   }
 }
 
-export class SchemaValidator<S extends Schema> extends AbstractValidator<InferSchema<S>> {
+export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>> {
   readonly schema: S
 
   #additionalProperties?: Validator
@@ -47,8 +39,8 @@ export class SchemaValidator<S extends Schema> extends AbstractValidator<InferSc
 
       if (isPrimitive(definition)) {
         this.#requiredProperties[key] = getValidator(definition)
-      } else if (isValidator(definition)) {
-        this.#requiredProperties[key] = getValidator(definition)
+      } else if (definition instanceof Validator) {
+        this.#requiredProperties[key] = definition
       } else if ('modifier' in definition) {
         (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition.modifier
       } else if ('never' in definition) {
@@ -112,7 +104,7 @@ export class SchemaValidator<S extends Schema> extends AbstractValidator<InferSc
           builder.record(key, error)
         }
       })
-    } else {
+    } else if (! options.stripAdditionalProperties) {
       additionalKeys.forEach((key) => {
         if (value[key] !== undefined) builder.record(key, 'Unknown property found')
       })

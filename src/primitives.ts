@@ -1,12 +1,11 @@
-import { Validator } from './validation'
-import { AbstractValidator } from './validator'
+import { Validator } from './validator'
 import { assert } from './utilities'
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, BOOLEANS)                                           *
  * ========================================================================== */
 
-export class AnyValidator extends AbstractValidator<any> {
+export class AnyValidator extends Validator<any> {
   validate(value: any): any {
     return value
   }
@@ -19,7 +18,7 @@ export class AnyValidator extends AbstractValidator<any> {
  */
 export const any = new AnyValidator()
 
-export class BooleanValidator extends AbstractValidator<boolean> {
+export class BooleanValidator extends Validator<boolean> {
   validate(value: any): boolean {
     assert(typeof value === 'boolean', 'Value is not a "boolean"')
     return value
@@ -55,7 +54,7 @@ export interface NumberConstraints {
   allowNaN?: boolean,
 }
 
-export class NumberValidator<N extends number = number> extends AbstractValidator<N> {
+export class NumberValidator<N extends number = number> extends Validator<N> {
   #allowNaN: boolean
   #exclusiveMaximum?: number
   #exclusiveMinumum?: number
@@ -168,7 +167,7 @@ export interface StringConstraints {
   pattern?: RegExp,
 }
 
-export class StringValidator<S extends string = string> extends AbstractValidator<S> {
+export class StringValidator<S extends string = string> extends Validator<S> {
   #maxLength: number
   #minLength: number
   #pattern?: RegExp
@@ -224,7 +223,7 @@ export function string<S extends string>(constraints?: StringConstraints): Strin
  * CONSTANTS VALIDATION                                                       *
  * ========================================================================== */
 
-export class ConstantValidator<T extends string | number | boolean | null> extends AbstractValidator<T> {
+export class ConstantValidator<T extends string | number | boolean | null> extends Validator<T> {
   #constant: T
 
   constructor(constant: T) {

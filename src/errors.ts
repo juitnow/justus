@@ -1,5 +1,5 @@
-import { assert } from './utilities'
 import { ValidationOptions } from './validation'
+import { assert } from './utilities'
 
 type ValidationErrors = { key: string, message: string }[]
 

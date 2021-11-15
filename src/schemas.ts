@@ -1,11 +1,7 @@
-import type {
-  InferValidationType,
-  Validation,
-  Validator,
-} from './validation'
-
-import { getValidator, isPrimitive, isValidator } from './utilities'
+import { InferValidationType, Validation } from './validation'
+import { Validator } from './validator'
 import { any, AnyValidator } from './primitives'
+import { getValidator, isPrimitive } from './utilities'
 
 export const allowAdditionalProperties = Symbol('additionalProperties')
 type allowAdditionalProperties = typeof allowAdditionalProperties
@@ -85,7 +81,7 @@ export function readonly<M extends Modifier>(modifier: M): CombineModifiers<Read
 export function readonly(modifier?: Modifier<any> | Validation): any {
   const validator =
     isPrimitive(modifier) ? getValidator(modifier) :
-    isValidator(modifier) ? getValidator(modifier) :
+    modifier instanceof Validator ? modifier :
     modifier ? modifier : any
 
   return { modifier: validator, readonly: true }
@@ -98,7 +94,7 @@ export function optional<M extends Modifier>(modifier: M): CombineModifiers<Opti
 export function optional(modifier?: Modifier<any> | Validation): any {
   const validator =
     isPrimitive(modifier) ? getValidator(modifier) :
-    isValidator(modifier) ? getValidator(modifier) :
+    modifier instanceof Validator ? modifier :
     modifier ? modifier : any
 
   return { modifier: validator, optional: true }

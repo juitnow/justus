@@ -1,4 +1,4 @@
-import type { ValidationOptions, Validator } from './validation'
+import { ValidationOptions } from './validation'
 
 /**
  * A `Validator` is an object capable of validating a given _value_ and
@@ -6,7 +6,7 @@ import type { ValidationOptions, Validator } from './validation'
  *
  * @public
  */
-export abstract class AbstractValidator<T = any> implements Validator<T> {
+export abstract class Validator<T = any> {
   /**
    * Validate a _value_ and optionally convert it to the required `Type`.
    *
