@@ -6,8 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "npm run lint && npm run compile && npm run test",
-    "compile": "rm -rf build dist ; ./node_modules/.bin/tsc ; cp -R build/src dist",
-    "dev": "nodemon -e ts,js -x 'npm run compile && npm run test' -w src -w test -w test-d",
+    "compile": "rm -rf build dist && tsc && cp -R build/src dist",
+    "dev": "nodemon -e ts,js -x 'tsc && npm run test' -w src -w test -w test-d",
     "lint": "eslint src test test-d",
     "prepare": "patch -N -p0 -i .nyc.patch",
     "test": "NODE_OPTIONS='--enable-source-maps' nyc --reporter=html --reporter=text mocha 'build/test/**/*.js'"
