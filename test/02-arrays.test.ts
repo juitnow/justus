@@ -1,7 +1,7 @@
 import { ValidationError, validate, array, string } from '../src'
 import { expect } from 'chai'
 
-describe('Arrays validators', () => {
+describe('Array validators', () => {
   it('should validate an array', () => {
     expect(validate(array, [ 1, true, 'foo' ])).to.eql([ 1, true, 'foo' ])
     expect(validate(array, [])).to.eql([])

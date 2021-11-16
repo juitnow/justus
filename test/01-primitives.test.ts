@@ -1,7 +1,7 @@
 import { ValidationError, any, boolean, validate, number, constant, string } from '../src'
 import { expect } from 'chai'
 
-describe('Primitives validators', () => {
+describe('Primitive validators', () => {
   describe('any', () => {
     it('should validate anything', () => {
       expect(validate(any, undefined)).to.be.undefined
