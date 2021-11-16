@@ -5,7 +5,7 @@ type ValidationErrors = { key: string, message: string }[]
 
 /** Simple assertion function */
 export function assert(what: boolean | undefined, message: string): asserts what {
-  if (! what) throw new ValidationError(message, assert)
+  if (! what) throw new TypeError(message)
 }
 
 export class ValidationError extends Error {
@@ -16,15 +16,21 @@ export class ValidationError extends Error {
   constructor(errors: ValidationErrors | string, constructor?: Function) {
     if (typeof errors === 'string') errors = [ { key: '', message: errors } ]
 
-    super(`Found ${errors.length} validation errors`)
-    Object.defineProperty(this, 'errors', { value: errors })
-
     const details = errors
         .map(({ key, message }) => key ? `${key} : ${message}` : message)
         .join('\n  ')
+    const message = errors.length !== 1 ?
+      `Found ${errors.length} validation errors` :
+      'Found 1 validation error'
+
+    super(`${message}\n  ${details}`)
 
     Error.captureStackTrace(this, constructor || ValidationError)
-    this.stack = this.stack!.replace('\n', `\n  ${details}\n`)
+    Object.defineProperty(this, 'errors', { value: errors })
+  }
+
+  static assert(what: boolean | undefined, message: string): asserts what {
+    if (! what) throw new ValidationError(message, ValidationError.assert)
   }
 }
 
