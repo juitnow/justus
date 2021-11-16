@@ -47,8 +47,7 @@ export class ValidationErrorBuilder {
       error.errors.forEach(({ key: subkey, message }) => {
         const newkey =
             typeof key === 'number' ? `[${key}]${subkey}` :
-            key ? `${key}.${subkey}` :
-            subkey
+            key ? subkey ? `${key}.${subkey}` : key : subkey
 
         this.errors.push({ key: newkey, message })
       })
