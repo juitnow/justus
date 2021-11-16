@@ -1,9 +1,8 @@
 import { AdditionalProperties, InferSchema, Schema, allowAdditionalProperties } from './schemas'
 import { AnyValidator, any } from './primitives'
-import { ValidationErrorBuilder } from './errors'
+import { ValidationError, ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
 import { Validator } from './validator'
-import { assert } from './errors'
 import { getValidator, isPrimitive } from './utilities'
 
 /* ========================================================================== *
@@ -15,8 +14,8 @@ export class ObjectValidator extends Validator<Record<string, any>>
   [allowAdditionalProperties] = any
 
   validate(value: unknown): Record<string, any> {
-    assert(typeof value == 'object', 'Value is not an "object"')
-    assert(value !== null, 'Value is "null"')
+    ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
+    ValidationError.assert(value !== null, 'Value is "null"')
     return value
   }
 }
@@ -27,7 +26,7 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
   #additionalProperties?: Validator
   #requiredProperties: Record<string, Validator<any>> = {}
   #optionalProperties: Record<string, Validator<any>> = {}
-  #neverProperties: string[] = []
+  #neverProperties: Set<string> = new Set<string>()
 
   constructor(schema: S) {
     super()
@@ -45,7 +44,7 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
       } else if ('modifier' in definition) {
         (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition.modifier
       } else if ('never' in definition) {
-        this.#neverProperties.push(key)
+        this.#neverProperties.add(key)
       } else {
         this.#requiredProperties[key] = getValidator(definition)
       }
@@ -55,46 +54,47 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
   }
 
   validate(value: any, options: ValidationOptions): InferSchema<S> {
-    assert(typeof value == 'object', 'Value is not an "object"')
-    assert(value !== null, 'Value is "null"')
+    ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
+    ValidationError.assert(value !== null, 'Value is "null"')
 
     const builder = new ValidationErrorBuilder(options)
     const clone: Record<string, any> = {}
 
-    for (const key of Object.keys(this.#requiredProperties)) {
-      const validator = this.#requiredProperties[key]
+    for (const [ key, validator ] of Object.entries(this.#requiredProperties)) {
+      if (value[key] === undefined) {
+        builder.record(key, 'Required property missing')
+        continue
+      }
 
       try {
-        assert(value[key] !== undefined, 'Required value is "undefined"')
         clone[key] = validator.validate(value[key], options)
       } catch (error) {
         builder.record(key, error)
       }
     }
 
-    for (const key of Object.keys(this.#optionalProperties)) {
-      const validator = this.#requiredProperties[key]
+    for (const [ key, validator ] of Object.entries(this.#optionalProperties)) {
+      if (value[key] === undefined) continue
 
       try {
-        if (value[key] !== undefined) {
-          clone[key] = validator.validate(value[key], options)
-        }
+        clone[key] = validator.validate(value[key], options)
       } catch (error) {
         builder.record(key, error)
       }
     }
 
     for (const key of this.#neverProperties) {
-      try {
-        assert(value[key] == undefined, 'Forbidden property found')
-      } catch (error) {
-        builder.record(key, error)
-      }
+      if (value[key] === undefined) continue
+      builder.record(key, 'Forbidden property')
     }
 
-    const cloned = Object.keys(clone)
-    const additionalKeys = Object.keys(value).filter((k) => ! cloned.includes(k))
     const additional = this.#additionalProperties
+    const additionalKeys = Object.keys(value).filter((k) => {
+      if (k in this.#requiredProperties) return false
+      if (k in this.#optionalProperties) return false
+      if (this.#neverProperties.has(k)) return false
+      return true
+    })
 
     if (additional) {
       additionalKeys.forEach((key) => {
