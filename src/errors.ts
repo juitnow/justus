@@ -1,5 +1,3 @@
-import { ValidationOptions } from './validation'
-
 type ValidationErrors = { path: (string | number)[], message: string }[]
 
 function pathToString(path: (string | number)[]): string {
@@ -43,11 +41,6 @@ export class ValidationError extends Error {
 
 export class ValidationErrorBuilder {
   readonly errors: ValidationErrors = []
-  readonly #options: ValidationOptions
-
-  constructor(options: ValidationOptions) {
-    this.#options = options
-  }
 
   record(key: string | number, error: any): void {
     if (error instanceof ValidationError) {
@@ -56,10 +49,6 @@ export class ValidationErrorBuilder {
       })
     } else {
       this.errors.push({ path: [ key ], message: `${error}` })
-    }
-
-    if (this.errors.length > this.#options.maximumFailures) {
-      throw new ValidationError(this.errors)
     }
   }
 

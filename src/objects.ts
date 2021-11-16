@@ -57,7 +57,7 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
     ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
     ValidationError.assert(value !== null, 'Value is "null"')
 
-    const builder = new ValidationErrorBuilder(options)
+    const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
 
     for (const [ key, validator ] of Object.entries(this.#requiredProperties)) {

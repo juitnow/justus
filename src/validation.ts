@@ -24,7 +24,6 @@ export type InferValidationType<V extends Validation> =
  * ========================================================================== */
 
 export interface ValidationOptions {
-  readonly maximumFailures: number,
   readonly stripAdditionalProperties: boolean,
 }
 
@@ -38,7 +37,6 @@ export function validate<V extends Validation>(
     options: PartialValidationOptions = {},
 ): InferValidationType<V> {
   const opts: ValidationOptions = {
-    maximumFailures: Number.POSITIVE_INFINITY,
     stripAdditionalProperties: false,
     ...options,
   }

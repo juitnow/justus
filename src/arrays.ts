@@ -63,7 +63,7 @@ export class ArrayValidator<V extends Validation> extends Validator<InferValidat
     ValidationError.assert(value.length <= this.#maxItems,
         `Array must have a maximum length of ${this.#maxItems}`)
 
-    const builder = new ValidationErrorBuilder(options)
+    const builder = new ValidationErrorBuilder()
     const clone: any[] = new Array(value.length)
 
     value.forEach((item, i) => {
