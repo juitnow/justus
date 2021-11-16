@@ -4,6 +4,7 @@ import { Validator } from './validator'
 import { any } from './primitives'
 import { assert } from './errors'
 import { getValidator, isFunction, isPrimitive } from './utilities'
+import { ValidationError } from '.'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -21,25 +22,34 @@ export interface ArrayConstraints<V extends Validation> {
   items?: V,
 }
 
-export class ArrayValidator<T> extends Validator<T[]> {
+export class ArrayValidator<V extends Validation> extends Validator<InferValidationType<V>[]> {
   #maxItems: number
   #minItems: number
   #uniqueItems: boolean
-  #items: Validator<T>
+  #items: Validator<V>
 
-  constructor(options: ArrayConstraints<Validator<T>> = {}) {
+  constructor()
+  constructor(validation: V)
+  constructor(constraints: ArrayConstraints<V>)
+  constructor(options: Validation | ArrayConstraints<Validation> = {}) {
     super()
+
+    const resolvedOptions =
+      options instanceof Validator ? { items: options } :
+      isFunction(options) ? { items: getValidator(options) } :
+      isPrimitive(options) ? { items: getValidator(options) } :
+      { ...options, items: getValidator(options.items) }
 
     const {
       items = any,
       maxItems = Number.POSITIVE_INFINITY,
       minItems = 0,
       uniqueItems = false,
-    } = options
+    } = resolvedOptions
 
-    assert(minItems >= 0, `Constraint "minItems" must be non-negative: ${minItems}`)
-    assert(maxItems >= 0, `Constraint "maxItems" must be non-negative: ${maxItems}`)
-    assert(minItems > maxItems, `Constraint "minItems" is greater than "maxItems": ${minItems} > ${maxItems}`)
+    assert(minItems >= 0, `Constraint "minItems" (${minItems}) must be non-negative`)
+    assert(maxItems >= 0, `Constraint "maxItems" (${maxItems}) must be non-negative`)
+    assert(minItems <= maxItems, `Constraint "minItems" (${minItems}) is greater than "maxItems" (${maxItems})`)
 
     this.#items = items
     this.#maxItems = maxItems
@@ -47,13 +57,13 @@ export class ArrayValidator<T> extends Validator<T[]> {
     this.#uniqueItems = uniqueItems
   }
 
-  validate(value: any, options: ValidationOptions): T[] {
-    assert(Array.isArray(value), 'Value is not an "array"')
+  validate(value: any, options: ValidationOptions): InferValidationType<V>[] {
+    ValidationError.assert(Array.isArray(value), 'Value is not an "array"')
 
-    assert(value.length >= this.#minItems,
+    ValidationError.assert(value.length >= this.#minItems,
         `Array must have a minimum length of ${this.#minItems}`)
 
-    assert(value.length <= this.#maxItems,
+    ValidationError.assert(value.length <= this.#maxItems,
         `Array must have a maximum length of ${this.#maxItems}`)
 
     const builder = new ValidationErrorBuilder(options)
@@ -61,9 +71,13 @@ export class ArrayValidator<T> extends Validator<T[]> {
 
     value.forEach((item, i) => {
       try {
-        const unique = value.indexOf(value[i]) == i
-        if (unique) clone[i] = this.#items.validate(item[i], options)
-        else if (this.#uniqueItems) assert(false, `Duplicate item at index ${i}`)
+        const position = value.indexOf(value[i])
+        if (position === i) {
+          this.#items.validate(item, options)
+        } else if (this.#uniqueItems) {
+          builder.record(i, `Duplicates item at index ${position}`)
+        }
+        clone[i] = item
       } catch (error) {
         builder.record(i, error)
       }
@@ -80,30 +94,9 @@ export class ArrayValidator<T> extends Validator<T[]> {
  * A function returning a `Validator` for an `Array` containing `any` item.
  */
 export function array(): ArrayValidator<any>
-
-/**
- * A function returning a `Validator` for an `Array`.
- *
- * @param validation - A `Validator` (or generator thereof) validating each
- *                     of the _items_ in the `Array`
- */
 export function array<V extends Validation>(validation: V): ArrayValidator<InferValidationType<V>>
-
-/**
- * A function returning a `Validator` for an `Array`.
- *
- * @param constraints - Optional constraints to validate the `Array` with.
- */
 export function array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidationType<V>>
 
-/* -------------------------------------------------------------------------- */
-
-export function array(options: Validation | ArrayConstraints<Validation> = {}): Validator<any[]> {
-  const resolvedOptions =
-    isFunction(options) ? { items: getValidator(options) } :
-    isPrimitive(options) ? { items: getValidator(options) } :
-    options instanceof Validator ? { items: options } :
-    { ...options, items: getValidator(options.items) }
-
-  return new ArrayValidator(resolvedOptions)
+export function array(options?: Validation | ArrayConstraints<Validation>): ArrayValidator<Validation> {
+  return new ArrayValidator(<any> options)
 }
