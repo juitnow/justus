@@ -1,4 +1,4 @@
-import { ValidationError, any, boolean, validate, number, constant } from '../src'
+import { ValidationError, any, boolean, validate, number, constant, string } from '../src'
 import { expect } from 'chai'
 
 describe('Primitives validators', () => {
@@ -32,6 +32,7 @@ describe('Primitives validators', () => {
 
   describe('constants', () => {
     it('should validate a constant', () => {
+      expect(validate(constant(null), null)).to.be.null
       expect(validate(constant(false), false)).to.be.false
       expect(validate(constant('foo'), 'foo')).to.equal('foo')
     })
@@ -47,6 +48,12 @@ describe('Primitives validators', () => {
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
             { key: '', message: 'Value does not match constant "true"' },
+          ])
+
+      expect(() => validate(constant(null), undefined))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { key: '', message: 'Value does not match constant "null"' },
           ])
     })
   })
@@ -154,20 +161,6 @@ describe('Primitives validators', () => {
           .to.throw(TypeError, 'Constraint "exclusiveMaximum" (0) must be greater than "minimum" (0)')
     })
 
-    it('should validate NaN', () => {
-      expect(() => validate(number, NaN))
-          .to.throw(ValidationError, 'Found 1 validation error')
-          .with.property('errors').to.eql([
-            { key: '', message: 'Number is "NaN"' },
-          ])
-      expect(() => validate(number({ allowNaN: false }), NaN))
-          .to.throw(ValidationError, 'Found 1 validation error')
-          .with.property('errors').to.eql([
-            { key: '', message: 'Number is "NaN"' },
-          ])
-      expect(validate(number({ allowNaN: true }), NaN)).to.be.NaN
-    })
-
     it('should validate multiple ofs', () => {
       // integers
       expect(validate(number({ multipleOf: 2 }), 4)).to.equal(4)
@@ -195,6 +188,67 @@ describe('Primitives validators', () => {
       // too much precision
       expect(() => number({ multipleOf: 1.2345678 }))
           .to.throw(TypeError, 'Constraint "multipleOf" (1.2345678) requires too much precision')
+    })
+
+    it('should validate NaN', () => {
+      expect(() => validate(number, NaN))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { key: '', message: 'Number is "NaN"' },
+          ])
+      expect(() => validate(number({ allowNaN: false }), NaN))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { key: '', message: 'Number is "NaN"' },
+          ])
+      expect(validate(number({ allowNaN: true }), NaN)).to.be.NaN
+    })
+  })
+
+  describe('string', () => {
+    it('should validate a string', () => {
+      expect(validate(string, 'foobar')).to.equal('foobar')
+      expect(validate(string, '')).to.equal('')
+
+      expect(() => validate(string, 123))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { key: '', message: 'Value is not a "string"' },
+          ])
+    })
+
+    it('should validate a of a specified length', () => {
+      const length = string({ minLength: 3, maxLength: 6 })
+      expect(validate(length, 'foo')).to.equal('foo')
+      expect(validate(length, 'foobar')).to.equal('foobar')
+      expect(() => validate(length, 'fo'))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { key: '', message: 'String must have a minimum length of 3' },
+          ])
+      expect(() => validate(length, 'foobarx'))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { key: '', message: 'String must have a maximum length of 6' },
+          ])
+
+      expect(validate(string({ minLength: 3, maxLength: 3 }), 'foo')).to.equal('foo')
+
+      expect(() => string({ minLength: -1 }))
+          .to.throw(TypeError, 'Constraint "minLength" (-1) must be non-negative')
+      expect(() => string({ maxLength: -1 }))
+          .to.throw(TypeError, 'Constraint "maxLength" (-1) must be non-negative')
+      expect(() => string({ minLength: 4, maxLength: 3 }))
+          .to.throw(TypeError, 'Constraint "minLength" (4) is greater than "maxLength" (3)')
+    })
+
+    it('should validate a with a pattern', () => {
+      expect(validate(string({ pattern: /^foobar$/ }), 'foobar')).to.equal('foobar')
+      expect(() => validate(string({ pattern: /^$/ }), 'foobar'))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { key: '', message: 'String does not match required pattern /^$/' },
+          ])
     })
   })
 })

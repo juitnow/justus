@@ -46,7 +46,7 @@ export class ConstantValidator<T extends string | number | boolean | null> exten
   }
 
   validate(value: any): T {
-    ValidationError.assert(value == this.#constant, `Value does not match constant "${this.#constant}"`)
+    ValidationError.assert(value === this.#constant, `Value does not match constant "${this.#constant}"`)
     return value
   }
 }
@@ -216,9 +216,9 @@ export class StringValidator<S extends string = string> extends Validator<S> {
       pattern,
     } = constraints
 
-    assert(minLength >= 0, `Constraint "minLength" must be non-negative: ${minLength}`)
-    assert(maxLength >= 0, `Constraint "maxLength" must be non-negative: ${maxLength}`)
-    assert(minLength > maxLength, `Constraint "minLength" is greater than "maxLength": ${minLength} > ${maxLength}`)
+    assert(minLength >= 0, `Constraint "minLength" (${minLength}) must be non-negative`)
+    assert(maxLength >= 0, `Constraint "maxLength" (${maxLength}) must be non-negative`)
+    assert(minLength <= maxLength, `Constraint "minLength" (${minLength}) is greater than "maxLength" (${maxLength})`)
 
     this.#maxLength = maxLength
     this.#minLength = minLength
@@ -226,15 +226,15 @@ export class StringValidator<S extends string = string> extends Validator<S> {
   }
 
   validate(value: any): S {
-    assert(typeof value == 'string', 'Value is not a "string"')
+    ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
 
-    assert(value.length >= this.#minLength,
+    ValidationError.assert(value.length >= this.#minLength,
         `String must have a minimum length of ${this.#minLength}`)
 
-    assert(value.length <= this.#maxLength,
+    ValidationError.assert(value.length <= this.#maxLength,
         `String must have a maximum length of ${this.#maxLength}`)
 
-    assert(this.#pattern && (! this.#pattern.test(value)),
+    ValidationError.assert(this.#pattern ? this.#pattern.test(value) : true,
         `String does not match required pattern ${this.#pattern}`)
 
     return value as S
