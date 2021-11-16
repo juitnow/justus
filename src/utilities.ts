@@ -22,10 +22,10 @@ export function getValidator(validation?: Validation): Validator {
   if (isPrimitive(validation)) return constant(validation)
 
   // Validator instances (or function creating one)
-  if (isFunction(validation)) validation = validation()
+  if (isFunction(validation)) return validation()
 
   // Something bad happened!
-  throw new TypeError('Invalid validation (no validator???)')
+  throw new TypeError(`Invalid validation (type=${typeof validation})`)
 }
 
 /** Type guard for _primitives_ (`boolean`, `string`, `number` or `null`). */
