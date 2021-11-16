@@ -217,7 +217,7 @@ describe('Primitives validators', () => {
           ])
     })
 
-    it('should validate a of a specified length', () => {
+    it('should validate a string of a specified length', () => {
       const length = string({ minLength: 3, maxLength: 6 })
       expect(validate(length, 'foo')).to.equal('foo')
       expect(validate(length, 'foobar')).to.equal('foobar')
@@ -242,7 +242,7 @@ describe('Primitives validators', () => {
           .to.throw(TypeError, 'Constraint "minLength" (4) is greater than "maxLength" (3)')
     })
 
-    it('should validate a with a pattern', () => {
+    it('should validate a string a with a pattern', () => {
       expect(validate(string({ pattern: /^foobar$/ }), 'foobar')).to.equal('foobar')
       expect(() => validate(string({ pattern: /^$/ }), 'foobar'))
           .to.throw(ValidationError, 'Found 1 validation error')
