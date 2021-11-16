@@ -1,5 +1,5 @@
 import { Validator } from './validator'
-import { assert } from './errors'
+import { ValidationError, assert } from './errors'
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, BOOLEANS)                                           *
@@ -20,7 +20,7 @@ export const any = new AnyValidator()
 
 export class BooleanValidator extends Validator<boolean> {
   validate(value: any): boolean {
-    assert(typeof value === 'boolean', 'Value is not a "boolean"')
+    ValidationError.assert(typeof value === 'boolean', 'Value is not a "boolean"')
     return value
   }
 }
@@ -31,6 +31,35 @@ export class BooleanValidator extends Validator<boolean> {
  * @public
  */
 export const boolean = new BooleanValidator()
+
+
+/* ========================================================================== *
+ * CONSTANTS VALIDATION                                                       *
+ * ========================================================================== */
+
+export class ConstantValidator<T extends string | number | boolean | null> extends Validator<T> {
+  #constant: T
+
+  constructor(constant: T) {
+    super()
+    this.#constant = constant
+  }
+
+  validate(value: any): T {
+    ValidationError.assert(value == this.#constant, `Value does not match constant "${this.#constant}"`)
+    return value
+  }
+}
+
+/**
+ * Create a `Validator` validating the specified constant.
+ *
+ * @public
+ */
+export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
+  return new ConstantValidator(constant)
+}
+
 
 /* ========================================================================== *
  * BRANDED NUMBERS VALIDATION                                                 *
@@ -49,7 +78,7 @@ export interface NumberConstraints {
   /** The _exclusive_ maximum value for a valid `number`: `value < exclusiveMaximum` */
   exclusiveMaximum?: number,
   /** The _exclusive_ minimum value for a valid `number`: `value > exclusiveMaximum` */
-  exclusiveMinumum?: number,
+  exclusiveMinimum?: number,
   /** Whether to allow `NaN` or not (default: `false`) */
   allowNaN?: boolean,
 }
@@ -57,7 +86,7 @@ export interface NumberConstraints {
 export class NumberValidator<N extends number = number> extends Validator<N> {
   #allowNaN: boolean
   #exclusiveMaximum?: number
-  #exclusiveMinumum?: number
+  #exclusiveMinimum?: number
   #isMultipleOf?: ((value: number) => boolean)
   #maximum: number
   #minimum: number
@@ -69,75 +98,81 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
     const {
       allowNaN = false,
       exclusiveMaximum,
-      exclusiveMinumum,
+      exclusiveMinimum,
       maximum = Number.POSITIVE_INFINITY,
       minimum = Number.NEGATIVE_INFINITY,
       multipleOf,
     } = constraints
 
-    assert(minimum > maximum, `Constraint "minimum" is greater than "maximum": ${minimum} > ${maximum}`)
+    assert(maximum >= minimum, `Constraint "minimum" (${minimum}) is greater than "maximum" (${maximum})`)
 
     if (exclusiveMaximum !== undefined) {
-      assert(minimum >= exclusiveMaximum,
-          `Constraint "exclusiveMaximum" must be greater than "minimum": ${exclusiveMaximum} <= ${minimum}`)
+      assert(exclusiveMaximum > minimum,
+          `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "minimum" (${minimum})`)
     }
 
-    if (exclusiveMinumum !== undefined) {
-      assert(exclusiveMinumum >= maximum,
-          `Constraint "maximum" must be greater than "exclusiveMinumum": ${maximum} <= ${exclusiveMinumum}`)
+    if (exclusiveMinimum !== undefined) {
+      assert(maximum > exclusiveMinimum,
+          `Constraint "maximum" (${maximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`)
     }
 
-    if ((exclusiveMinumum != undefined) && (exclusiveMaximum !== undefined)) {
-      assert(exclusiveMinumum >= exclusiveMaximum,
-          `Constraint "exclusiveMaximum" must be greater than "exclusiveMinumum": ${exclusiveMaximum} <= ${exclusiveMinumum}`)
+    if ((exclusiveMinimum != undefined) && (exclusiveMaximum !== undefined)) {
+      assert(exclusiveMaximum > exclusiveMinimum,
+          `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`)
     }
 
     if (multipleOf !== undefined) {
-      assert(multipleOf > 0, `Constraint "multipleOf" must be greater than zero: ${multipleOf}`)
+      assert(multipleOf > 0, `Constraint "multipleOf" (${multipleOf}) must be greater than zero`)
 
       // Split the multiple of in integer and fraction
-      const integer = Math.trunc(multipleOf) // 1.05 -> 1.00
-      const fraction = multipleOf - integer //  1.05 -> 0.05
+      const bigMultipleOf = multipleOf * NumberValidator.PRECISION
+      const bigInteger = bigMultipleOf % NumberValidator.PRECISION
+      const bigDecimal = bigMultipleOf - Math.trunc(bigMultipleOf)
 
-      if (fraction === 0) {
+      if (bigInteger === 0) {
         // Easy case is when we only have to deal with integers...
         this.#isMultipleOf = (value): boolean => ! (value % multipleOf)
-      } else if (fraction >= 0.000001) {
-        // We have some "fractional" part (max 6 decimal digits), multiply...
-        const bigMultipleOf = Math.trunc(multipleOf * 1000000)
-        this.#isMultipleOf = (value): boolean => ! (Math.trunc(value * 1000000) % bigMultipleOf)
+      } else if (bigDecimal === 0) {
+        // We have some "decimal" part (max 6 decimal digits), multiply...
+        this.#isMultipleOf = (value): boolean => ! ((value * NumberValidator.PRECISION) % bigMultipleOf)
       } else {
         // Required precision was too much (more than 6 decimal digits)
-        assert(false, `Constraint "multipleOf" requires too much precision: ${multipleOf}`)
+        assert(false, `Constraint "multipleOf" (${multipleOf}) requires too much precision`)
       }
     }
 
     this.#allowNaN = allowNaN
     this.#exclusiveMaximum = exclusiveMaximum
-    this.#exclusiveMinumum = exclusiveMinumum
+    this.#exclusiveMinimum = exclusiveMinimum
     this.#maximum = maximum
     this.#minimum = minimum
+    this.#multipleOf = multipleOf
   }
 
   validate(value: unknown): N {
-    assert(typeof value == 'number', 'Value is not a "number"')
+    ValidationError.assert(typeof value == 'number', 'Value is not a "number"')
 
-    assert(isNaN(value) && this.#allowNaN, 'Number is "NaN"')
+    if (isNaN(value)) {
+      ValidationError.assert(this.#allowNaN, 'Number is "NaN"')
+      return value as N
+    }
 
-    assert(value >= this.#minimum, `Number is less than ${this.#minimum}`)
-    assert(value <= this.#maximum, `Number is greater than ${this.#minimum}`)
+    ValidationError.assert(value >= this.#minimum, `Number is less than ${this.#minimum}`)
+    ValidationError.assert(value <= this.#maximum, `Number is greater than ${this.#maximum}`)
 
-    assert((this.#exclusiveMinumum !== undefined) && (value > this.#exclusiveMinumum),
-        `Number is less than or equal to ${this.#exclusiveMinumum}`)
+    ValidationError.assert((this.#exclusiveMinimum == undefined) || (value > this.#exclusiveMinimum),
+        `Number is less than or equal to ${this.#exclusiveMinimum}`)
 
-    assert((this.#exclusiveMaximum !== undefined) && (value < this.#exclusiveMaximum),
+    ValidationError.assert((this.#exclusiveMaximum == undefined) || (value < this.#exclusiveMaximum),
         `Number is greater than or equal to ${this.#exclusiveMaximum}`)
 
-    assert(this.#isMultipleOf && this.#isMultipleOf(value),
+    ValidationError.assert(this.#isMultipleOf ? this.#isMultipleOf(value) : true,
         `Number is not a multiple of ${this.#multipleOf}`)
 
     return value as N
   }
+
+  static readonly PRECISION = 1000000
 }
 
 /**
@@ -216,32 +251,4 @@ export function string(constraints?: StringConstraints): StringValidator
 export function string<S extends string>(constraints?: StringConstraints): StringValidator<S>
 export function string<S extends string>(constraints?: StringConstraints): StringValidator<S> {
   return new StringValidator(constraints)
-}
-
-
-/* ========================================================================== *
- * CONSTANTS VALIDATION                                                       *
- * ========================================================================== */
-
-export class ConstantValidator<T extends string | number | boolean | null> extends Validator<T> {
-  #constant: T
-
-  constructor(constant: T) {
-    super()
-    this.#constant = constant
-  }
-
-  validate(value: any): T {
-    assert(value == this.#constant, `Value does not match constant ${constant}`)
-    return value
-  }
-}
-
-/**
- * Create a `Validator` validating the specified constant.
- *
- * @public
- */
-export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
-  return new ConstantValidator(constant)
 }
