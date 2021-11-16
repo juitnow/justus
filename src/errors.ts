@@ -17,7 +17,7 @@ export class ValidationError extends Error {
     if (typeof errors === 'string') errors = [ { key: '', message: errors } ]
 
     const details = errors
-        .map(({ key, message }) => key ? `${key} : ${message}` : message)
+        .map(({ key, message }) => key ? `${key}: ${message}` : message)
         .join('\n  ')
     const message = errors.length !== 1 ?
       `Found ${errors.length} validation errors` :
@@ -46,7 +46,7 @@ export class ValidationErrorBuilder {
     if (error instanceof ValidationError) {
       error.errors.forEach(({ key: subkey, message }) => {
         const newkey =
-            typeof subkey == 'number' ? `${key}[${subkey}]` :
+            typeof key === 'number' ? `[${key}]${subkey}` :
             key ? `${key}.${subkey}` :
             subkey
 
