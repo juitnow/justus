@@ -12,7 +12,7 @@ describe('Array validators', () => {
     expect(() => validate(array, 123))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([
-          { key: '', message: 'Value is not an "array"' },
+          { path: [], message: 'Value is not an "array"' },
         ])
   })
 
@@ -23,12 +23,12 @@ describe('Array validators', () => {
     expect(() => validate(length, [ 1, 2 ]))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([
-          { key: '', message: 'Array must have a minimum length of 3' },
+          { path: [], message: 'Array must have a minimum length of 3' },
         ])
     expect(() => validate(length, [ 1, 2, 3, 4, 5, 6, 7 ]))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([
-          { key: '', message: 'Array must have a maximum length of 6' },
+          { path: [], message: 'Array must have a maximum length of 6' },
         ])
 
     expect(validate(array({ minItems: 3, maxItems: 3 }), [ 1, 2, 3 ])).to.eql([ 1, 2, 3 ])
@@ -48,8 +48,8 @@ describe('Array validators', () => {
     expect(() => validate(array({ uniqueItems: true }), [ 1, 2, 1, 2 ]))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
-          { key: '[2]', message: 'Duplicate of item at index 0' },
-          { key: '[3]', message: 'Duplicate of item at index 1' },
+          { path: [ 2 ], message: 'Duplicate of item at index 0' },
+          { path: [ 3 ], message: 'Duplicate of item at index 1' },
         ])
   })
 
@@ -59,8 +59,8 @@ describe('Array validators', () => {
     expect(() => validate(array(string), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
-          { key: '[1]', message: 'Value is not a "string"' },
-          { key: '[3]', message: 'Value is not a "string"' },
+          { path: [ 1 ], message: 'Value is not a "string"' },
+          { path: [ 3 ], message: 'Value is not a "string"' },
         ])
 
     expect(validate(array(string()), [ 'a', 'b', 'c' ])).to.eql([ 'a', 'b', 'c' ])
@@ -68,8 +68,8 @@ describe('Array validators', () => {
     expect(() => validate(array(string()), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
-          { key: '[1]', message: 'Value is not a "string"' },
-          { key: '[3]', message: 'Value is not a "string"' },
+          { path: [ 1 ], message: 'Value is not a "string"' },
+          { path: [ 3 ], message: 'Value is not a "string"' },
         ])
 
     expect(validate(array('a'), [ 'a', 'a', 'a' ])).to.eql([ 'a', 'a', 'a' ])
@@ -77,9 +77,9 @@ describe('Array validators', () => {
     expect(() => validate(array('a'), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 3 validation errors')
         .with.property('errors').to.eql([
-          { key: '[1]', message: 'Value does not match constant "a"' },
-          { key: '[2]', message: 'Value does not match constant "a"' },
-          { key: '[3]', message: 'Value does not match constant "a"' },
+          { path: [ 1 ], message: 'Value does not match constant "a"' },
+          { path: [ 2 ], message: 'Value does not match constant "a"' },
+          { path: [ 3 ], message: 'Value does not match constant "a"' },
         ])
 
     expect(validate(array('a'), [ 'a', 'a', 'a' ])).to.eql([ 'a', 'a', 'a' ])
@@ -87,9 +87,9 @@ describe('Array validators', () => {
     expect(() => validate(array({ items: 'a', uniqueItems: true }), [ 'a', true, 'a', 123 ]))
         .to.throw(ValidationError, 'Found 3 validation errors')
         .with.property('errors').to.eql([
-          { key: '[1]', message: 'Value does not match constant "a"' },
-          { key: '[2]', message: 'Duplicate of item at index 0' },
-          { key: '[3]', message: 'Value does not match constant "a"' },
+          { path: [ 1 ], message: 'Value does not match constant "a"' },
+          { path: [ 2 ], message: 'Duplicate of item at index 0' },
+          { path: [ 3 ], message: 'Value does not match constant "a"' },
         ])
   })
 })

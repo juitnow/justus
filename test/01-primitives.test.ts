@@ -19,13 +19,13 @@ describe('Primitive validators', () => {
       expect(() => validate(boolean, 'foobar'))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Value is not a "boolean"' },
+            { path: [], message: 'Value is not a "boolean"' },
           ])
 
       expect(() => validate(boolean, undefined))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Value is not a "boolean"' },
+            { path: [], message: 'Value is not a "boolean"' },
           ])
     })
   })
@@ -41,19 +41,19 @@ describe('Primitive validators', () => {
       expect(() => validate(constant('foo'), 'bar'))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Value does not match constant "foo"' },
+            { path: [], message: 'Value does not match constant "foo"' },
           ])
 
       expect(() => validate(constant(true), false))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Value does not match constant "true"' },
+            { path: [], message: 'Value does not match constant "true"' },
           ])
 
       expect(() => validate(constant(null), undefined))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Value does not match constant "null"' },
+            { path: [], message: 'Value does not match constant "null"' },
           ])
     })
   })
@@ -68,7 +68,7 @@ describe('Primitive validators', () => {
       expect(() => validate(number, 'foobar'))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Value is not a "number"' },
+            { path: [], message: 'Value is not a "number"' },
           ])
     })
 
@@ -83,13 +83,13 @@ describe('Primitive validators', () => {
       expect(() => validate(range, -10))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is less than -9' },
+            { path: [], message: 'Number is less than -9' },
           ])
 
       expect(() => validate(range, 20))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is greater than 19' },
+            { path: [], message: 'Number is greater than 19' },
           ])
 
       expect(() => number({ minimum: 10, maximum: 9 }))
@@ -104,13 +104,13 @@ describe('Primitive validators', () => {
       expect(() => validate(range1, 0))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is less than or equal to 0' },
+            { path: [], message: 'Number is less than or equal to 0' },
           ])
 
       expect(() => validate(range1, 1))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is greater than or equal to 1' },
+            { path: [], message: 'Number is greater than or equal to 1' },
           ])
 
       const range2 = number({ exclusiveMinimum: 0, maximum: 1 })
@@ -120,13 +120,13 @@ describe('Primitive validators', () => {
       expect(() => validate(range2, 0))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is less than or equal to 0' },
+            { path: [], message: 'Number is less than or equal to 0' },
           ])
 
       expect(() => validate(range2, 1.001))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is greater than 1' },
+            { path: [], message: 'Number is greater than 1' },
           ])
 
       const range3 = number({ minimum: 0, exclusiveMaximum: 1 })
@@ -136,13 +136,13 @@ describe('Primitive validators', () => {
       expect(() => validate(range3, -0.001))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is less than 0' },
+            { path: [], message: 'Number is less than 0' },
           ])
 
       expect(() => validate(range3, 1))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is greater than or equal to 1' },
+            { path: [], message: 'Number is greater than or equal to 1' },
           ])
 
       expect(() => number({ exclusiveMinimum: 2, exclusiveMaximum: 1 }))
@@ -167,7 +167,7 @@ describe('Primitive validators', () => {
       expect(() => validate(number({ multipleOf: 2 }), 3))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is not a multiple of 2' },
+            { path: [], message: 'Number is not a multiple of 2' },
           ])
 
       // reals
@@ -175,14 +175,14 @@ describe('Primitive validators', () => {
       expect(() => validate(number({ multipleOf: 0.03 }), 0.07))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is not a multiple of 0.03' },
+            { path: [], message: 'Number is not a multiple of 0.03' },
           ])
 
       expect(validate(number({ multipleOf: 0.000001 }), 0.123456)).to.equal(0.123456)
       expect(() => validate(number({ multipleOf: 0.000001 }), 0.0000001))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is not a multiple of 0.000001' },
+            { path: [], message: 'Number is not a multiple of 0.000001' },
           ])
 
       // too much precision
@@ -194,12 +194,12 @@ describe('Primitive validators', () => {
       expect(() => validate(number, NaN))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is "NaN"' },
+            { path: [], message: 'Number is "NaN"' },
           ])
       expect(() => validate(number({ allowNaN: false }), NaN))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Number is "NaN"' },
+            { path: [], message: 'Number is "NaN"' },
           ])
       expect(validate(number({ allowNaN: true }), NaN)).to.be.NaN
     })
@@ -213,7 +213,7 @@ describe('Primitive validators', () => {
       expect(() => validate(string, 123))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'Value is not a "string"' },
+            { path: [], message: 'Value is not a "string"' },
           ])
     })
 
@@ -224,12 +224,12 @@ describe('Primitive validators', () => {
       expect(() => validate(length, 'fo'))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'String must have a minimum length of 3' },
+            { path: [], message: 'String must have a minimum length of 3' },
           ])
       expect(() => validate(length, 'foobarx'))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'String must have a maximum length of 6' },
+            { path: [], message: 'String must have a maximum length of 6' },
           ])
 
       expect(validate(string({ minLength: 3, maxLength: 3 }), 'foo')).to.equal('foo')
@@ -247,7 +247,7 @@ describe('Primitive validators', () => {
       expect(() => validate(string({ pattern: /^$/ }), 'foobar'))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { key: '', message: 'String does not match required pattern /^$/' },
+            { path: [], message: 'String does not match required pattern /^$/' },
           ])
     })
   })

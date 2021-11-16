@@ -1,7 +1,13 @@
 import { ValidationOptions } from './validation'
-// import { assert } from './utilities'
 
-type ValidationErrors = { key: string, message: string }[]
+type ValidationErrors = { path: (string | number)[], message: string }[]
+
+function pathToString(path: (string | number)[]): string {
+  return path.reduce((string: string, key, index): string => {
+    if (typeof key === 'number') return `${string}[${key}]`
+    return index === 0 ? key : `${string}.${key}`
+  }, '')
+}
 
 /** Simple assertion function */
 export function assert(what: boolean | undefined, message: string): asserts what {
@@ -14,9 +20,10 @@ export class ValidationError extends Error {
   constructor(message: string, constructor?: Function)
   constructor(errors: ValidationErrors, constructor?: Function)
   constructor(errors: ValidationErrors | string, constructor?: Function) {
-    if (typeof errors === 'string') errors = [ { key: '', message: errors } ]
+    if (typeof errors === 'string') errors = [ { path: [], message: errors } ]
 
     const details = errors
+        .map(({ path, message }) => ({ key: pathToString(path), message }))
         .map(({ key, message }) => key ? `${key}: ${message}` : message)
         .join('\n  ')
     const message = errors.length !== 1 ?
@@ -44,17 +51,11 @@ export class ValidationErrorBuilder {
 
   record(key: string | number, error: any): void {
     if (error instanceof ValidationError) {
-      error.errors.forEach(({ key: subkey, message }) => {
-        const newkey =
-            typeof key === 'number' ? `[${key}]${subkey}` :
-            key ? subkey ? `${key}.${subkey}` : key : subkey
-
-        this.errors.push({ key: newkey, message })
+      error.errors.forEach(({ path, message }) => {
+        this.errors.push({ path: [ key, ...path ], message })
       })
-    } else if (typeof key === 'number') {
-      this.errors.push({ key: `[${key}]`, message: error.toString() })
     } else {
-      this.errors.push({ key, message: error.toString() })
+      this.errors.push({ path: [ key ], message: `${error}` })
     }
 
     if (this.errors.length > this.#options.maximumFailures) {
