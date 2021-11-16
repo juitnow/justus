@@ -116,9 +116,8 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
   }
 }
 
-export function object(): ObjectValidator // <any, undefined>
+export function object(): ObjectValidator
 export function object<S extends Schema>(schema: S): SchemaValidator<S>
 export function object(schema?: Schema): ObjectValidator | SchemaValidator<Schema> {
-  if (! schema) return new ObjectValidator()
-  return new SchemaValidator(schema)
+  return schema ? new SchemaValidator(schema) : new ObjectValidator()
 }
