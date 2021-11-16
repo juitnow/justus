@@ -126,10 +126,6 @@ export type InferSchema<S extends Schema> =
       Record<string, V> &
       InferRemovedProperties<S> &
       InferValidators<S> :
-    // S extends AdditionalProperties<true> ?
-    //   Record<string, any> &
-    //   InferRemovedProperties<S> &
-    //   InferValidators<S> :
     InferValidators<S>
   )
 
