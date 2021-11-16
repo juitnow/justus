@@ -1,7 +1,6 @@
 import { InferValidationType, Validation, ValidationOptions } from './validation'
 import { ValidationErrorBuilder } from './errors'
 import { Validator } from './validator'
-import { any } from './primitives'
 import { assert } from './errors'
 import { getValidator, isFunction, isPrimitive } from './utilities'
 import { ValidationError } from '.'
@@ -34,18 +33,16 @@ export class ArrayValidator<V extends Validation> extends Validator<InferValidat
   constructor(options: Validation | ArrayConstraints<Validation> = {}) {
     super()
 
-    const resolvedOptions =
+    const {
+      items,
+      maxItems = Number.POSITIVE_INFINITY,
+      minItems = 0,
+      uniqueItems = false,
+    } =
       options instanceof Validator ? { items: options } :
       isFunction(options) ? { items: getValidator(options) } :
       isPrimitive(options) ? { items: getValidator(options) } :
       { ...options, items: getValidator(options.items) }
-
-    const {
-      items = any,
-      maxItems = Number.POSITIVE_INFINITY,
-      minItems = 0,
-      uniqueItems = false,
-    } = resolvedOptions
 
     assert(minItems >= 0, `Constraint "minItems" (${minItems}) must be non-negative`)
     assert(maxItems >= 0, `Constraint "maxItems" (${maxItems}) must be non-negative`)
@@ -75,7 +72,7 @@ export class ArrayValidator<V extends Validation> extends Validator<InferValidat
         if (position === i) {
           this.#items.validate(item, options)
         } else if (this.#uniqueItems) {
-          builder.record(i, `Duplicates item at index ${position}`)
+          builder.record(i, `Duplicate of item at index ${position}`)
         }
         clone[i] = item
       } catch (error) {
