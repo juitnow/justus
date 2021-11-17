@@ -35,6 +35,10 @@ describe('Primitive validators', () => {
       expect(validate(constant(null), null)).to.be.null
       expect(validate(constant(false), false)).to.be.false
       expect(validate(constant('foo'), 'foo')).to.equal('foo')
+
+      expect(validate(null, null)).to.be.null
+      expect(validate(false as const, false)).to.be.false
+      expect(validate('foo' as const, 'foo')).to.equal('foo')
     })
 
     it('should fail validating the wrong constant', () => {
