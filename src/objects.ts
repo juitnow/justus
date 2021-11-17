@@ -1,4 +1,4 @@
-import { AdditionalProperties, InferSchema, Schema, allowAdditionalProperties } from './schemas'
+import { AdditionalProperties, InferSchema, Schema, additionalProperties } from './schemas'
 import { AnyValidator, any } from './primitives'
 import { ValidationError, ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
@@ -11,7 +11,7 @@ import { getValidator, isPrimitive } from './utilities'
 
 export class ObjectValidator extends Validator<Record<string, any>>
   implements AdditionalProperties<AnyValidator> {
-  [allowAdditionalProperties] = any
+  [additionalProperties] = any
 
   validate(value: unknown): Record<string, any> {
     ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
@@ -30,7 +30,7 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
 
   constructor(schema: S) {
     super()
-    const { [allowAdditionalProperties]: additional, ...properties } = schema
+    const { [additionalProperties]: additional, ...properties } = schema
 
     this.#additionalProperties = additional && getValidator(additional)
 

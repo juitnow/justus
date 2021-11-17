@@ -1,4 +1,4 @@
-import { ValidationError, object, validate, string, number, array, additionalProperties, any } from '../src'
+import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any } from '../src'
 import { expect } from 'chai'
 
 describe('Object validator', () => {
@@ -104,26 +104,26 @@ describe('Object validator', () => {
   })
 
   it('should validate an object with additional properties', () => {
-    const validator1 = object({ foo: true, ...additionalProperties })
+    const validator1 = object({ foo: true, ...allowAdditionalProperties })
     expect(validate(validator1, { foo: true, bar: 'whatever' }))
         .to.eql({ foo: true, bar: 'whatever' })
 
-    const validator2 = object({ foo: true, ...additionalProperties(true) })
+    const validator2 = object({ foo: true, ...allowAdditionalProperties(true) })
     expect(validate(validator2, { foo: true, bar: 'whatever' }))
         .to.eql({ foo: true, bar: 'whatever' })
 
-    const validator3 = object({ foo: true, ...additionalProperties(any) })
+    const validator3 = object({ foo: true, ...allowAdditionalProperties(any) })
     expect(validate(validator3, { foo: true, bar: 'whatever' }))
         .to.eql({ foo: true, bar: 'whatever' })
 
-    const validator4 = object({ foo: true, ...additionalProperties(false) })
+    const validator4 = object({ foo: true, ...allowAdditionalProperties(false) })
     expect(() => validate(validator4, { foo: true, bar: 'whatever' }))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([
           { path: [ 'bar' ], message: 'Unknown property' },
         ])
 
-    const validator5 = object({ foo: true, ...additionalProperties(string) })
+    const validator5 = object({ foo: true, ...allowAdditionalProperties(string) })
     expect(validate(validator5, { foo: true, bar: 'whatever' }))
         .to.eql({ foo: true, bar: 'whatever' })
     expect(() => validate(validator5, { foo: true, bar: 123 }))

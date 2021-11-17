@@ -1,6 +1,6 @@
 import { expectError, expectType, printType } from 'tsd'
 import {
-  additionalProperties,
+  allowAdditionalProperties,
   boolean,
   number,
   never,
@@ -18,27 +18,27 @@ expectError(validate(object({
 }), null).extra)
 
 expectType<any>(validate(object({
-  ...additionalProperties, // as a function
+  ...allowAdditionalProperties, // as a function
 }), null).extra)
 
 expectType<any>(validate(object({
-  ...additionalProperties(), // default = true
+  ...allowAdditionalProperties(), // default = true
 }), null).extra)
 
 expectType<any>(validate(object({
-  ...additionalProperties(true),
+  ...allowAdditionalProperties(true),
 }), null).extra)
 
 expectError(validate(object({
-  ...additionalProperties(false),
+  ...allowAdditionalProperties(false),
 }), null).extra)
 
 // -------------------------------------------------------------------------- //
 
-expectType<null>(validate(object({ ...additionalProperties(null) }), null).extra)
-expectType<Record<string, any>>(validate(object({ ...additionalProperties(object) }), null).extra)
-expectType<number>(validate(object({ ...additionalProperties(number()) }), null).extra)
-expectType<'hello'>(validate(object({ ...additionalProperties('hello') }), null).extra)
+expectType<null>(validate(object({ ...allowAdditionalProperties(null) }), null).extra)
+expectType<Record<string, any>>(validate(object({ ...allowAdditionalProperties(object) }), null).extra)
+expectType<number>(validate(object({ ...allowAdditionalProperties(number()) }), null).extra)
+expectType<'hello'>(validate(object({ ...allowAdditionalProperties('hello') }), null).extra)
 
 // -------------------------------------------------------------------------- //
 // combining schemas
@@ -46,7 +46,7 @@ expectType<'hello'>(validate(object({ ...additionalProperties('hello') }), null)
 const s0 = object({
   a: number,
   b: number,
-  ...additionalProperties(boolean),
+  ...allowAdditionalProperties(boolean),
 })
 
 const s1 = object({
@@ -84,7 +84,7 @@ const s3 = object({
   a: number,
   b: never,
   c: string,
-  ...additionalProperties(boolean),
+  ...allowAdditionalProperties(boolean),
 })
 
 const o3 = validate(s3, null)

@@ -3,8 +3,8 @@ import { Validator } from './validator'
 import { any, AnyValidator } from './primitives'
 import { getValidator, isPrimitive } from './utilities'
 
-export const allowAdditionalProperties = Symbol('additionalProperties')
-type allowAdditionalProperties = typeof allowAdditionalProperties
+export const additionalProperties = Symbol('additionalProperties')
+type additionalProperties = typeof additionalProperties
 
 /* ========================================================================== *
  * SCHEMA DEFINITION                                                          *
@@ -12,7 +12,7 @@ type allowAdditionalProperties = typeof allowAdditionalProperties
 
 export interface Schema {
   [ key: string ] : Validation | Modifier | Never
-  [ allowAdditionalProperties ]?: Validator
+  [ additionalProperties ]?: Validator
 }
 
 /* ========================================================================== *
@@ -20,25 +20,25 @@ export interface Schema {
  * ========================================================================== */
 
 export interface AdditionalProperties<V extends Validator> {
-  [ allowAdditionalProperties ]: V
+  [ additionalProperties ]: V
 }
 
-export type additionalProperties =
+export type allowAdditionalProperties =
   (() => AdditionalProperties<AnyValidator>) &
   ((allow: true) => AdditionalProperties<AnyValidator>) &
   ((allow: false) => AdditionalProperties<never>) &
   (<V extends Validation>(validation: V) => AdditionalProperties<Validator<InferValidationType<V>>>) &
-  { [allowAdditionalProperties]: Validator<any> }
+  { [additionalProperties]: Validator<any> }
 
-export const additionalProperties: additionalProperties = <additionalProperties>
+export const allowAdditionalProperties: allowAdditionalProperties = <allowAdditionalProperties>
   ((options?: Validation | boolean): AdditionalProperties<Validator> => {
     if (options === false) return {} as AdditionalProperties<never>
 
     const allow = options === true ? any : getValidator(options)
-    return { [allowAdditionalProperties]: allow }
+    return { [additionalProperties]: allow }
   })
 
-additionalProperties[allowAdditionalProperties] = any
+allowAdditionalProperties[additionalProperties] = any
 
 
 /* ========================================================================== *
