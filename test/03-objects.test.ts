@@ -1,7 +1,7 @@
-import { ValidationError, object, validate, string, number, array } from '../src'
+import { ValidationError, object, validate, string, number, array, additionalProperties, any } from '../src'
 import { expect } from 'chai'
 
-describe('Array validators', () => {
+describe('Object validator', () => {
   it('should validate a generic object', () => {
     expect(validate(object, {})).to.eql({})
     expect(validate(object, { a: 1, b: 'foo' })).to.eql({ a: 1, b: 'foo' })
@@ -51,7 +51,7 @@ describe('Array validators', () => {
         .with.property('errors').to.eql([
           { path: [ 'a' ], message: 'Value is not a "number"' },
           { path: [ 'b' ], message: 'Value is not a "string"' },
-          { path: [ 'c' ], message: 'Unknown property found' },
+          { path: [ 'c' ], message: 'Unknown property' },
         ])
   })
 
@@ -100,6 +100,36 @@ describe('Array validators', () => {
           { path: [ 'contents', 0, 'description' ], message: 'Required property missing' },
           { path: [ 'contents', 0, 'value' ], message: 'Required property missing' },
           { path: [ 'contents', 1 ], message: 'Value is not an "object"' },
+        ])
+  })
+
+  it('should validate an object with additional properties', () => {
+    const validator1 = object({ foo: true, ...additionalProperties })
+    expect(validate(validator1, { foo: true, bar: 'whatever' }))
+        .to.eql({ foo: true, bar: 'whatever' })
+
+    const validator2 = object({ foo: true, ...additionalProperties(true) })
+    expect(validate(validator2, { foo: true, bar: 'whatever' }))
+        .to.eql({ foo: true, bar: 'whatever' })
+
+    const validator3 = object({ foo: true, ...additionalProperties(any) })
+    expect(validate(validator3, { foo: true, bar: 'whatever' }))
+        .to.eql({ foo: true, bar: 'whatever' })
+
+    const validator4 = object({ foo: true, ...additionalProperties(false) })
+    expect(() => validate(validator4, { foo: true, bar: 'whatever' }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'bar' ], message: 'Unknown property' },
+        ])
+
+    const validator5 = object({ foo: true, ...additionalProperties(string) })
+    expect(validate(validator5, { foo: true, bar: 'whatever' }))
+        .to.eql({ foo: true, bar: 'whatever' })
+    expect(() => validate(validator5, { foo: true, bar: 123 }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'bar' ], message: 'Value is not a "string"' },
         ])
   })
 })
