@@ -107,7 +107,7 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
       })
     } else if (! options.stripAdditionalProperties) {
       additionalKeys.forEach((key) => {
-        if (value[key] !== undefined) builder.record(key, 'Unknown property found')
+        if (value[key] !== undefined) builder.record(key, 'Unknown property')
       })
     }
 
