@@ -3,7 +3,7 @@ import { AnyValidator, any } from './primitives'
 import { ValidationError, ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
 import { Validator } from './validator'
-import { getValidator, isPrimitive } from './utilities'
+import { getValidator, isValidation } from './utilities'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -37,16 +37,21 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
     for (const key of Object.keys(properties)) {
       const definition = properties[key]
 
-      if (isPrimitive(definition)) {
+      if (isValidation(definition)) {
         this.#requiredProperties[key] = getValidator(definition)
-      } else if (definition instanceof Validator) {
-        this.#requiredProperties[key] = definition
+        // }
+
+        // if (isPrimitive(definition)) {
+        //   this.#requiredProperties[key] = getValidator(definition)
+        // } else if (definition instanceof Validator) {
+        //   this.#requiredProperties[key] = definition
       } else if ('modifier' in definition) {
         (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition.modifier
       } else if ('never' in definition) {
         this.#neverProperties.add(key)
       } else {
-        this.#requiredProperties[key] = getValidator(definition)
+        throw new Error('Foo!')
+        // this.#requiredProperties[key] = getValidator(definition)
       }
     }
 

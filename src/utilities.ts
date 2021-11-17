@@ -1,6 +1,7 @@
 import { Validation } from './validation'
 import { Validator } from './validator'
 import { any, constant } from './primitives'
+// import { validate } from '.'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
@@ -12,36 +13,40 @@ import { any, constant } from './primitives'
  * When `validation` is `undefined` it will return a `Validator<any>`,
  */
 export function getValidator(validation?: Validation): Validator {
-  // Undefined maps to `any`
+  // Undefined maps to `any`, null is a constant
   if (validation === undefined) return any
+  if (validation === null) return constant(null)
 
   // Validator instances are simply returned
   if (validation instanceof Validator) return validation
 
-  // Constant values
-  if (isPrimitive(validation)) return constant(validation)
+  // Other types
+  switch (typeof validation) {
+    // constants
+    case 'boolean':
+    case 'string':
+    case 'number':
+      return constant(validation)
 
-  // Validator instances (or function creating one)
-  if (isFunction(validation)) return validation()
+    // validator generator
+    case 'function':
+      return validation()
 
-  // Something bad happened!
-  throw new TypeError(`Invalid validation (type=${typeof validation})`)
+    // definitely not one of our types
+    default:
+      throw new TypeError(`Invalid validation (type=${typeof validation})`)
+  }
 }
 
-/** Type guard for _primitives_ (`boolean`, `string`, `number` or `null`). */
-export function isPrimitive(what: any): what is boolean | string | number | null {
-  if (what === null) return true
+export function isValidation(what: any): what is Validation {
+  if (what instanceof Validator) return true
   switch (typeof what) {
+    case 'function':
     case 'boolean':
     case 'string':
     case 'number':
       return true
     default:
-      return false
+      return what === null
   }
-}
-
-/** Type guard for _functions_. */
-export function isFunction(what: any): what is Function {
-  return typeof what === 'function'
 }

@@ -1,7 +1,7 @@
 import { InferValidationType, Validation } from './validation'
 import { Validator } from './validator'
 import { any, AnyValidator } from './primitives'
-import { getValidator, isPrimitive } from './utilities'
+import { getValidator, isValidation } from './utilities'
 
 export const additionalProperties = Symbol('additionalProperties')
 type additionalProperties = typeof additionalProperties
@@ -84,26 +84,28 @@ export function readonly(): ReadonlyModifier<any>
 export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidationType<V>>>
 export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
 
-export function readonly(modifier?: Modifier<any> | Validation): any {
-  const validator =
-    isPrimitive(modifier) ? getValidator(modifier) :
-    modifier instanceof Validator ? modifier :
-    modifier ? modifier : any
+export function readonly(options?: Modifier<any> | Validation): Modifier<any> {
+  const { modifier, optional = undefined } =
+    isValidation(options) ? { modifier: getValidator(options) } :
+    options ? options : { modifier: any }
 
-  return { modifier: validator, readonly: true }
+  return optional ?
+    { modifier, optional, readonly: true } :
+    { modifier, readonly: true }
 }
 
 export function optional(): OptionalModifier<any>
 export function optional<V extends Validation>(validation: V): OptionalModifier<Validator<InferValidationType<V>>>
 export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
 
-export function optional(modifier?: Modifier<any> | Validation): any {
-  const validator =
-    isPrimitive(modifier) ? getValidator(modifier) :
-    modifier instanceof Validator ? modifier :
-    modifier ? modifier : any
+export function optional(options?: Modifier<any> | Validation): Modifier<any> {
+  const { modifier, readonly = undefined } =
+    isValidation(options) ? { modifier: getValidator(options) } :
+    options ? options : { modifier: any }
 
-  return { modifier: validator, optional: true }
+  return readonly ?
+    { modifier, readonly, optional: true } :
+    { modifier, optional: true }
 }
 
 /* ========================================================================== *

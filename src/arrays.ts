@@ -2,7 +2,7 @@ import { InferValidationType, Validation, ValidationOptions } from './validation
 import { ValidationErrorBuilder } from './errors'
 import { Validator } from './validator'
 import { assert } from './errors'
-import { getValidator, isFunction, isPrimitive } from './utilities'
+import { getValidator, isValidation } from './utilities'
 import { ValidationError } from '.'
 
 /* ========================================================================== *
@@ -39,9 +39,10 @@ export class ArrayValidator<V extends Validation> extends Validator<InferValidat
       minItems = 0,
       uniqueItems = false,
     } =
-      options instanceof Validator ? { items: options } :
-      isFunction(options) ? { items: getValidator(options) } :
-      isPrimitive(options) ? { items: getValidator(options) } :
+      isValidation(options) ? { items: getValidator(options) } :
+      // options instanceof Validator ? { items: options } :
+      // isFunction(options) ? { items: getValidator(options) } :
+      // isPrimitive(options) ? { items: getValidator(options) } :
       { ...options, items: getValidator(options.items) }
 
     assert(minItems >= 0, `Constraint "minItems" (${minItems}) must be non-negative`)
