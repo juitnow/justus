@@ -18,6 +18,10 @@ expectError(validate(object({
 }), null).extra)
 
 expectType<any>(validate(object({
+  ...additionalProperties, // as a function
+}), null).extra)
+
+expectType<any>(validate(object({
   ...additionalProperties(), // default = true
 }), null).extra)
 
