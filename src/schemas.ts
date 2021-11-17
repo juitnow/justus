@@ -23,16 +23,22 @@ export interface AdditionalProperties<V extends Validator> {
   [ allowAdditionalProperties ]: V
 }
 
-export function additionalProperties(): AdditionalProperties<AnyValidator>
-export function additionalProperties(allow: true): AdditionalProperties<AnyValidator>
-export function additionalProperties(allow: false): AdditionalProperties<never>
-export function additionalProperties<V extends Validation>(validation: V): AdditionalProperties<Validator<InferValidationType<V>>>
-export function additionalProperties(options?: Validation | boolean): AdditionalProperties<Validator> {
-  if (options === false) return {} as AdditionalProperties<never>
+export type additionalProperties =
+  (() => AdditionalProperties<AnyValidator>) &
+  ((allow: true) => AdditionalProperties<AnyValidator>) &
+  ((allow: false) => AdditionalProperties<never>) &
+  (<V extends Validation>(validation: V) => AdditionalProperties<Validator<InferValidationType<V>>>) &
+  { [allowAdditionalProperties]: Validator<any> }
 
-  const allow = options === true ? any : getValidator(options)
-  return { [allowAdditionalProperties]: allow }
-}
+export const additionalProperties: additionalProperties = <additionalProperties>
+  ((options?: Validation | boolean): AdditionalProperties<Validator> => {
+    if (options === false) return {} as AdditionalProperties<never>
+
+    const allow = options === true ? any : getValidator(options)
+    return { [allowAdditionalProperties]: allow }
+  })
+
+additionalProperties[allowAdditionalProperties] = any
 
 
 /* ========================================================================== *
