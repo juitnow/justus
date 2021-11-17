@@ -1,6 +1,6 @@
 import { AdditionalProperties, InferSchema, Schema, additionalProperties } from './schemas'
 import { AnyValidator, any } from './primitives'
-import { ValidationError, ValidationErrorBuilder } from './errors'
+import { assert, ValidationError, ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
 import { Validator } from './validator'
 import { getValidator, isValidation } from './utilities'
@@ -39,19 +39,12 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
 
       if (isValidation(definition)) {
         this.#requiredProperties[key] = getValidator(definition)
-        // }
-
-        // if (isPrimitive(definition)) {
-        //   this.#requiredProperties[key] = getValidator(definition)
-        // } else if (definition instanceof Validator) {
-        //   this.#requiredProperties[key] = definition
       } else if ('modifier' in definition) {
         (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition.modifier
       } else if ('never' in definition) {
         this.#neverProperties.add(key)
       } else {
-        throw new Error('Foo!')
-        // this.#requiredProperties[key] = getValidator(definition)
+        assert(false, `Invalid property in schema for key "${key}"`)
       }
     }
 
