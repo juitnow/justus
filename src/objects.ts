@@ -85,6 +85,7 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
 
     for (const key of this.#neverProperties) {
       if (value[key] === undefined) continue
+      if (options.stripForbiddenProperties) continue
       builder.record(key, 'Forbidden property')
     }
 

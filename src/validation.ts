@@ -25,6 +25,7 @@ export type InferValidationType<V extends Validation> =
 
 export interface ValidationOptions {
   readonly stripAdditionalProperties: boolean,
+  readonly stripForbiddenProperties: boolean,
 }
 
 type PartialValidationOptions = {
@@ -38,6 +39,7 @@ export function validate<V extends Validation>(
 ): InferValidationType<V> {
   const opts: ValidationOptions = {
     stripAdditionalProperties: false,
+    stripForbiddenProperties: false,
     ...options,
   }
 
