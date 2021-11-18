@@ -1,9 +1,15 @@
 export { Validator } from './validator'
 export { validate } from './validation'
-export { any, boolean, constant, number, string } from './primitives'
 export { array } from './arrays'
 export { object } from './objects'
 export { allowAdditionalProperties, readonly, optional, never } from './schemas'
 export { tuple } from './tuples'
 // TODO: export { allOf, oneOf } from './unions'
 export { ValidationError } from './errors'
+
+
+export { any, AnyValidator } from './validators/any'
+export { boolean, BooleanValidator } from './validators/boolean'
+export { constant, ConstantValidator } from './validators/constant'
+export { number, NumberValidator } from './validators/number'
+export { string, StringValidator } from './validators/string'

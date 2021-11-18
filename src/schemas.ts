@@ -1,6 +1,6 @@
 import { InferValidationType, Validation } from './validation'
 import { Validator } from './validator'
-import { any, AnyValidator } from './primitives'
+import { any, AnyValidator } from './validators/any'
 import { getValidator, isValidation } from './utilities'
 
 export const additionalProperties = Symbol('additionalProperties')

@@ -1,11 +1,23 @@
 import { Validation } from './validation'
 import { Validator } from './validator'
-import { any, constant } from './primitives'
-// import { validate } from '.'
+import { any } from './validators/any'
+import { constant } from './validators/constant'
+import { TupleRest } from './tuples'
+import { tupleRest } from './symbols'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
  * ========================================================================== */
+
+export function makeTupleRestIterable<
+  F extends(...args: any[]) => Validator,
+  V extends Validator,
+>(create: F, validator: V): F & Iterable<TupleRest<V>> {
+  (<any>create)[Symbol.iterator] = function* (): Generator<TupleRest<V>> {
+    yield { [tupleRest]: validator }
+  }
+  return create as any
+}
 
 /**
  * Return the `Validator` for the given `Validation`.

@@ -1,5 +1,5 @@
 import { AdditionalProperties, InferSchema, Schema, additionalProperties } from './schemas'
-import { AnyValidator, any } from './primitives'
+import { AnyValidator, any } from './validators/any'
 import { assert, ValidationError, ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
 import { Validator } from './validator'
