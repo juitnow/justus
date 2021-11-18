@@ -1,3 +1,5 @@
+import { tupleRest } from './symbols'
+import { TupleRest } from './tuples'
 import { ValidationOptions } from './validation'
 
 /**
@@ -6,11 +8,15 @@ import { ValidationOptions } from './validation'
  *
  * @public
  */
-export abstract class Validator<T = any> {
+export abstract class Validator<T = any> { // implements Iterable<TupleRest<Validator<T>>> {
   /**
    * Validate a _value_ and optionally convert it to the required `Type`.
    *
    * @param value - The _value_ to validate
    */
   abstract validate(value: unknown, options: ValidationOptions): T
+
+  * [Symbol.iterator](): Generator<TupleRest<this>> {
+    yield { [tupleRest]: this }
+  }
 }
