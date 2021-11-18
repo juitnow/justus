@@ -1,6 +1,5 @@
 export { Validator } from './validator'
 export { validate } from './validation'
-export { array } from './arrays'
 export { object } from './objects'
 export { allowAdditionalProperties, readonly, optional, never } from './schemas'
 export { tuple } from './tuples'
@@ -9,6 +8,7 @@ export { ValidationError } from './errors'
 
 
 export { any, AnyValidator } from './validators/any'
+export { array, ArrayValidator } from './validators/array'
 export { boolean, BooleanValidator } from './validators/boolean'
 export { constant, ConstantValidator } from './validators/constant'
 export { number, NumberValidator } from './validators/number'

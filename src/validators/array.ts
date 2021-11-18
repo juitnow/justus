@@ -1,9 +1,16 @@
-import { InferValidationType, Validation, ValidationOptions } from './validation'
-import { ValidationErrorBuilder } from './errors'
-import { Validator } from './validator'
-import { assert } from './errors'
-import { getValidator, isValidation } from './utilities'
-import { ValidationError } from '.'
+import { InferValidationType, Validation, ValidationOptions } from '../validation'
+import { ValidationError, ValidationErrorBuilder, assert } from '../errors'
+import { Validator } from '../validator'
+import { getValidator, isValidation } from '../utilities'
+
+class AnyArrayValidator extends Validator<any[]> {
+  validate(value: unknown): any[] {
+    ValidationError.assert(Array.isArray(value), 'Value is not an "array"')
+    return value
+  }
+}
+
+const anyArrayValidator = new AnyArrayValidator()
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -25,7 +32,7 @@ export class ArrayValidator<V extends Validation> extends Validator<InferValidat
   #maxItems: number
   #minItems: number
   #uniqueItems: boolean
-  #items: Validator<V>
+  #items: Validator<InferValidationType<V>>
 
   constructor()
   constructor(validation: V)
@@ -91,10 +98,10 @@ export class ArrayValidator<V extends Validation> extends Validator<InferValidat
 /**
  * A function returning a `Validator` for an `Array` containing `any` item.
  */
-export function array(): ArrayValidator<any>
+export function array(): AnyArrayValidator
 export function array<V extends Validation>(validation: V): ArrayValidator<InferValidationType<V>>
 export function array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidationType<V>>
 
-export function array(options?: Validation | ArrayConstraints<Validation>): ArrayValidator<Validation> {
-  return new ArrayValidator(<any> options)
+export function array(options?: Validation | ArrayConstraints<Validation>): Validator<any[]> {
+  return options ? new ArrayValidator(<any> options) : anyArrayValidator
 }
