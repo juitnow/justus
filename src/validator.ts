@@ -8,7 +8,7 @@ import { ValidationOptions } from './validation'
  *
  * @public
  */
-export abstract class Validator<T = any> { // implements Iterable<TupleRest<Validator<T>>> {
+export abstract class Validator<T = any> {
   /**
    * Validate a _value_ and optionally convert it to the required `Type`.
    *
