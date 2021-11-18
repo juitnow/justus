@@ -1,5 +1,7 @@
 import { Validator } from './validator'
 import { ValidationError, assert } from './errors'
+import { TupleRest } from './tuples'
+import { tupleRest } from './symbols'
 
 /* ========================================================================== *
  * BASIC VALIDATION (ANY, BOOLEANS)                                           *
@@ -175,18 +177,33 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
   static readonly PRECISION = 1000000
 }
 
+const numberValidator = new class extends Validator<number> {
+  validate(value: unknown): number {
+    ValidationError.assert(typeof value == 'number', 'Value is not a "number"')
+    ValidationError.assert(! isNaN(value), 'Number is "NaN"')
+    return value
+  }
+}
+
 /**
  * A function returning a `Validator` for `number`s.
  *
  * @param constraints - Optional constraints to validate the `number` with.
  * @public
  */
-export function number(constraints?: NumberConstraints): NumberValidator
-export function number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N>
-export function number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N> {
-  return new NumberValidator(constraints)
+function _number(): Validator<number>
+function _number(constraints: NumberConstraints): NumberValidator
+function _number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N>
+
+function _number(constraints?: NumberConstraints): Validator<number> {
+  return constraints ? new NumberValidator(constraints) : numberValidator
 }
 
+export const number = _number as typeof _number & Iterable<TupleRest<Validator<number>>>
+
+number[Symbol.iterator] = function* (): Generator<TupleRest<Validator<number>>> {
+  yield { [tupleRest]: numberValidator }
+}
 
 /* ========================================================================== *
  * BRANDED STRINGS VALIDATION                                                 *
@@ -241,14 +258,29 @@ export class StringValidator<S extends string = string> extends Validator<S> {
   }
 }
 
+const stringValidator = new class extends Validator<string> {
+  validate(value: unknown): string {
+    ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
+    return value
+  }
+}
+
 /**
  * A function returning a `Validator` for the `string` type.
  *
  * @param constraints - Optional constraints to validate the `string` with.
  * @public
  */
-export function string(constraints?: StringConstraints): StringValidator
-export function string<S extends string>(constraints?: StringConstraints): StringValidator<S>
-export function string<S extends string>(constraints?: StringConstraints): StringValidator<S> {
-  return new StringValidator(constraints)
+function _string(): Validator<string>
+function _string(constraints: StringConstraints): StringValidator
+function _string<S extends string>(constraints?: StringConstraints): StringValidator<S>
+
+function _string(constraints?: StringConstraints): Validator<string> {
+  return constraints ? new StringValidator(constraints) : stringValidator
+}
+
+export const string = _string as typeof _string & Iterable<TupleRest<Validator<string>>>
+
+string[Symbol.iterator] = function* (): Generator<TupleRest<Validator<string>>> {
+  yield { [tupleRest]: stringValidator }
 }
