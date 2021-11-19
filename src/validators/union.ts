@@ -1,8 +1,8 @@
 import {
   InferValidationType,
   Validation,
-} from './validation'
-import { Validator } from './validator'
+} from '../validation'
+import { Validator } from '../validator'
 
 type UnionArguments = readonly [ Validation, ...Validation[] ]
 
