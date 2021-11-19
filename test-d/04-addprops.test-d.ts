@@ -7,7 +7,7 @@ import {
   object,
   string,
   validate,
-} from '../src/index'
+} from '../src'
 
 printType('__file_marker__')
 
