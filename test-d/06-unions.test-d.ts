@@ -22,18 +22,26 @@ const oneOf1 = oneOf([ string, number, boolean ])
 expectAssignable<Validator<string | number | boolean>>(oneOf1)
 expectType<string | number | boolean>(validate(oneOf1, null))
 
-const oneOf2 = oneOf([ t1, t2 ])
-expectAssignable<Validator<InferValidationType<typeof t1 | typeof t2>>>(oneOf2)
+const oneOf2 = oneOf([ 'foo', 123, true ])
+expectAssignable<Validator<string | number | true>>(oneOf2)
+expectType<string | number | true>(validate(oneOf2, null))
 
-const oneOfR2 = validate(oneOf2, null)
-expectAssignable<{ o1: string } | { o2: number}>(oneOfR2)
+const oneOf3 = oneOf([ 'foo', 123, true ] as const)
+expectAssignable<Validator<'foo' | 123 | true>>(oneOf3)
+expectType<'foo' | 123 | true>(validate(oneOf3, null))
 
-if ('o1' in oneOfR2) {
-  expectType<string>(oneOfR2.o1)
-  expectError(oneOfR2.o2)
+const oneOf4 = oneOf([ t1, t2 ])
+expectAssignable<Validator<InferValidationType<typeof t1 | typeof t2>>>(oneOf4)
+
+const oneOfR4 = validate(oneOf4, null)
+expectAssignable<{ o1: string } | { o2: number}>(oneOfR4)
+
+if ('o1' in oneOfR4) {
+  expectType<string>(oneOfR4.o1)
+  expectError(oneOfR4.o2)
 } else {
-  expectType<number>(oneOfR2.o2)
-  expectError(oneOfR2.o1)
+  expectType<number>(oneOfR4.o2)
+  expectError(oneOfR4.o1)
 }
 
 /* -------------------------------------------------------------------------- */
