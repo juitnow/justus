@@ -2,16 +2,6 @@ import { Validator } from '../validator'
 import { assert, ValidationError } from '../errors'
 import { makeTupleRestIterable } from '../utilities'
 
-class AnyNumberValidator extends Validator<number> {
-  validate(value: unknown): number {
-    ValidationError.assert(typeof value == 'number', 'Value is not a "number"')
-    ValidationError.assert(! isNaN(value), 'Number is "NaN"')
-    return value
-  }
-}
-
-const anyNumberValidator = new AnyNumberValidator()
-
 /**
  * Constraints to validate a `number` with.
  */
@@ -123,7 +113,15 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
   static readonly PRECISION = 1000000
 }
 
-function _number(): AnyNumberValidator
+const anyNumberValidator = new class extends NumberValidator {
+  validate(value: unknown): number {
+    ValidationError.assert(typeof value == 'number', 'Value is not a "number"')
+    ValidationError.assert(! isNaN(value), 'Number is "NaN"')
+    return value
+  }
+}
+
+function _number(): NumberValidator
 function _number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N>
 
 function _number(constraints?: NumberConstraints): Validator<number> {

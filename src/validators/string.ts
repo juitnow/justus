@@ -2,15 +2,6 @@ import { Validator } from '../validator'
 import { ValidationError, assert } from '../errors'
 import { makeTupleRestIterable } from '../utilities'
 
-class AnyStringValidator extends Validator {
-  validate(value: unknown): string {
-    ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
-    return value
-  }
-}
-
-const anyStringValidator = new AnyStringValidator()
-
 /** Constraints to validate a `string` with. */
 export interface StringConstraints {
   /** The _maximum_ length of a valid `string`: `value.length <= maxLength` */
@@ -60,7 +51,14 @@ export class StringValidator<S extends string = string> extends Validator<S> {
   }
 }
 
-function _string(): AnyStringValidator
+const anyStringValidator = new class extends StringValidator {
+  validate(value: unknown): string {
+    ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
+    return value
+  }
+}
+
+function _string(): StringValidator
 function _string<S extends string = string>(constraints?: StringConstraints): StringValidator<S>
 
 function _string(constraints?: StringConstraints): Validator<string> {
