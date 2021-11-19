@@ -42,13 +42,14 @@ export class ValidationError extends Error {
 export class ValidationErrorBuilder {
   readonly errors: ValidationErrors = []
 
-  record(key: string | number, error: any): void {
+  record(key: string | number | undefined, error: any): void {
+    const path = key === undefined ? [] : [ key ]
     if (error instanceof ValidationError) {
-      error.errors.forEach(({ path, message }) => {
-        this.errors.push({ path: [ key, ...path ], message })
+      error.errors.forEach(({ path: subpath, message }) => {
+        this.errors.push({ path: [ ...path, ...subpath ], message })
       })
     } else {
-      this.errors.push({ path: [ key ], message: `${error}` })
+      this.errors.push({ path, message: `${error}` })
     }
   }
 
