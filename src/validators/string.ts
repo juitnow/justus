@@ -26,7 +26,7 @@ export class StringValidator<S extends string = string> extends Validator<S> {
   readonly minLength: number
   readonly pattern?: RegExp
 
-  constructor(constraints: StringConstraints) { // } = {}) {
+  constructor(constraints: StringConstraints = {}) {
     super()
 
     const {
