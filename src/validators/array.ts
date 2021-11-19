@@ -28,16 +28,13 @@ export interface ArrayConstraints<V extends Validation> {
   items?: V,
 }
 
-export class ArrayValidator<V extends Validation> extends Validator<InferValidationType<V>[]> {
+export class ArrayValidator<V extends Validation = Validation> extends Validator<InferValidationType<V>[]> {
   #maxItems: number
   #minItems: number
   #uniqueItems: boolean
   #items: Validator<InferValidationType<V>>
 
-  constructor()
-  constructor(validation: V)
-  constructor(constraints: ArrayConstraints<V>)
-  constructor(options: Validation | ArrayConstraints<Validation> = {}) {
+  constructor(options: ArrayConstraints<V>) {
     super()
 
     const {
@@ -45,18 +42,13 @@ export class ArrayValidator<V extends Validation> extends Validator<InferValidat
       maxItems = Number.POSITIVE_INFINITY,
       minItems = 0,
       uniqueItems = false,
-    } =
-      isValidation(options) ? { items: getValidator(options) } :
-      // options instanceof Validator ? { items: options } :
-      // isFunction(options) ? { items: getValidator(options) } :
-      // isPrimitive(options) ? { items: getValidator(options) } :
-      { ...options, items: getValidator(options.items) }
+    } = options
 
     assert(minItems >= 0, `Constraint "minItems" (${minItems}) must be non-negative`)
     assert(maxItems >= 0, `Constraint "maxItems" (${maxItems}) must be non-negative`)
     assert(minItems <= maxItems, `Constraint "minItems" (${minItems}) is greater than "maxItems" (${maxItems})`)
 
-    this.#items = items
+    this.#items = getValidator(items)
     this.#maxItems = maxItems
     this.#minItems = minItems
     this.#uniqueItems = uniqueItems
@@ -103,5 +95,7 @@ export function array<V extends Validation>(validation: V): ArrayValidator<Infer
 export function array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidationType<V>>
 
 export function array(options?: Validation | ArrayConstraints<Validation>): Validator<any[]> {
-  return options ? new ArrayValidator(<any> options) : anyArrayValidator
+  return isValidation(options) ? new ArrayValidator({ items: options }) :
+    options ? new ArrayValidator(options) :
+    anyArrayValidator
 }
