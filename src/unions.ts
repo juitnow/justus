@@ -1,107 +1,59 @@
-import type {
+import {
   InferValidationType,
   Validation,
 } from './validation'
 import { Validator } from './validator'
 
-/* ========================================================================== *
- * CONSTANTS AND UNIONS VALIDATION                                            *
- * ========================================================================== */
-
-type CompoundType = Validation | string | number
-
-type InferCompoundValidator<T extends CompoundType> =
-  T extends Validation ? Validator<InferValidationType<T>> :
-  T extends string ? Validator<T> :
-  T extends number ? Validator<T> :
-  never
+type UnionArguments = readonly [ Validation, ...Validation[] ]
 
 /* -------------------------------------------------------------------------- */
 
-export function oneOf<
-  A extends CompoundType,
-  B extends CompoundType,
->(a: A, b: B): InferCompoundValidator<A | B>
+type InferOneOfValidationType<A extends UnionArguments> =
+  A extends readonly [ infer First, ...infer Rest ] ?
+    First extends Validation ?
+      Rest extends UnionArguments ?
+        InferValidationType<First> | InferOneOfValidationType<Rest> :
+      InferValidationType<First> :
+    never :
+  never
 
-export function oneOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
->(a: A, b: B, c: C): InferCompoundValidator<A | B | C>
+export class OneOfValidator<A extends UnionArguments> extends Validator<InferOneOfValidationType<A>> {
+  constructor(args: A) {
+    super()
+    void args
+  }
 
-export function oneOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
-  D extends CompoundType,
->(a: A, b: B, c: C, d: D): InferCompoundValidator<A | B | C | D>
+  validate(value: unknown): InferOneOfValidationType<A> {
+    return <any> value // TODO
+  }
+}
 
-export function oneOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
-  D extends CompoundType,
-  E extends CompoundType,
->(a: A, b: B, c: C, d: D, e: E): InferCompoundValidator<A | B | C | D | E>
-
-export function oneOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
-  D extends CompoundType,
-  E extends CompoundType,
-  F extends CompoundType,
->(a: A, b: B, c: C, d: D, e: E, f: F): InferCompoundValidator<A | B | C | D | E | F>
-
-export function oneOf<A extends readonly any[]>(...args: A): Validator<A> // TODO infer [A,B] => A|B
-
-export function oneOf(...args: any[]): Validator {
-  // TODO
-  void args
-  return <any> null
+export function oneOf<A extends UnionArguments>(args: A): OneOfValidator<A> {
+  return new OneOfValidator(args)
 }
 
 /* -------------------------------------------------------------------------- */
 
-export function allOf<
-  A extends CompoundType,
-  B extends CompoundType,
->(a: A, b: B): InferCompoundValidator<A & B>
+type InferAllOfValidationType<A extends UnionArguments> =
+  A extends readonly [ infer First, ...infer Rest ] ?
+    First extends Validation ?
+      Rest extends UnionArguments ?
+        InferValidationType<First> & InferOneOfValidationType<Rest> :
+      InferValidationType<First> :
+    never :
+  never
 
-export function allOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
->(a: A, b: B, c: C): InferCompoundValidator<A & B & C>
+export class AllOfValidator<A extends UnionArguments> extends Validator<InferAllOfValidationType<A>> {
+  constructor(args: A) {
+    super()
+    void args
+  }
 
-export function allOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
-  D extends CompoundType,
->(a: A, b: B, c: C, d: D): InferCompoundValidator<A & B & C & D>
+  validate(value: unknown): InferAllOfValidationType<A> {
+    return <any> value // TODO
+  }
+}
 
-export function allOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
-  D extends CompoundType,
-  E extends CompoundType,
->(a: A, b: B, c: C, d: D, e: E): InferCompoundValidator<A & B & C & D & E>
-
-export function allOf<
-  A extends CompoundType,
-  B extends CompoundType,
-  C extends CompoundType,
-  D extends CompoundType,
-  E extends CompoundType,
-  F extends CompoundType,
->(a: A, b: B, c: C, d: D, e: E, f: F): InferCompoundValidator<A & B & C & D & E & F>
-
-export function allOf<A extends readonly any[]>(...args: A): Validator<A> // TODO infer [A,B] => A&B
-
-export function allOf(...args: any[]): Validator {
-  // TODO
-  void args
-  return <any> null
+export function allOf<A extends UnionArguments>(args: A): AllOfValidator<A> {
+  return new AllOfValidator(args)
 }
