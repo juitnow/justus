@@ -1,6 +1,9 @@
+import { ValidationErrorBuilder } from '../errors'
+import { getValidator } from '../utilities'
 import {
   InferValidationType,
   Validation,
+  ValidationOptions,
 } from '../validation'
 import { Validator } from '../validator'
 
@@ -18,13 +21,24 @@ type InferOneOfValidationType<A extends UnionArguments> =
   never
 
 export class OneOfValidator<A extends UnionArguments> extends Validator<InferOneOfValidationType<A>> {
+  readonly validators: readonly Validator[]
+
   constructor(args: A) {
     super()
-    void args
+    this.validators = args.map((validation) => getValidator(validation))
   }
 
-  validate(value: unknown): InferOneOfValidationType<A> {
-    return <any> value // TODO
+  validate(value: unknown, options: ValidationOptions): InferOneOfValidationType<A> {
+    const builder = new ValidationErrorBuilder()
+    for (const validator of this.validators) {
+      try {
+        return validator.validate(value, options)
+      } catch (error) {
+        builder.record(undefined, error)
+      }
+    }
+    builder.assert()
+    return <any> value
   }
 }
 
@@ -44,13 +58,18 @@ type InferAllOfValidationType<A extends UnionArguments> =
   never
 
 export class AllOfValidator<A extends UnionArguments> extends Validator<InferAllOfValidationType<A>> {
+  readonly validators: readonly Validator[]
+
   constructor(args: A) {
     super()
-    void args
+    this.validators = args.map((validation) => getValidator(validation))
   }
 
-  validate(value: unknown): InferAllOfValidationType<A> {
-    return <any> value // TODO
+  validate(value: unknown, options: ValidationOptions): InferAllOfValidationType<A> {
+    for (const validator of this.validators) {
+      value = validator.validate(value, options)
+    }
+    return <any> value
   }
 }
 
