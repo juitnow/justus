@@ -51,14 +51,14 @@ export class StringValidator<S extends string = string> extends Validator<S> {
   }
 }
 
-const anyStringValidator = new class extends StringValidator {
+const anyStringValidator = new class extends Validator<string> {
   validate(value: unknown): string {
     ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
     return value
   }
 }
 
-function _string(): StringValidator
+function _string(): Validator<string>
 function _string<S extends string = string>(constraints?: StringConstraints): StringValidator<S>
 
 function _string(constraints?: StringConstraints): Validator<string> {

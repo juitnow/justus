@@ -113,7 +113,7 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
   static readonly PRECISION = 1000000
 }
 
-const anyNumberValidator = new class extends NumberValidator {
+const anyNumberValidator = new class extends Validator<number> {
   validate(value: unknown): number {
     ValidationError.assert(typeof value == 'number', 'Value is not a "number"')
     ValidationError.assert(! isNaN(value), 'Number is "NaN"')
@@ -121,7 +121,7 @@ const anyNumberValidator = new class extends NumberValidator {
   }
 }
 
-function _number(): NumberValidator
+function _number(): Validator<number>
 function _number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N>
 
 function _number(constraints?: NumberConstraints): Validator<number> {

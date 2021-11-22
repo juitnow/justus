@@ -77,7 +77,7 @@ export class ArrayValidator<T = any> extends Validator<T[]> {
   }
 }
 
-const anyArrayValidator = new class extends ArrayValidator<Validator<any>> {
+const anyArrayValidator = new class extends Validator<any[]> {
   validate(value: unknown): any[] {
     ValidationError.assert(Array.isArray(value), 'Value is not an "array"')
     return value
@@ -89,11 +89,11 @@ const anyArrayValidator = new class extends ArrayValidator<Validator<any>> {
 /**
  * A function returning a `Validator` for an `Array` containing `any` item.
  */
-export function array(): ArrayValidator
+export function array(): Validator<any[]>
 export function array<V extends Validation>(validation: V): ArrayValidator<InferValidationType<V>>
 export function array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidationType<V>>
 
-export function array(options?: Validation | ArrayConstraints<Validation>): ArrayValidator {
+export function array(options?: Validation | ArrayConstraints<Validation>): Validator<any[]> {
   if (! options) return anyArrayValidator
 
   if (isValidation(options)) options = { items: options }
