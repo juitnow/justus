@@ -1,5 +1,4 @@
-import { AdditionalProperties, InferSchema, Schema, additionalProperties } from './schemas'
-import { AnyValidator, any } from './validators/any'
+import { InferSchema, Schema, additionalProperties } from './schemas'
 import { assert, ValidationError, ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
 import { Validator } from './validator'
@@ -9,18 +8,7 @@ import { getValidator, isValidation } from './utilities'
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
 
-export class ObjectValidator extends Validator<Record<string, any>>
-  implements AdditionalProperties<AnyValidator> {
-  [additionalProperties] = any
-
-  validate(value: unknown): Record<string, any> {
-    ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
-    ValidationError.assert(value !== null, 'Value is "null"')
-    return value
-  }
-}
-
-export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>> {
+export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>> {
   readonly schema: S
 
   #additionalProperties?: Validator
@@ -116,8 +104,17 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
   }
 }
 
-export function object(): ObjectValidator
-export function object<S extends Schema>(schema: S): SchemaValidator<S>
-export function object(schema?: Schema): ObjectValidator | SchemaValidator<Schema> {
-  return schema ? new SchemaValidator(schema) : new ObjectValidator()
+const anyObjectValidator = new class extends Validator<Record<string, any>> {
+  validate(value: unknown): Record<string, any> {
+    ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
+    ValidationError.assert(value !== null, 'Value is "null"')
+    return value
+  }
+}
+
+
+export function object(): Validator<Record<string, any>>
+export function object<S extends Schema>(schema: S): ObjectValidator<S>
+export function object(schema?: Schema): Validator<Record<string, any>> | ObjectValidator<Schema> {
+  return schema ? new ObjectValidator(schema) : anyObjectValidator
 }
