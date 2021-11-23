@@ -7,8 +7,8 @@ import { InferTuple, Tuple } from './tuples'
  * ========================================================================== */
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
-export type Validation<V extends Validator = Validator> =
-  (() => V) | V | // a `Validator` or a zero parameter function returning one
+export type Validation = // <V extends Validator = Validator> =
+  (() => Validator) | Validator | Tuple | // a `Validator` or a zero parameter function returning one
   null | boolean | number | string // primitives, mapped as constants
 
 // export type Validation2 = Validation | Tuple

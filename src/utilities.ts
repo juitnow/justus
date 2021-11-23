@@ -4,6 +4,7 @@ import { any } from './validators/any'
 import { constant } from './validators/constant'
 import { TupleRest } from './tuples'
 import { tupleRest } from './symbols'
+import { tuple } from '.'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
@@ -31,6 +32,9 @@ export function getValidator(validation?: Validation): Validator {
 
   // Validator instances are simply returned
   if (validation instanceof Validator) return validation
+
+  // Tuples
+  if (Array.isArray(validation)) return tuple(validation)
 
   // Other types
   switch (typeof validation) {
