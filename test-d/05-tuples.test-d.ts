@@ -1,4 +1,4 @@
-import { expectAssignable, expectType, printType } from 'tsd'
+import { expectAssignable, expectError, expectType, printType } from 'tsd'
 import { boolean, number, object, string, tuple, validate } from '../src'
 
 printType('__file_marker__')
@@ -80,3 +80,21 @@ expectType<number|string|boolean>(resultX.tuple[0])
 expectType<number|string|boolean>(resultX.tuple[1])
 expectType<number|string|boolean>(resultX.tuple[2])
 expectType<number|string|boolean>(resultX.tuple[9])
+
+// tuples in tuples
+const tuple1 = tuple([ string, number ] as const)
+const tuple2 = tuple([ 'header', ...tuple1 ] as const)
+const result = validate(tuple2, null)
+
+expectType<'header'>(result[0])
+
+expectType<[ string, number ]>(result[1])
+expectType<[ string, number ]>(result[9])
+
+expectType<string>(result[1][0])
+expectType<number>(result[1][1])
+// ??? why ??? expectError(result[1][2])
+
+expectType<string>(result[9][0])
+expectType<number>(result[9][1])
+// ??? why ??? expectError(result[9][2])
