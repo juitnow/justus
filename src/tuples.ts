@@ -8,40 +8,35 @@ export type TupleRest<V extends Validator = Validator> = {
   [tupleRest] : V
 }
 
-type Tuple =
-  readonly TupleRest[] |
-  readonly [ Validation, ...Validation[], ...TupleRest[] | never ]
+export type Tuple = readonly (Validation | TupleRest)[]
 
-type InferTuple<T extends readonly (Validation | TupleRest)[]> =
-  T extends readonly [] ? [] :
-  T extends readonly TupleRest<infer V>[] ? InferValidationType<V>[] :
-  T extends readonly [ Validation, ...infer Rest ] ?
-    Rest extends [] ?
-      [ InferValidationType<T[0]> ] :
-    Rest extends EnforceTuple<infer Q> ?
-      [ InferValidationType<T[0]>, ...InferTuple<Q> ] :
-    Rest extends TupleRest<infer V>[] ?
-      [ InferValidationType<T[0]>, ...InferValidationType<V>[] ] :
-    never :
+type InferValidationOrTupleRest<T> =
+  T extends TupleRest<Validator<infer V>> ? V :
+  T extends Validation ? InferValidationType<T> :
   never
 
-type EnforceTuple<T extends readonly (Validation | TupleRest)[]> =
-  T extends readonly TupleRest[] ? T :
-  T extends readonly Validation[] ? T :
-  T extends readonly [ infer First, ...infer Rest ] ?
-    First extends Validation ?
-      Rest extends readonly (Validation | TupleRest)[] ?
-        readonly [ First, ...EnforceTuple<Rest> ] :
+export type InferTuple<T> =
+  T extends Tuple ?
+    T extends readonly [] ? [] :
+    T extends readonly [ Validation, ...any[] ] ?
+      T extends readonly [ infer V, ...infer Rest ] ?
+        [ InferValidationType<V>, ...InferTuple<Rest> ] :
       never :
+    T extends readonly [ ...any[], Validation ] ?
+      T extends readonly [ ...infer Rest, infer V ] ?
+        [ ...InferTuple<Rest>, InferValidationType<V> ] :
+      never :
+    T extends readonly (infer V)[] ?
+      [ ...InferValidationOrTupleRest<V>[] ] :
     never :
-  [ never ]
+  never
 
 
 export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
   readonly tupleValidators: readonly Validator[]
   readonly restValidator?: Validator
 
-  constructor(tuple: EnforceTuple<T>) {
+  constructor(tuple: T) {
     super()
 
     const tupleValidators: Validator[] = []
@@ -71,6 +66,9 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
   }
 }
 
-export function tuple<T extends Tuple>(tuple: EnforceTuple<T>): Validator<InferTuple<T>> {
+export function tuple<T extends Tuple>(tuple: T): Validator<InferTuple<T>> {
   return new TupleValidator(tuple)
 }
+
+const q = tuple([ 'foo' ] as const)
+void q
