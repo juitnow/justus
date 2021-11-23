@@ -51,44 +51,45 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
     this.schema = schema
   }
 
-  validate(value: any, options: ValidationOptions): InferSchema<S> {
-    ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
+  validate(value: unknown, options: ValidationOptions): InferSchema<S> {
+    ValidationError.assert(typeof value === 'object', 'Value is not an "object"')
     ValidationError.assert(value !== null, 'Value is "null"')
 
+    const record: { [ k in string | number | symbol ]?: unknown } = value
     const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
 
     for (const [ key, validator ] of Object.entries(this.#requiredProperties)) {
-      if (value[key] === undefined) {
+      if (record[key] === undefined) {
         builder.record(key, 'Required property missing')
         continue
       }
 
       try {
-        clone[key] = validator.validate(value[key], options)
+        clone[key] = validator.validate(record[key], options)
       } catch (error) {
         builder.record(key, error)
       }
     }
 
     for (const [ key, validator ] of Object.entries(this.#optionalProperties)) {
-      if (value[key] === undefined) continue
+      if (record[key] === undefined) continue
 
       try {
-        clone[key] = validator.validate(value[key], options)
+        clone[key] = validator.validate(record[key], options)
       } catch (error) {
         builder.record(key, error)
       }
     }
 
     for (const key of this.#neverProperties) {
-      if (value[key] === undefined) continue
+      if (record[key] === undefined) continue
       if (options.stripForbiddenProperties) continue
       builder.record(key, 'Forbidden property')
     }
 
     const additional = this.#additionalProperties
-    const additionalKeys = Object.keys(value).filter((k) => {
+    const additionalKeys = Object.keys(record).filter((k) => {
       if (k in this.#requiredProperties) return false
       if (k in this.#optionalProperties) return false
       if (this.#neverProperties.has(k)) return false
@@ -97,16 +98,16 @@ export class SchemaValidator<S extends Schema> extends Validator<InferSchema<S>>
 
     if (additional) {
       additionalKeys.forEach((key) => {
-        if (value[key] === undefined) return
+        if (record[key] === undefined) return
         try {
-          clone[key] = additional.validate(value[key], options)
+          clone[key] = additional.validate(record[key], options)
         } catch (error) {
           builder.record(key, error)
         }
       })
     } else if (! options.stripAdditionalProperties) {
       additionalKeys.forEach((key) => {
-        if (value[key] !== undefined) builder.record(key, 'Unknown property')
+        if (record[key] !== undefined) builder.record(key, 'Unknown property')
       })
     }
 

@@ -9,9 +9,9 @@ export class ConstantValidator<T extends string | number | boolean | null> exten
     this.constant = constant
   }
 
-  validate(value: any): T {
+  validate(value: unknown): T {
     ValidationError.assert(value === this.constant, `Value does not match constant "${this.constant}"`)
-    return value
+    return value as T
   }
 }
 

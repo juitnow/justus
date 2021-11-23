@@ -35,7 +35,7 @@ export class StringValidator<S extends string = string> extends Validator<S> {
     this.pattern = pattern
   }
 
-  validate(value: any): S {
+  validate(value: unknown): S {
     ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
 
     ValidationError.assert(value.length >= this.minLength,

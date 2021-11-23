@@ -46,7 +46,7 @@ export class ArrayValidator<T = any> extends Validator<T[]> {
     this.uniqueItems = uniqueItems
   }
 
-  validate(value: any, options: ValidationOptions): T[] {
+  validate(value: unknown, options: ValidationOptions): T[] {
     ValidationError.assert(Array.isArray(value), 'Value is not an "array"')
 
     ValidationError.assert(value.length >= this.minItems,
