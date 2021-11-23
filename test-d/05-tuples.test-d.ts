@@ -1,4 +1,4 @@
-import { expectAssignable, expectError, expectType, printType } from 'tsd'
+import { expectAssignable, expectType, printType } from 'tsd'
 import { boolean, number, object, string, tuple, validate } from '../src'
 
 printType('__file_marker__')
@@ -46,35 +46,37 @@ expectType<[ 'foo', false, 12345, ...string[] ]>(validate(tuple([ 'foo', false, 
 expectType<[ 'foo', ...(boolean|number)[], 'bar' ]>(validate(tuple([ 'foo', ...boolean, ...number, 'bar' ] as const), null))
 expectType<[ 'foo', ...(boolean|'xxx'|number)[], 'bar' ]>(validate(tuple([ 'foo', ...boolean, 'xxx', ...number, 'bar' ] as const), null))
 
-// TODO // tuples in objects
-// const validator1 = object({
-//   tuple: [ number, string, ...boolean ],
-// })
-// const result1 = validate(validator1, null)
-// expectAssignable<{ tuple: [ number, string, ...boolean[] ] }>(result1)
-// expectType<[ number, string, ...boolean[] ]>(result1.tuple)
-// expectType<number>(result1.tuple[0])
-// expectType<string>(result1.tuple[1])
-// expectType<boolean>(result1.tuple[2])
-// expectType<boolean>(result1.tuple[9])
+// tuples in objects
+const validator1 = object({
+  tuple: [ number, string, ...boolean ],
+} as const)
+const result1 = validate(validator1, null)
+expectAssignable<{ tuple: [ number, string, ...boolean[] ] }>(result1)
+expectType<[ number, string, ...boolean[] ]>(result1.tuple)
+expectType<number>(result1.tuple[0])
+expectType<string>(result1.tuple[1])
+expectType<boolean>(result1.tuple[2])
+expectType<boolean>(result1.tuple[9])
 
-// const validator2 = object({
-//   tuple: [ 12345, 'foo', ...boolean ],
-// } as const)
+const validator2 = object({
+  tuple: [ 12345, 'foo', ...boolean ],
+} as const)
 
-// const result2 = validate(validator2, null)
-// expectAssignable<{ tuple: [ 12345, 'foo', ...boolean[] ] }>(result2)
-// expectType<[ 12345, 'foo', ...boolean[] ]>(result2.tuple)
-// expectType<12345>(result2.tuple[0])
-// expectType<'foo'>(result2.tuple[1])
-// expectType<boolean>(result2.tuple[2])
-// expectType<boolean>(result2.tuple[9])
+const result2 = validate(validator2, null)
+expectAssignable<{ tuple: [ 12345, 'foo', ...boolean[] ] }>(result2)
+expectType<[ 12345, 'foo', ...boolean[] ]>(result2.tuple)
+expectType<12345>(result2.tuple[0])
+expectType<'foo'>(result2.tuple[1])
+expectType<boolean>(result2.tuple[2])
+expectType<boolean>(result2.tuple[9])
 
-// // no rest arguments before last in object tuples
-// expectError(object({
-//   tuple: [ number, ...string, boolean ],
-// }))
-
-// expectError(object({
-//   tuple: [ 123, ...string, boolean ],
-// } as const))
+const validatorX = object({
+  tuple: [ number, string, ...boolean ],
+}) // no as const... types are messed up! :-)
+const resultX = validate(validatorX, null)
+expectAssignable<{ tuple:(number|string|boolean)[] }>(resultX)
+expectType<(number|string|boolean)[]>(resultX.tuple)
+expectType<number|string|boolean>(resultX.tuple[0])
+expectType<number|string|boolean>(resultX.tuple[1])
+expectType<number|string|boolean>(resultX.tuple[2])
+expectType<number|string|boolean>(resultX.tuple[9])
