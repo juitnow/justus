@@ -2,7 +2,6 @@ import { InferValidationType, Validation } from './validation'
 import { Validator } from './validator'
 import { any, AnyValidator } from './validators/any'
 import { getValidator, isValidation } from './utilities'
-import { Tuple } from './tuples'
 
 export const additionalProperties = Symbol('additionalProperties')
 type additionalProperties = typeof additionalProperties
@@ -12,7 +11,7 @@ type additionalProperties = typeof additionalProperties
  * ========================================================================== */
 
 export interface Schema {
-  [ key: string ] : Validation | Tuple | Modifier | Never
+  [ key: string ] : Validation | Modifier | Never
   [ additionalProperties ]?: Validator
 }
 
