@@ -20,7 +20,7 @@ export interface ArrayConstraints<V extends Validation> {
   items?: V,
 }
 
-export class ArrayValidator<T = any> extends Validator<T[]> {
+export class ArrayValidator<T> extends Validator<T[]> {
   readonly maxItems: number
   readonly minItems: number
   readonly uniqueItems: boolean
