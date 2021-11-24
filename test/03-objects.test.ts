@@ -1,6 +1,8 @@
 import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never } from '../src'
 import { expect } from 'chai'
 
+// TODO: test removing additionalproperties
+
 describe('Object validator', () => {
   it('should validate a generic object', () => {
     expect(validate(object, {})).to.eql({})
@@ -57,14 +59,14 @@ describe('Object validator', () => {
 
   it('should validate a complex object', () => {
     const basic = object({
-      version: 0 as const,
+      version: 0,
       title: string,
-    })
+    } as const)
 
     const contents = object({
       description: string({ minLength: 1 }),
       value: number,
-    })
+    } as const)
 
     const validator = object({
       ...basic,

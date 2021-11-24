@@ -7,6 +7,7 @@ import {
   object,
   string,
   validate,
+  schemaValidator,
 } from '../src'
 
 printType('__file_marker__')
@@ -55,6 +56,11 @@ const s1 = object({
   c: string,
 })
 
+const s2 = object({
+  ...s1,
+  ...allowAdditionalProperties(false),
+})
+
 const o1 = validate(s1, null)
 
 expectType<number>(o1.a)
@@ -62,34 +68,41 @@ expectType<string>(o1.b)
 expectType<string>(o1.c)
 expectType<boolean>(o1.extra)
 
+const o2 = validate(s2, null)
+
+expectType<number>(o2.a)
+expectType<string>(o2.b)
+expectType<string>(o2.c)
+expectError(o2.extra)
+
 // -------------------------------------------------------------------------- //
 // never
 
-const s2 = object({
+const s4 = object({
   a: number,
   b: never,
   c: string,
 })
 
-const o2 = validate(s2, null)
+const o4 = validate(s4, null)
 
-expectType<number>(o2.a)
-expectError(o2.b) // does not exist on the returned object
-expectType<string>(o2.c)
-expectError(o2.extra) // no additional properties
+expectType<number>(o4.a)
+expectError(o4.b) // does not exist on the returned object
+expectType<string>(o4.c)
+expectError(o4.extra) // no additional properties
 
 // never with "additionalProperties"
 
-const s3 = object({
+const s5 = object({
   a: number,
   b: never,
   c: string,
   ...allowAdditionalProperties(boolean),
 })
 
-const o3 = validate(s3, null)
+const o5 = validate(s5, null)
 
-expectType<number>(o3.a)
-expectType<never>(o3.b) // forcedly removed from the resulting object
-expectType<string>(o3.c)
-expectType<boolean>(o3.extra) // defined in additionalProperties
+expectType<number>(o5.a)
+expectType<never>(o5.b) // forcedly removed from the resulting object
+expectType<string>(o5.c)
+expectType<boolean>(o5.extra) // defined in additionalProperties

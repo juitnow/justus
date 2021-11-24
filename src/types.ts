@@ -190,34 +190,60 @@ export type InferTuple<T> =
  */
 export interface Schema {
   [ key: string ] : Validation | Modifier | typeof never
-  [ additionalValidator ]?: Validator
+  [ additionalValidator ]?: Validator | false
   [ schemaValidator ]?: Validator
 }
 
-export interface AdditionalProperties<V extends Validator> {
+/**
+ * An interface defining whether a `Schema` should include additional
+ * properties, and the `Validator` used to validate them.
+ *
+ * @internal
+ */
+export interface AdditionalProperties<V extends Validator | false> {
   [ additionalValidator ]: V
 }
 
 /* -------------------------------------------------------------------------- */
 
+/**
+ * A `Modifier` marks a `Schema` property either _read only_ and/or _optional_.
+ *
+ * @internal
+ */
 export interface Modifier<V extends Validator = Validator> {
   [ modifierValidator ]: V
   readonly?: true,
   optional?: true,
 }
 
+/**
+ * Mark a `Schema` property as _read only_.
+ *
+ * @public
+ */
 export interface ReadonlyModifier<V extends Validator = Validator> extends Modifier<V> {
   readonly: true,
 }
 
+/**
+ * Mark a `Schema` property as _optional_.
+ *
+ * @public
+ */
 export interface OptionalModifier<V extends Validator = Validator> extends Modifier<V> {
   optional: true,
 }
 
+/**
+ * Mark a `Schema` property as both _optional_ and _read only_.
+ *
+ * @public
+ */
 export interface CombinedModifier<V extends Validator = Validator>
   extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
-  readonly: true,
   optional: true,
+  readonly: true,
 }
 
 /* ========================================================================== *
@@ -229,15 +255,11 @@ export type InferSchema<S extends Schema> =
   InferReadonlyModifiers<S> &
   InferOptionalModifiers<S> &
   InferCombinedModifiers<S> &
-  (
-    S extends AdditionalProperties<never> ?
-      InferValidators<S> :
-    S extends AdditionalProperties<Validator<infer V>> ?
+  ( S extends AdditionalProperties<Validator<infer V>> ?
       Record<string, V> &
-      InferRemovedProperties<S> &
+      InferNever<S> &
       InferValidators<S> :
-    InferValidators<S>
-  )
+    InferValidators<S> )
 
 /* -------------------------------------------------------------------------- */
 
@@ -255,6 +277,7 @@ type InferValidators<S extends Schema> = {
 
 /* -------------------------------------------------------------------------- */
 
+/** Infer the type of _read only_ `Schema` properties  */
 type InferReadonlyModifiers<S extends Schema> = {
   readonly [ key in keyof S as
     key extends string ?
@@ -266,6 +289,7 @@ type InferReadonlyModifiers<S extends Schema> = {
     S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> : never
 }
 
+/** Infer the type of _optional_ `Schema` properties  */
 type InferOptionalModifiers<S extends Schema> = {
   [ key in keyof S as
     key extends string ?
@@ -277,6 +301,7 @@ type InferOptionalModifiers<S extends Schema> = {
     S[key] extends OptionalModifier<infer V> ? InferValidation<V> : never
 }
 
+/** Infer the type of  _read only_ **and** _optional_ `Schema` properties  */
 type InferCombinedModifiers<S extends Schema> = {
   readonly [ key in keyof S as
     key extends string ?
@@ -289,7 +314,8 @@ type InferCombinedModifiers<S extends Schema> = {
 
 /* -------------------------------------------------------------------------- */
 
-type InferRemovedProperties<S extends Schema> =
+/** Ensure that we properly type `never` properties */
+type InferNever<S extends Schema> =
   { [ key in keyof S as
       key extends string ?
         S[key] extends typeof never ? key :

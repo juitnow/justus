@@ -18,7 +18,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
     super()
     const { [additionalValidator]: additional, ...properties } = schema
 
-    this.#additionalProperties = additional && getValidator(additional)
+    if (additional) this.#additionalProperties = getValidator(additional)
 
     for (const key of Object.keys(properties)) {
       const definition = properties[key]

@@ -22,13 +22,13 @@ import {
 export type allowAdditionalProperties =
   (() => AdditionalProperties<AnyValidator>) &
   ((allow: true) => AdditionalProperties<AnyValidator>) &
-  ((allow: false) => AdditionalProperties<never>) &
+  ((allow: false) => AdditionalProperties<false>) &
   (<V extends Validation>(validation: V) => AdditionalProperties<Validator<InferValidation<V>>>) &
   { [additionalValidator]: Validator<any> }
 
 export const allowAdditionalProperties: allowAdditionalProperties = <allowAdditionalProperties>
-  ((options?: Validation | boolean): AdditionalProperties<Validator> => {
-    if (options === false) return {} as AdditionalProperties<never>
+  ((options?: Validation | boolean): AdditionalProperties<Validator | false> => {
+    if (options === false) return { [additionalValidator]: false }
 
     const allow = options === true ? any : getValidator(options)
     return { [additionalValidator]: allow }
