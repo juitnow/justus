@@ -23,7 +23,7 @@ function _allowAdditionalProperties(allow: true): AdditionalProperties<Validator
 function _allowAdditionalProperties(allow: false): AdditionalProperties<false>
 function _allowAdditionalProperties<V extends Validation>(validation: V): AdditionalProperties<Validator<InferValidation<V>>>
 
-function _allowAdditionalProperties(options?: Validation | boolean): AdditionalProperties<Validator | false>  {
+function _allowAdditionalProperties(options?: Validation | boolean): AdditionalProperties<Validator | false> {
   if (options === false) return { [additionalValidator]: false }
   if (options === true) return { [additionalValidator]: any }
 
