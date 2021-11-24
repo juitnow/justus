@@ -1,4 +1,4 @@
-import { any, AnyValidator } from './validators/any'
+import { any } from './validators/any'
 import { getValidator, isValidation } from './utilities'
 
 import {
@@ -18,21 +18,20 @@ import {
  * ADDITIONAL PROPERTIES IN SCHEMAS                                           *
  * ========================================================================== */
 
+function _allowAdditionalProperties(): AdditionalProperties<Validator<any>>
+function _allowAdditionalProperties(allow: true): AdditionalProperties<Validator<any>>
+function _allowAdditionalProperties(allow: false): AdditionalProperties<false>
+function _allowAdditionalProperties<V extends Validation>(validation: V): AdditionalProperties<Validator<InferValidation<V>>>
 
-export type allowAdditionalProperties =
-  (() => AdditionalProperties<AnyValidator>) &
-  ((allow: true) => AdditionalProperties<AnyValidator>) &
-  ((allow: false) => AdditionalProperties<false>) &
-  (<V extends Validation>(validation: V) => AdditionalProperties<Validator<InferValidation<V>>>) &
-  { [additionalValidator]: Validator<any> }
+function _allowAdditionalProperties(options?: Validation | boolean): AdditionalProperties<Validator | false>  {
+  if (options === false) return { [additionalValidator]: false }
+  if (options === true) return { [additionalValidator]: any }
 
-export const allowAdditionalProperties: allowAdditionalProperties = <allowAdditionalProperties>
-  ((options?: Validation | boolean): AdditionalProperties<Validator | false> => {
-    if (options === false) return { [additionalValidator]: false }
+  return { [additionalValidator]: getValidator(options) }
+}
 
-    const allow = options === true ? any : getValidator(options)
-    return { [additionalValidator]: allow }
-  })
+export const allowAdditionalProperties = _allowAdditionalProperties as
+  typeof _allowAdditionalProperties & AdditionalProperties<Validator<any>>
 
 allowAdditionalProperties[additionalValidator] = any
 
@@ -40,8 +39,6 @@ allowAdditionalProperties[additionalValidator] = any
 /* ========================================================================== *
  * SCHEMA KEYS MODIFIERS                                                      *
  * ========================================================================== */
-
-/* -------------------------------------------------------------------------- */
 
 type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
   M1 extends ReadonlyModifier ?
