@@ -113,7 +113,7 @@ const anyObjectValidator = new class extends Validator<Record<string, any>> {
   }
 }
 
-type ObjectValidation<S extends Schema> = Omit<S, schemaValidator> & {
+type ObjectValidation<S extends Schema> = S & {
   [ schemaValidator ]: ObjectValidator<S>;
 }
 

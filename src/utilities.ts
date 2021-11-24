@@ -3,7 +3,7 @@ import { Validator } from './validator'
 import { any } from './validators/any'
 import { constant } from './validators/constant'
 import { TupleRest } from './tuples'
-import { schemaValidator, tupleRest } from './symbols'
+import { schemaValidator, restValidator } from './symbols'
 import { InferValidationType, tuple } from '.'
 
 /* ========================================================================== *
@@ -15,7 +15,7 @@ export function makeTupleRestIterable<
 >(create: F): F & Iterable<TupleRest<InferValidationType<F>>> {
   const validator = create()
   ;(<any>create)[Symbol.iterator] = function* (): Generator<TupleRest<InferValidationType<F>>> {
-    yield { [tupleRest]: validator }
+    yield { [restValidator]: validator }
   }
   return create as any
 }

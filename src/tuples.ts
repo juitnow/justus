@@ -1,9 +1,9 @@
 import { InferValidationType, Validation, ValidationOptions } from './validation'
 import { Validator } from './validator'
-import { tupleRest } from './symbols'
+import { restValidator } from './symbols'
 
 export type TupleRest<T = any> = {
-  [tupleRest] : Validator<T>
+  [restValidator] : Validator<T>
 }
 
 export type Tuple = readonly (Validation | TupleRest)[]
