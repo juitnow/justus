@@ -1,15 +1,16 @@
 import { expect } from 'chai'
 import { any, boolean, number, object, optional, readonly, string, validate, ValidationError } from '../src'
+import { modifierValidator } from '../src/types'
 
 describe('Object modifiers', () => {
   it('should construct a "readonly" modifier', () => {
     expect(readonly()).to.eql({
-      modifier: any,
+      [modifierValidator]: any,
       readonly: true,
     })
 
     expect(readonly(boolean)).to.eql({
-      modifier: boolean,
+      [modifierValidator]: boolean,
       readonly: true,
     })
 
@@ -17,19 +18,19 @@ describe('Object modifiers', () => {
 
     const modified = readonly(validator)
     expect(modified).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       readonly: true,
     })
   })
 
   it('should construct a "optional" modifier', () => {
     expect(optional()).to.eql({
-      modifier: any,
+      [modifierValidator]: any,
       optional: true,
     })
 
     expect(optional(boolean)).to.eql({
-      modifier: boolean,
+      [modifierValidator]: boolean,
       optional: true,
     })
 
@@ -37,7 +38,7 @@ describe('Object modifiers', () => {
 
     const modified = optional(validator)
     expect(modified).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       optional: true,
     })
   })
@@ -47,34 +48,34 @@ describe('Object modifiers', () => {
 
     const r = readonly(validator)
     expect(r).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       readonly: true,
     })
 
     expect(readonly(r)).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       readonly: true,
     })
 
     expect(optional(r)).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       readonly: true,
       optional: true,
     })
 
     const o = optional(validator)
     expect(o).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       optional: true,
     })
 
     expect(optional(o)).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       optional: true,
     })
 
     expect(readonly(o)).to.eql({
-      modifier: validator,
+      [modifierValidator]: validator,
       readonly: true,
       optional: true,
     })

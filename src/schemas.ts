@@ -1,32 +1,21 @@
-import { InferValidationType, Validation } from './validation'
+import { InferValidation, Validation } from './validation'
 import { Validator } from './validator'
 import { any, AnyValidator } from './validators/any'
 import { getValidator, isValidation } from './utilities'
-import { additionalProperties, schemaValidator } from './symbols'
+import { additionalProperties } from './symbols'
 
-/* ========================================================================== *
- * SCHEMA DEFINITION                                                          *
- * ========================================================================== */
-
-export interface Schema {
-  [ key: string ] : Validation | Modifier | Never
-  [ additionalProperties ]?: Validator
-  [ schemaValidator ]?: Validator
-}
+import { AdditionalProperties, CombinedModifier, Modifier, modifierValidator, Never, OptionalModifier, ReadonlyModifier } from './types'
 
 /* ========================================================================== *
  * ADDITIONAL PROPERTIES IN SCHEMAS                                           *
  * ========================================================================== */
 
-export interface AdditionalProperties<V extends Validator> {
-  [ additionalProperties ]: V
-}
 
 export type allowAdditionalProperties =
   (() => AdditionalProperties<AnyValidator>) &
   ((allow: true) => AdditionalProperties<AnyValidator>) &
   ((allow: false) => AdditionalProperties<never>) &
-  (<V extends Validation>(validation: V) => AdditionalProperties<Validator<InferValidationType<V>>>) &
+  (<V extends Validation>(validation: V) => AdditionalProperties<Validator<InferValidation<V>>>) &
   { [additionalProperties]: Validator<any> }
 
 export const allowAdditionalProperties: allowAdditionalProperties = <allowAdditionalProperties>
@@ -44,26 +33,6 @@ allowAdditionalProperties[additionalProperties] = any
  * SCHEMA KEYS MODIFIERS                                                      *
  * ========================================================================== */
 
-interface Modifier<V extends Validator = Validator> {
-  readonly?: true,
-  optional?: true,
-  modifier: V
-}
-
-interface ReadonlyModifier<V extends Validator = Validator> extends Modifier<V> {
-  readonly: true,
-}
-
-interface OptionalModifier<V extends Validator = Validator> extends Modifier<V> {
-  optional: true,
-}
-
-interface CombinedModifier<V extends Validator = Validator>
-  extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
-  readonly: true,
-  optional: true,
-}
-
 /* -------------------------------------------------------------------------- */
 
 type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
@@ -80,117 +49,39 @@ type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
 /* -------------------------------------------------------------------------- */
 
 export function readonly(): ReadonlyModifier<any>
-export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidationType<V>>>
+export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidation<V>>>
 export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
 
 export function readonly(options?: Modifier<any> | Validation): Modifier<any> {
-  const { modifier, optional = undefined } =
-    isValidation(options) ? { modifier: getValidator(options) } :
-    options ? options : { modifier: any }
+  const { [modifierValidator]: modifier, optional = undefined } =
+    isValidation(options) ? { [modifierValidator]: getValidator(options) } :
+    options ? options : { [modifierValidator]: any }
 
   return optional ?
-    { modifier, optional, readonly: true } :
-    { modifier, readonly: true }
+    { [modifierValidator]: modifier, optional, readonly: true } :
+    { [modifierValidator]: modifier, readonly: true }
 }
 
 export function optional(): OptionalModifier<any>
-export function optional<V extends Validation>(validation: V): OptionalModifier<Validator<InferValidationType<V>>>
+export function optional<V extends Validation>(validation: V): OptionalModifier<Validator<InferValidation<V>>>
 export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
 
 export function optional(options?: Modifier<any> | Validation): Modifier<any> {
-  const { modifier, readonly = undefined } =
-    isValidation(options) ? { modifier: getValidator(options) } :
-    options ? options : { modifier: any }
+  const { [modifierValidator]: modifier, readonly = undefined } =
+    isValidation(options) ? { [modifierValidator]: getValidator(options) } :
+    options ? options : { [modifierValidator]: any }
 
   return readonly ?
-    { modifier, readonly, optional: true } :
-    { modifier, optional: true }
+    { [modifierValidator]: modifier, readonly, optional: true } :
+    { [modifierValidator]: modifier, optional: true }
 }
 
 /* ========================================================================== *
  * NEVER PSEUDO-MODIFIER                                                      *
  * ========================================================================== */
 
-interface Never {
-  never: true
-}
-
 export const never: Never = { never: true }
 
 /* ========================================================================== *
  * INFER OBJECT TYPE FROM SCHEMA                                              *
  * ========================================================================== */
-
-/** Infer the type validated by a `Schema` */
-export type InferSchema<S extends Schema> =
-  InferReadonlyModifiers<S> &
-  InferOptionalModifiers<S> &
-  InferCombinedModifiers<S> &
-  (
-    S extends AdditionalProperties<never> ?
-      InferValidators<S> :
-    S extends AdditionalProperties<Validator<infer V>> ?
-      Record<string, V> &
-      InferRemovedProperties<S> &
-      InferValidators<S> :
-    InferValidators<S>
-  )
-
-/* -------------------------------------------------------------------------- */
-
-/** Infer the type of keys associated with `Validator`s */
-type InferValidators<S extends Schema> = {
-  [ key in keyof S as
-      key extends string ?
-        S[key] extends Validation ? key :
-        never :
-      never
-  ] :
-    S[key] extends Validation ? InferValidationType<S[key]> :
-    never
-}
-
-/* -------------------------------------------------------------------------- */
-
-type InferReadonlyModifiers<S extends Schema> = {
-  readonly [ key in keyof S as
-    key extends string ?
-      S[key] extends OptionalModifier<Validator> ? never :
-      S[key] extends ReadonlyModifier<Validator> ? key :
-      never :
-    never
-  ] :
-    S[key] extends ReadonlyModifier<infer V> ? InferValidationType<V> : never
-}
-
-type InferOptionalModifiers<S extends Schema> = {
-  [ key in keyof S as
-    key extends string ?
-      S[key] extends ReadonlyModifier<Validator> ? never :
-      S[key] extends OptionalModifier<Validator> ? key :
-      never :
-    never
-  ] ? :
-    S[key] extends OptionalModifier<infer V> ? InferValidationType<V> : never
-}
-
-type InferCombinedModifiers<S extends Schema> = {
-  readonly [ key in keyof S as
-    key extends string ?
-      S[key] extends CombinedModifier ? key :
-      never :
-    never
-  ] ? :
-    S[key] extends CombinedModifier<infer V> ? InferValidationType<V> : never
-}
-
-/* -------------------------------------------------------------------------- */
-
-type InferRemovedProperties<S extends Schema> =
-  { [ key in keyof S as
-      key extends string ?
-        S[key] extends Never ? key :
-        never :
-      never
-    ] : never
-  }

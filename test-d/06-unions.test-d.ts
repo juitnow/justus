@@ -8,7 +8,7 @@ import {
   boolean,
   Validator,
   object,
-  InferValidationType,
+  InferValidation,
 } from '../src'
 
 printType('__file_marker__')
@@ -27,7 +27,7 @@ expectAssignable<Validator<'foo' | 123 | true>>(oneOf2)
 expectType<'foo' | 123 | true>(validate(oneOf2, null))
 
 const oneOf3 = oneOf(t1, t2)
-expectAssignable<Validator<InferValidationType<typeof t1 | typeof t2>>>(oneOf3)
+expectAssignable<Validator<InferValidation<typeof t1 | typeof t2>>>(oneOf3)
 
 const oneOfR3 = validate(oneOf3, null)
 expectAssignable<{ o1: string } | { o2: number}>(oneOfR3)
@@ -47,7 +47,7 @@ expectAssignable<Validator<never>>(allOf1)
 expectType<never>(validate(allOf1, null))
 
 const allOf2 = allOf(t1, t2)
-expectAssignable<Validator<InferValidationType<typeof t1 & typeof t2>>>(allOf2)
+expectAssignable<Validator<InferValidation<typeof t1 & typeof t2>>>(allOf2)
 
 const allOfR2 = validate(allOf2, null)
 expectAssignable<{ o1: string, o2: number}>(allOfR2)

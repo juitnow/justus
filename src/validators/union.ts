@@ -1,7 +1,7 @@
 import { ValidationErrorBuilder } from '../errors'
 import { getValidator } from '../utilities'
 import {
-  InferValidationType,
+  InferValidation,
   Validation,
   ValidationOptions,
 } from '../validation'
@@ -15,8 +15,8 @@ type InferOneOfValidationType<A extends UnionArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
       Rest extends UnionArguments ?
-        InferValidationType<First> | InferOneOfValidationType<Rest> :
-      InferValidationType<First> :
+        InferValidation<First> | InferOneOfValidationType<Rest> :
+      InferValidation<First> :
     never :
   never
 
@@ -52,8 +52,8 @@ type InferAllOfValidationType<A extends UnionArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
       Rest extends UnionArguments ?
-        InferValidationType<First> & InferOneOfValidationType<Rest> :
-      InferValidationType<First> :
+        InferValidation<First> & InferOneOfValidationType<Rest> :
+      InferValidation<First> :
     never :
   never
 

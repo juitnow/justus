@@ -1,34 +1,4 @@
-import { InferValidationType, Validation, ValidationOptions } from './validation'
-import { Validator } from './validator'
-import { restValidator } from './symbols'
-
-export type TupleRest<T = any> = {
-  [restValidator] : Validator<T>
-}
-
-export type Tuple = readonly (Validation | TupleRest)[]
-
-type InferValidationOrTupleRest<T> =
-  T extends TupleRest<infer X> ? X :
-  T extends Validation ? InferValidationType<T> :
-  never
-
-export type InferTuple<T> =
-  T extends Tuple ?
-    T extends readonly [] ? [] :
-    T extends readonly [ Validation, ...any[] ] ?
-      T extends readonly [ infer V, ...infer Rest ] ?
-        [ InferValidationType<V>, ...InferTuple<Rest> ] :
-      never :
-    T extends readonly [ ...any[], Validation ] ?
-      T extends readonly [ ...infer Rest, infer V ] ?
-        [ ...InferTuple<Rest>, InferValidationType<V> ] :
-      never :
-    T extends readonly (infer V)[] ?
-      [ ...InferValidationOrTupleRest<V>[] ] :
-    never :
-  never
-
+import { Tuple, InferTuple, Validator, ValidationOptions } from './types'
 
 export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
   readonly tuple: T

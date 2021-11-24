@@ -1,5 +1,5 @@
 export { Validator } from './validator'
-export { Validation, InferValidationType, validate } from './validation'
+export { Validation, InferValidation, validate } from './validation'
 export { object } from './objects'
 export { allowAdditionalProperties, readonly, optional, never } from './schemas'
 export { tuple } from './tuples'

@@ -10,8 +10,8 @@ import { getValidator } from './utilities'
 export { Validation } from './types'
 import { Validation } from './types'
 
-export { InferValidationType } from './types'
-import { InferValidationType } from './types'
+export { InferValidation as InferValidation } from './types'
+import { InferValidation } from './types'
 
 // /** The `Validation` type defines a `Validator` or a function creating one. */
 // export type Validation = // <V extends Validator = Validator> =
@@ -69,7 +69,7 @@ export function validate<V extends Validation>(
     validator: V,
     value: any,
     options: PartialValidationOptions = {},
-): InferValidationType<V> {
+): InferValidation<V> {
   const opts: ValidationOptions = {
     stripAdditionalProperties: false,
     stripForbiddenProperties: false,

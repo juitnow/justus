@@ -1,5 +1,3 @@
-import type { InferSchema, Schema } from './schemas'
-
 /* ========================================================================== *
  * SYMBOLS IDENTIFYING SPECIAL FUNCTIONALITIES                                *
  * ========================================================================== */
@@ -9,6 +7,9 @@ export const restValidator = Symbol.for('justus.restValidator')
 
 /** A symbol indicating the `Validator` for a `Schema`. */
 export const schemaValidator = Symbol.for('justus.schemaValidator')
+
+/** A symbol indicating the `Validator` for a `Modifier`. */
+export const modifierValidator = Symbol.for('justus.modifierValidator')
 
 /** A symbol indicating that a `Schema` can have additional properties. */
 export const additionalProperties = Symbol.for('justus.additionalProperties')
@@ -36,12 +37,12 @@ export interface ValidationOptions {
  *
  * @public
  */
-export abstract class Validator<T = any> {
+export abstract class Validator<T = any> implements Iterable<TupleRestParameter<T>> {
   /** Validate a _value_ and optionally convert it to the required `Type` */
   abstract validate(value: unknown, options: ValidationOptions): T
 
   /** Allow any `Validator` to be used as a rest parameter in `Tuple`s */
-  * [Symbol.iterator](): Generator<TupleRest<T>> {
+  * [Symbol.iterator](): Generator<TupleRestParameter<T>> {
     yield { [restValidator]: this }
   }
 }
@@ -65,8 +66,10 @@ export type Validation =
 
 /**
  * Infer the type returned by a `Validation` when validating.
+ *
+ * @public
  */
-export type InferValidationType<V> =
+export type InferValidation<V> =
   // Let `InferValidationType<T>` be liberal in the type it accepts and check
   // here whether it extends `Validation`
   V extends Validation ?
@@ -97,49 +100,198 @@ export type InferValidationType<V> =
       A9 extends [] ? R9 :
       never :
 
+    // Validators return their validation type
+    V extends Validator<infer T> ? T :
+
     // Tuples and schemas are inferred using their own types
     V extends Tuple ? InferTuple<V> :
     V extends Schema ? InferSchema<V> :
 
-    // Validators return their validation type
-    V extends Validator<infer T> ? T :
-
+    // Primitives are returned as constants
     V extends boolean ? V :
     V extends number ? V :
     V extends string ? V :
     V extends null ? V :
     never :
-
-    // V // b oolean, number, string or null
   never
+
 
 /* ========================================================================== *
  * TUPLES                                                                     *
  * ========================================================================== */
 
-export type TupleRest<T = any> = {
+/** Infer the type validated by a `Validation` or `TupleRestParameter` */
+type InferValidationOrTupleRest<T> =
+  T extends TupleRestParameter<infer X> ? X :
+  T extends Validation ? InferValidation<T> :
+  never
+
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A `Tuple` is defined to be an array of `Validation` or `TupleRest`
+ *
+ * @public
+ */
+export type Tuple = readonly (Validation | TupleRestParameter)[]
+
+/**
+ * The `TupleRestParameter` defines a tuple member that can occur several
+ * times while validating an array.
+ *
+ * Every `Validator` is an `Iterable` of `TupleRestParameters` so that it can
+ * be used in tuples. For example, to indicate a tuple composed by a number,
+ * followed by zero or more non-empty strings we can write:
+ *
+ * ```
+ * const nonEmptyString = string({ minLength: 1 })
+ * const myTuple = tuple([ number, ...nonEmptyString ])
+ * ```
+ *
+ * @public
+ */
+export type TupleRestParameter<T = any> = {
   [restValidator] : Validator<T>
 }
 
-export type Tuple = readonly (Validation | TupleRest)[]
-
-type InferValidationOrTupleRest<T> =
-  T extends TupleRest<infer X> ? X :
-  T extends Validation ? InferValidationType<T> :
-  never
-
+/**
+ * Infer the type returned by a `TupleValidator` when validating an array.
+ *
+ * @public
+ */
 export type InferTuple<T> =
   T extends Tuple ?
     T extends readonly [] ? [] :
     T extends readonly [ Validation, ...any[] ] ?
       T extends readonly [ infer V, ...infer Rest ] ?
-        [ InferValidationType<V>, ...InferTuple<Rest> ] :
+        [ InferValidation<V>, ...InferTuple<Rest> ] :
       never :
     T extends readonly [ ...any[], Validation ] ?
       T extends readonly [ ...infer Rest, infer V ] ?
-        [ ...InferTuple<Rest>, InferValidationType<V> ] :
+        [ ...InferTuple<Rest>, InferValidation<V> ] :
       never :
     T extends readonly (infer V)[] ?
       [ ...InferValidationOrTupleRest<V>[] ] :
     never :
   never
+
+
+/* ========================================================================== *
+ * OBJECT SCHEMAS                                                             *
+ * ========================================================================== */
+
+export interface Schema {
+  [ key: string ] : Validation | Modifier | Never
+  [ additionalProperties ]?: Validator
+  [ schemaValidator ]?: Validator
+}
+
+export interface AdditionalProperties<V extends Validator> {
+  [ additionalProperties ]: V
+}
+
+/* -------------------------------------------------------------------------- */
+
+export interface Modifier<V extends Validator = Validator> {
+  [ modifierValidator ]: V
+  readonly?: true,
+  optional?: true,
+}
+
+export interface ReadonlyModifier<V extends Validator = Validator> extends Modifier<V> {
+  readonly: true,
+}
+
+export interface OptionalModifier<V extends Validator = Validator> extends Modifier<V> {
+  optional: true,
+}
+
+export interface CombinedModifier<V extends Validator = Validator>
+  extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
+  readonly: true,
+  optional: true,
+}
+
+/* -------------------------------------------------------------------------- */
+
+export interface Never {
+  never: true
+}
+
+/* ========================================================================== *
+ * INFER OBJECT TYPE FROM SCHEMA                                              *
+ * ========================================================================== */
+
+/** Infer the type validated by a `Schema` */
+export type InferSchema<S extends Schema> =
+  InferReadonlyModifiers<S> &
+  InferOptionalModifiers<S> &
+  InferCombinedModifiers<S> &
+  (
+    S extends AdditionalProperties<never> ?
+      InferValidators<S> :
+    S extends AdditionalProperties<Validator<infer V>> ?
+      Record<string, V> &
+      InferRemovedProperties<S> &
+      InferValidators<S> :
+    InferValidators<S>
+  )
+
+/* -------------------------------------------------------------------------- */
+
+/** Infer the type of keys associated with `Validator`s */
+type InferValidators<S extends Schema> = {
+  [ key in keyof S as
+      key extends string ?
+        S[key] extends Validation ? key :
+        never :
+      never
+  ] :
+    S[key] extends Validation ? InferValidation<S[key]> :
+    never
+}
+
+/* -------------------------------------------------------------------------- */
+
+type InferReadonlyModifiers<S extends Schema> = {
+  readonly [ key in keyof S as
+    key extends string ?
+      S[key] extends OptionalModifier<Validator> ? never :
+      S[key] extends ReadonlyModifier<Validator> ? key :
+      never :
+    never
+  ] :
+    S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> : never
+}
+
+type InferOptionalModifiers<S extends Schema> = {
+  [ key in keyof S as
+    key extends string ?
+      S[key] extends ReadonlyModifier<Validator> ? never :
+      S[key] extends OptionalModifier<Validator> ? key :
+      never :
+    never
+  ] ? :
+    S[key] extends OptionalModifier<infer V> ? InferValidation<V> : never
+}
+
+type InferCombinedModifiers<S extends Schema> = {
+  readonly [ key in keyof S as
+    key extends string ?
+      S[key] extends CombinedModifier ? key :
+      never :
+    never
+  ] ? :
+    S[key] extends CombinedModifier<infer V> ? InferValidation<V> : never
+}
+
+/* -------------------------------------------------------------------------- */
+
+type InferRemovedProperties<S extends Schema> =
+  { [ key in keyof S as
+      key extends string ?
+        S[key] extends Never ? key :
+        never :
+      never
+    ] : never
+  }
