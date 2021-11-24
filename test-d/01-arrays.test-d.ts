@@ -2,6 +2,7 @@ import { expectType, printType } from 'tsd'
 import {
   any,
   array,
+  arrayOf,
   boolean,
   constant,
   number,
@@ -17,32 +18,32 @@ type BrandedString = string & { __branded_string: never }
 // plain exports
 expectType<any[]>(validate(array, null))
 
-expectType<any[]>(validate(array(any), null))
-expectType<boolean[]>(validate(array(boolean), null))
-expectType<number[]>(validate(array(number), null))
-expectType<string[]>(validate(array(string), null))
+expectType<any[]>(validate(arrayOf(any), null))
+expectType<boolean[]>(validate(arrayOf(boolean), null))
+expectType<number[]>(validate(arrayOf(number), null))
+expectType<string[]>(validate(arrayOf(string), null))
 
 // constructed validators
-expectType<number[]>(validate(array(number()), null))
-expectType<string[]>(validate(array(string()), null))
+expectType<number[]>(validate(arrayOf(number()), null))
+expectType<string[]>(validate(arrayOf(string()), null))
 
 // constants
-expectType<null[]>(validate(array(constant(null)), null))
-expectType<true[]>(validate(array(constant(true)), null))
-expectType<false[]>(validate(array(constant(false)), null))
-expectType<12345[]>(validate(array(constant(12345)), null))
-expectType<'xyz'[]>(validate(array(constant('xyz')), null))
+expectType<null[]>(validate(arrayOf(constant(null)), null))
+expectType<true[]>(validate(arrayOf(constant(true)), null))
+expectType<false[]>(validate(arrayOf(constant(false)), null))
+expectType<12345[]>(validate(arrayOf(constant(12345)), null))
+expectType<'xyz'[]>(validate(arrayOf(constant('xyz')), null))
 
 // simple constants (no need for "as const")
-expectType<null[]>(validate(array(null), null))
-expectType<true[]>(validate(array(true), null))
-expectType<false[]>(validate(array(false), null))
-expectType<12345[]>(validate(array(12345), null))
-expectType<'xyz'[]>(validate(array('xyz'), null))
+expectType<null[]>(validate(arrayOf(null), null))
+expectType<true[]>(validate(arrayOf(true), null))
+expectType<false[]>(validate(arrayOf(false), null))
+expectType<12345[]>(validate(arrayOf(12345), null))
+expectType<'xyz'[]>(validate(arrayOf('xyz'), null))
 
 // "branded" primitives
-expectType<BrandedNumber[]>(validate(array(number<BrandedNumber>()), null))
-expectType<BrandedString[]>(validate(array(string<BrandedString>()), null))
+expectType<BrandedNumber[]>(validate(arrayOf(number<BrandedNumber>()), null))
+expectType<BrandedString[]>(validate(arrayOf(string<BrandedString>()), null))
 
 // -------------------------------------------------------------------------- //
 

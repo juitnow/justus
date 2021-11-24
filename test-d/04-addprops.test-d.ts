@@ -50,7 +50,7 @@ const s0 = object({
 })
 
 const s1 = object({
-  ...s0.schema,
+  ...s0,
   b: string,
   c: string,
 })

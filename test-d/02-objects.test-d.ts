@@ -8,6 +8,7 @@ import {
   number,
   string,
   validate,
+  arrayOf,
 } from '../src'
 
 printType('__file_marker__')
@@ -49,7 +50,7 @@ expectAssignable<{
 const o2 = validate(object({
   n: number(),
   s: string(),
-  a: array(boolean),
+  a: arrayOf(boolean),
   o: object({ x: boolean }),
 }), null)
 
