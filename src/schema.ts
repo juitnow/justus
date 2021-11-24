@@ -1,5 +1,5 @@
 import { any } from './validators/any'
-import { getValidator, isValidation } from './utilities'
+import { getValidator } from './utilities'
 
 import {
   AdditionalProperties,
@@ -53,18 +53,25 @@ type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
 
 /* -------------------------------------------------------------------------- */
 
+export function isModifier(what: any): what is Modifier<any> {
+  return (what && (typeof what === 'object') && (modifierValidator in what))
+}
+
+/* -------------------------------------------------------------------------- */
+
 export function readonly(): ReadonlyModifier<any>
 export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidation<V>>>
 export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
 
-export function readonly(options?: Modifier<any> | Validation): Modifier<any> {
-  const { [modifierValidator]: modifier, optional = undefined } =
-    isValidation(options) ? { [modifierValidator]: getValidator(options) } :
-    options ? options : { [modifierValidator]: any }
+export function readonly(options: Modifier | Validation = any): Modifier {
+  const { [modifierValidator]: validation = any, optional = false } =
+    isModifier(options) ? options : { [modifierValidator]: options }
+
+  const validator = getValidator(validation)
 
   return optional ?
-    { [modifierValidator]: modifier, optional, readonly: true } :
-    { [modifierValidator]: modifier, readonly: true }
+    { [modifierValidator]: validator, optional, readonly: true } :
+    { [modifierValidator]: validator, readonly: true }
 }
 
 export function optional(): OptionalModifier<any>
@@ -72,11 +79,12 @@ export function optional<V extends Validation>(validation: V): OptionalModifier<
 export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
 
 export function optional(options?: Modifier<any> | Validation): Modifier<any> {
-  const { [modifierValidator]: modifier, readonly = undefined } =
-    isValidation(options) ? { [modifierValidator]: getValidator(options) } :
-    options ? options : { [modifierValidator]: any }
+  const { [modifierValidator]: validation = any, readonly = false } =
+    isModifier(options) ? options : { [modifierValidator]: options }
+
+  const validator = getValidator(validation)
 
   return readonly ?
-    { [modifierValidator]: modifier, readonly, optional: true } :
-    { [modifierValidator]: modifier, optional: true }
+    { [modifierValidator]: validator, readonly, optional: true } :
+    { [modifierValidator]: validator, optional: true }
 }
