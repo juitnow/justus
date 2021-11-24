@@ -11,9 +11,11 @@ export const schemaValidator = Symbol.for('justus.schemaValidator')
 /** A symbol indicating the `Validator` for a `Modifier`. */
 export const modifierValidator = Symbol.for('justus.modifierValidator')
 
-/** A symbol indicating that a `Schema` can have additional properties. */
-export const additionalProperties = Symbol.for('justus.additionalProperties')
+/** A symbol indicating the `Validator` for a `Schema`'s additional properties. */
+export const additionalValidator = Symbol.for('justus.additionalValidator')
 
+// const neverMarker = Symbol.for('justus.never')
+// export { neverMarker as never }
 
 /* ========================================================================== *
  * BASIC VALIDATION TYPES                                                     *
@@ -188,12 +190,12 @@ export type InferTuple<T> =
  */
 export interface Schema {
   [ key: string ] : Validation | Modifier | Never
-  [ additionalProperties ]?: Validator
+  [ additionalValidator ]?: Validator
   [ schemaValidator ]?: Validator
 }
 
 export interface AdditionalProperties<V extends Validator> {
-  [ additionalProperties ]: V
+  [ additionalValidator ]: V
 }
 
 /* -------------------------------------------------------------------------- */

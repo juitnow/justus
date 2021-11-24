@@ -1,4 +1,4 @@
-import { additionalProperties, InferSchema, modifierValidator, Schema, schemaValidator, ValidationOptions, Validator } from './types'
+import { additionalValidator, InferSchema, modifierValidator, Schema, schemaValidator, ValidationOptions, Validator } from './types'
 import { assert, ValidationError, ValidationErrorBuilder } from './errors'
 import { getValidator, isValidation } from './utilities'
 
@@ -16,7 +16,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
 
   constructor(schema: S) {
     super()
-    const { [additionalProperties]: additional, ...properties } = schema
+    const { [additionalValidator]: additional, ...properties } = schema
 
     this.#additionalProperties = additional && getValidator(additional)
 

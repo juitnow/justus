@@ -11,7 +11,7 @@ import {
   ReadonlyModifier,
   Validation,
   Validator,
-  additionalProperties,
+  additionalValidator,
   modifierValidator,
 } from './types'
 
@@ -25,17 +25,17 @@ export type allowAdditionalProperties =
   ((allow: true) => AdditionalProperties<AnyValidator>) &
   ((allow: false) => AdditionalProperties<never>) &
   (<V extends Validation>(validation: V) => AdditionalProperties<Validator<InferValidation<V>>>) &
-  { [additionalProperties]: Validator<any> }
+  { [additionalValidator]: Validator<any> }
 
 export const allowAdditionalProperties: allowAdditionalProperties = <allowAdditionalProperties>
   ((options?: Validation | boolean): AdditionalProperties<Validator> => {
     if (options === false) return {} as AdditionalProperties<never>
 
     const allow = options === true ? any : getValidator(options)
-    return { [additionalProperties]: allow }
+    return { [additionalValidator]: allow }
   })
 
-allowAdditionalProperties[additionalProperties] = any
+allowAdditionalProperties[additionalValidator] = any
 
 
 /* ========================================================================== *
