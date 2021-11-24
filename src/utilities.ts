@@ -1,7 +1,8 @@
 import { any } from './validators/any'
 import { constant } from './validators/constant'
-import { InferValidation, restValidator, schemaValidator, TupleRestParameter, Validation, Validator } from './types'
+import { InferValidation, restValidator, Schema, schemaValidator, TupleRestParameter, Validation, Validator } from './types'
 import { tuple } from './validators/tuple'
+import { ObjectValidator } from './objects'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
@@ -52,25 +53,11 @@ export function getValidator(validation?: Validation): Validator {
       if (schemaValidator in validation) {
         return (<any>validation)[schemaValidator]
       } else {
-        throw new TypeError(`Invalid validation (type=${typeof validation})`)
+        return new ObjectValidator(validation as Schema)
       }
 
     // definitely not one of our types
     default:
       throw new TypeError(`Invalid validation (type=${typeof validation})`)
-  }
-}
-
-export function isValidation(what: any): what is Validation {
-  if (what instanceof Validator) return true
-  // TODO: tuples, schemas!
-  switch (typeof what) {
-    case 'function':
-    case 'boolean':
-    case 'string':
-    case 'number':
-      return true
-    default:
-      return what === null
   }
 }
