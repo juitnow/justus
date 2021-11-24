@@ -1,6 +1,7 @@
 import { additionalValidator, InferSchema, modifierValidator, never, Schema, schemaValidator, ValidationOptions, Validator } from './types'
-import { assert, ValidationError, ValidationErrorBuilder } from './errors'
-import { getValidator, isValidation } from './utilities'
+import { ValidationError, ValidationErrorBuilder } from './errors'
+import { getValidator } from './utilities'
+import { isModifier } from './schema'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -21,16 +22,16 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
     if (additional) this.#additionalProperties = getValidator(additional)
 
     for (const key of Object.keys(properties)) {
+      if (typeof key !== 'string') continue
+
       const definition = properties[key]
 
-      if (isValidation(definition)) {
-        this.#requiredProperties[key] = getValidator(definition)
-      } else if (definition === never) {
+      if (definition === never) {
         this.#neverProperties.add(key)
-      } else if (modifierValidator in definition) {
+      } else if (isModifier(definition)) {
         (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition[modifierValidator]
       } else {
-        assert(false, `Invalid property in schema for key "${key}"`)
+        this.#requiredProperties[key] = getValidator(definition)
       }
     }
 
@@ -110,18 +111,17 @@ const anyObjectValidator = new class extends Validator<Record<string, any>> {
   }
 }
 
-type ObjectValidation<S extends Schema> = S & {
-  [schemaValidator]: ObjectValidator<S>;
-}
-
 
 export function object(): Validator<Record<string, any>>
-export function object<S extends Schema>(schema: S): ObjectValidation<S>
-export function object(schema?: Schema): Validator<Record<string, any>> | ObjectValidation<Schema> {
+export function object<S extends Schema>(schema: S): Readonly<S>
+export function object(schema?: Schema): Validator<Record<string, any>> | Readonly<Schema> {
   if (! schema) return anyObjectValidator
 
   const validator = new ObjectValidator(schema)
-  const validation: ObjectValidation<Schema> = { [schemaValidator]: validator }
+  const validation: Schema = {
+    [additionalValidator]: schema[additionalValidator],
+    [schemaValidator]: validator,
+  }
 
   for (const key of Object.keys(schema)) {
     if (typeof key === 'string') validation[key] = schema[key]
