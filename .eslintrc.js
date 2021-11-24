@@ -24,6 +24,29 @@ module.exports = {
     'no-console': 'warn',
     'no-debugger': 'warn',
 
+    // Indenting, but for TypeScript
+    'indent': [ 'off' ],
+    '@typescript-eslint/indent': [ 'error', 2, {
+      'CallExpression': {
+        'arguments': 2,
+      },
+      'FunctionDeclaration': {
+        'body': 1,
+        'parameters': 2,
+      },
+      'FunctionExpression': {
+        'body': 1,
+        'parameters': 2,
+      },
+      'MemberExpression': 2,
+      'ObjectExpression': 1,
+      'SwitchCase': 1,
+      'ignoredNodes': [
+        'ConditionalExpression',
+      ],
+    } ],
+
+
     // Always have spaces around arrays and objects
     'array-bracket-spacing': [ 'error', 'always' ],
     'object-curly-spacing': [ 'error', 'always' ],
