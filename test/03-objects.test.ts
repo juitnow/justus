@@ -67,7 +67,7 @@ describe('Object validator', () => {
     })
 
     const validator = object({
-      ...basic.schema,
+      ...basic,
       version: 1,
       contents: array({ items: contents, minItems: 2 }),
     } as const)
