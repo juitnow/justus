@@ -1,4 +1,4 @@
-import { Tuple, InferTuple, Validator, ValidationOptions } from './types'
+import { Tuple, InferTuple, Validator, ValidationOptions } from '../types'
 
 export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
   readonly tuple: T

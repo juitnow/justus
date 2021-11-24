@@ -3,7 +3,6 @@ import { getValidator } from './utilities'
 
 export { object } from './objects'
 export { allowAdditionalProperties, readonly, optional } from './schema'
-export { tuple } from './tuples'
 export { ValidationError } from './errors'
 
 export * from './types'
@@ -17,6 +16,7 @@ export { constant, ConstantValidator } from './validators/constant'
 export { number, NumberValidator } from './validators/number'
 export { oneOf, OneOfValidator } from './validators/union'
 export { string, StringValidator } from './validators/string'
+export { tuple, TupleValidator } from './validators/tuple'
 
 
 export type ValidateOptions = {

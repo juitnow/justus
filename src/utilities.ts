@@ -1,7 +1,7 @@
 import { any } from './validators/any'
 import { constant } from './validators/constant'
 import { InferValidation, restValidator, schemaValidator, TupleRestParameter, Validation, Validator } from './types'
-import { tuple } from './tuples'
+import { tuple } from './validators/tuple'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
