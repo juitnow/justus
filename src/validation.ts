@@ -1,6 +1,7 @@
 import { Validator } from './validator'
 import { getValidator } from './utilities'
 import { InferTuple, Tuple } from './tuples'
+import { InferSchema, Schema } from './schemas'
 
 /* ========================================================================== *
  * BASIC TYPES                                                                *
@@ -8,10 +9,8 @@ import { InferTuple, Tuple } from './tuples'
 
 /** The `Validation` type defines a `Validator` or a function creating one. */
 export type Validation = // <V extends Validator = Validator> =
-  (() => Validator) | Validator | Tuple | // a `Validator` or a zero parameter function returning one
+  (() => Validator) | Validator | Tuple | Schema | // a `Validator` or a zero parameter function returning one
   null | boolean | number | string // primitives, mapped as constants
-
-// export type Validation2 = Validation | Tuple
 
 /** Infer the type returned by a `Validator`'s own `validate` function. */
 export type InferValidationType<V> =
@@ -42,6 +41,7 @@ export type InferValidationType<V> =
       never :
     // All the rest is normal stuff...
     V extends Tuple ? InferTuple<V> :
+    V extends Schema ? InferSchema<V> :
     V extends Validator<infer T> ? T :
     V // boolean, number, string or null
   : never
