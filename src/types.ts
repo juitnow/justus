@@ -191,7 +191,6 @@ export type InferTuple<T> =
 export interface Schema {
   [ key: string ] : Validation | Modifier | typeof never
   [ additionalValidator ]?: Validator | false
-  [ schemaValidator ]?: Validator
 }
 
 /**
@@ -258,13 +257,13 @@ export type InferSchema<S extends Schema> =
   ( S extends AdditionalProperties<Validator<infer V>> ?
       Record<string, V> &
       InferNever<S> &
-      InferValidators<S> :
-    InferValidators<S> )
+      InferRequired<S> :
+    InferRequired<S> )
 
 /* -------------------------------------------------------------------------- */
 
-/** Infer the type of keys associated with `Validator`s */
-type InferValidators<S extends Schema> = {
+/** Infer the type of keys associated with `Validation`s */
+type InferRequired<S extends Schema> = {
   [ key in keyof S as
       key extends string ?
         S[key] extends Validation ? key :
