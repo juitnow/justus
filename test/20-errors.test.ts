@@ -1,5 +1,5 @@
-import { expect } from 'chai'
 import { ValidationError } from '../src'
+import { expect } from 'chai'
 
 describe('Validation errors', () => {
   it('should create a validation error', () => {

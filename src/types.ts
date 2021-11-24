@@ -180,6 +180,12 @@ export type InferTuple<T> =
  * OBJECT SCHEMAS                                                             *
  * ========================================================================== */
 
+/**
+ * The `Schema` interface defines what properties are defined for objects and
+ * how they should be validated.
+ *
+ * @public
+ */
 export interface Schema {
   [ key: string ] : Validation | Modifier | Never
   [ additionalProperties ]?: Validator

@@ -1,6 +1,5 @@
 import { expect } from 'chai'
-import { any, boolean, number, object, optional, readonly, string, validate, ValidationError } from '../src'
-import { modifierValidator } from '../src/types'
+import { any, boolean, modifierValidator, number, object, optional, readonly, string, validate, ValidationError } from '../src'
 
 describe('Object modifiers', () => {
   it('should construct a "readonly" modifier', () => {

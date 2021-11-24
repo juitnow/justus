@@ -5,6 +5,8 @@ export { allowAdditionalProperties, readonly, optional, never } from './schemas'
 export { tuple } from './tuples'
 export { ValidationError } from './errors'
 
+export * from './types'
+
 // Validators
 export { allOf, AllOfValidator } from './validators/union'
 export { any, AnyValidator } from './validators/any'

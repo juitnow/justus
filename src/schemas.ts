@@ -1,10 +1,19 @@
-import { InferValidation, Validation } from './validation'
-import { Validator } from './validator'
 import { any, AnyValidator } from './validators/any'
 import { getValidator, isValidation } from './utilities'
-import { additionalProperties } from './symbols'
 
-import { AdditionalProperties, CombinedModifier, Modifier, modifierValidator, Never, OptionalModifier, ReadonlyModifier } from './types'
+import {
+  AdditionalProperties,
+  CombinedModifier,
+  InferValidation,
+  Modifier,
+  Never,
+  OptionalModifier,
+  ReadonlyModifier,
+  Validation,
+  Validator,
+  additionalProperties,
+  modifierValidator,
+} from './types'
 
 /* ========================================================================== *
  * ADDITIONAL PROPERTIES IN SCHEMAS                                           *

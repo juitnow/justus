@@ -1,5 +1,5 @@
-import { expect } from 'chai'
 import { object, validate, Validator } from '../src'
+import { expect } from 'chai'
 
 describe('Edge cases', () => {
   it('should expose the Validator class', () => {
