@@ -1,4 +1,4 @@
-import { additionalValidator, InferSchema, modifierValidator, Schema, schemaValidator, ValidationOptions, Validator } from './types'
+import { additionalValidator, InferSchema, modifierValidator, never, Schema, schemaValidator, ValidationOptions, Validator } from './types'
 import { assert, ValidationError, ValidationErrorBuilder } from './errors'
 import { getValidator, isValidation } from './utilities'
 
@@ -25,7 +25,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
 
       if (isValidation(definition)) {
         this.#requiredProperties[key] = getValidator(definition)
-      } else if ('never' in definition) {
+      } else if (definition === never) {
         this.#neverProperties.add(key)
       } else if (modifierValidator in definition) {
         (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition[modifierValidator]

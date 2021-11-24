@@ -14,8 +14,8 @@ export const modifierValidator = Symbol.for('justus.modifierValidator')
 /** A symbol indicating the `Validator` for a `Schema`'s additional properties. */
 export const additionalValidator = Symbol.for('justus.additionalValidator')
 
-// const neverMarker = Symbol.for('justus.never')
-// export { neverMarker as never }
+/** A symbol indicating that a `Schema` property is _forbidden_. */
+export const never = Symbol.for('justus.never')
 
 /* ========================================================================== *
  * BASIC VALIDATION TYPES                                                     *
@@ -189,7 +189,7 @@ export type InferTuple<T> =
  * @public
  */
 export interface Schema {
-  [ key: string ] : Validation | Modifier | Never
+  [ key: string ] : Validation | Modifier | typeof never
   [ additionalValidator ]?: Validator
   [ schemaValidator ]?: Validator
 }
@@ -218,12 +218,6 @@ export interface CombinedModifier<V extends Validator = Validator>
   extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
   readonly: true,
   optional: true,
-}
-
-/* -------------------------------------------------------------------------- */
-
-export interface Never {
-  never: true
 }
 
 /* ========================================================================== *
@@ -298,7 +292,7 @@ type InferCombinedModifiers<S extends Schema> = {
 type InferRemovedProperties<S extends Schema> =
   { [ key in keyof S as
       key extends string ?
-        S[key] extends Never ? key :
+        S[key] extends typeof never ? key :
         never :
       never
     ] : never

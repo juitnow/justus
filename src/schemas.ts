@@ -6,7 +6,6 @@ import {
   CombinedModifier,
   InferValidation,
   Modifier,
-  Never,
   OptionalModifier,
   ReadonlyModifier,
   Validation,
@@ -84,13 +83,3 @@ export function optional(options?: Modifier<any> | Validation): Modifier<any> {
     { [modifierValidator]: modifier, readonly, optional: true } :
     { [modifierValidator]: modifier, optional: true }
 }
-
-/* ========================================================================== *
- * NEVER PSEUDO-MODIFIER                                                      *
- * ========================================================================== */
-
-export const never: Never = { never: true }
-
-/* ========================================================================== *
- * INFER OBJECT TYPE FROM SCHEMA                                              *
- * ========================================================================== */

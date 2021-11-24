@@ -2,7 +2,7 @@ import type { InferValidation, Validation, ValidationOptions } from './types'
 import { getValidator } from './utilities'
 
 export { object } from './objects'
-export { allowAdditionalProperties, readonly, optional, never } from './schemas'
+export { allowAdditionalProperties, readonly, optional } from './schemas'
 export { tuple } from './tuples'
 export { ValidationError } from './errors'
 
