@@ -1,4 +1,4 @@
-import { ValidationError, validate, array, string } from '../src'
+import { ValidationError, validate, array, arrayOf, string } from '../src'
 import { expect } from 'chai'
 
 describe('Array validators', () => {
@@ -54,27 +54,27 @@ describe('Array validators', () => {
   })
 
   it('should validate an array with items of a specific type', () => {
-    expect(validate(array(string), [ 'a', 'b', 'c' ])).to.eql([ 'a', 'b', 'c' ])
+    expect(validate(arrayOf(string), [ 'a', 'b', 'c' ])).to.eql([ 'a', 'b', 'c' ])
 
-    expect(() => validate(array(string), [ 'a', true, 'b', 123 ]))
+    expect(() => validate(arrayOf(string), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
           { path: [ 1 ], message: 'Value is not a "string"' },
           { path: [ 3 ], message: 'Value is not a "string"' },
         ])
 
-    expect(validate(array(string()), [ 'a', 'b', 'c' ])).to.eql([ 'a', 'b', 'c' ])
+    expect(validate(arrayOf(string()), [ 'a', 'b', 'c' ])).to.eql([ 'a', 'b', 'c' ])
 
-    expect(() => validate(array(string()), [ 'a', true, 'b', 123 ]))
+    expect(() => validate(arrayOf(string()), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
           { path: [ 1 ], message: 'Value is not a "string"' },
           { path: [ 3 ], message: 'Value is not a "string"' },
         ])
 
-    expect(validate(array('a'), [ 'a', 'a', 'a' ])).to.eql([ 'a', 'a', 'a' ])
+    expect(validate(arrayOf('a'), [ 'a', 'a', 'a' ])).to.eql([ 'a', 'a', 'a' ])
 
-    expect(() => validate(array('a'), [ 'a', true, 'b', 123 ]))
+    expect(() => validate(arrayOf('a'), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 3 validation errors')
         .with.property('errors').to.eql([
           { path: [ 1 ], message: 'Value does not match constant "a"' },
@@ -82,7 +82,7 @@ describe('Array validators', () => {
           { path: [ 3 ], message: 'Value does not match constant "a"' },
         ])
 
-    expect(validate(array('a'), [ 'a', 'a', 'a' ])).to.eql([ 'a', 'a', 'a' ])
+    expect(validate(arrayOf('a'), [ 'a', 'a', 'a' ])).to.eql([ 'a', 'a', 'a' ])
 
     expect(() => validate(array({ items: 'a', uniqueItems: true }), [ 'a', true, 'a', 123 ]))
         .to.throw(ValidationError, 'Found 3 validation errors')
