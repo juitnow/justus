@@ -1,7 +1,7 @@
 import { InferValidationType, Validation, ValidationOptions } from '../validation'
 import { ValidationError, ValidationErrorBuilder, assert } from '../errors'
 import { Validator } from '../validator'
-import { getValidator, isValidation } from '../utilities'
+import { getValidator, makeTupleRestIterable } from '../utilities'
 import { any } from './any'
 
 /* ========================================================================== *
@@ -89,13 +89,18 @@ const anyArrayValidator = new class extends Validator<any[]> {
 /**
  * A function returning a `Validator` for an `Array` containing `any` item.
  */
-export function array(): Validator<any[]>
-export function array<V extends Validation>(validation: V): ArrayValidator<InferValidationType<V>>
-export function array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidationType<V>>
+function _array(): Validator<any[]>
+function _array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidationType<V>>
 
-export function array(options?: Validation | ArrayConstraints<Validation>): Validator<any[]> {
+function _array(options?: ArrayConstraints<Validation>): Validator<any[]> {
   if (! options) return anyArrayValidator
 
-  if (isValidation(options)) options = { items: options }
-  return new ArrayValidator({ ...options, items: getValidator(options.items) })
+  const items = getValidator(options.items)
+  return new ArrayValidator({ ...options, items })
+}
+
+export const array = makeTupleRestIterable(_array)
+
+export function arrayOf<V extends Validation>(validation: V): ArrayValidator<InferValidationType<V>> {
+  return new ArrayValidator({ items: getValidator(validation) })
 }

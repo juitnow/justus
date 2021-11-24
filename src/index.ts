@@ -8,7 +8,7 @@ export { ValidationError } from './errors'
 // Validators
 export { allOf, AllOfValidator } from './validators/union'
 export { any, AnyValidator } from './validators/any'
-export { array, ArrayValidator } from './validators/array'
+export { array, arrayOf, ArrayValidator } from './validators/array'
 export { boolean, BooleanValidator } from './validators/boolean'
 export { constant, ConstantValidator } from './validators/constant'
 export { number, NumberValidator } from './validators/number'
