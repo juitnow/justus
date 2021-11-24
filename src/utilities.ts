@@ -3,18 +3,18 @@ import { Validator } from './validator'
 import { any } from './validators/any'
 import { constant } from './validators/constant'
 import { TupleRest } from './tuples'
-import { tupleRest } from './symbols'
-import { tuple } from '.'
+import { schemaValidator, tupleRest } from './symbols'
+import { InferValidationType, tuple } from '.'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
  * ========================================================================== */
 
 export function makeTupleRestIterable<
-  F extends(...args: any[]) => Validator,
-  V extends Validator,
->(create: F, validator: V): F & Iterable<TupleRest<V>> {
-  (<any>create)[Symbol.iterator] = function* (): Generator<TupleRest<V>> {
+  F extends() => Validator,
+>(create: F): F & Iterable<TupleRest<Validator<InferValidationType<F>>>> {
+  const validator = create()
+  ;(<any>create)[Symbol.iterator] = function* (): Generator<TupleRest<Validator<InferValidationType<F>>>> {
     yield { [tupleRest]: validator }
   }
   return create as any
@@ -36,6 +36,8 @@ export function getValidator(validation?: Validation): Validator {
   // Tuples
   if (Array.isArray(validation)) return tuple(validation)
 
+  // TODO: cleanup... here validation can _still_ be a tuple!
+
   // Other types
   switch (typeof validation) {
     // constants
@@ -47,6 +49,14 @@ export function getValidator(validation?: Validation): Validator {
     // validator generator
     case 'function':
       return validation()
+
+    // schema validator
+    case 'object':
+      if (schemaValidator in validation) {
+        return (<any>validation)[schemaValidator]
+      } else {
+        throw new TypeError(`Invalid validation (type=${typeof validation})`)
+      }
 
     // definitely not one of our types
     default:
