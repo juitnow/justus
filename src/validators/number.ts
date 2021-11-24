@@ -128,4 +128,4 @@ function _number(constraints?: NumberConstraints): Validator<number> {
   return constraints ? new NumberValidator(constraints) : anyNumberValidator
 }
 
-export const number = makeTupleRestIterable(_number, anyNumberValidator)
+export const number = makeTupleRestIterable(_number)

@@ -65,4 +65,4 @@ function _string(constraints?: StringConstraints): Validator<string> {
   return constraints ? new StringValidator(constraints) : anyStringValidator
 }
 
-export const string = makeTupleRestIterable(_string, anyStringValidator)
+export const string = makeTupleRestIterable(_string)
