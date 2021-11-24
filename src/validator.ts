@@ -16,7 +16,7 @@ export abstract class Validator<T = any> {
    */
   abstract validate(value: unknown, options: ValidationOptions): T
 
-  * [Symbol.iterator](): Generator<TupleRest<this>> {
+  * [Symbol.iterator](): Generator<TupleRest<T>> {
     yield { [tupleRest]: this }
   }
 }

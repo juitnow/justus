@@ -2,14 +2,14 @@ import { InferValidationType, Validation, ValidationOptions } from './validation
 import { Validator } from './validator'
 import { tupleRest } from './symbols'
 
-export type TupleRest<V extends Validator = Validator> = {
-  [tupleRest] : V
+export type TupleRest<T = any> = {
+  [tupleRest] : Validator<T>
 }
 
 export type Tuple = readonly (Validation | TupleRest)[]
 
 type InferValidationOrTupleRest<T> =
-  T extends TupleRest<Validator<infer V>> ? V :
+  T extends TupleRest<infer X> ? X :
   T extends Validation ? InferValidationType<T> :
   never
 

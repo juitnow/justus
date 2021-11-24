@@ -12,9 +12,9 @@ import { InferValidationType, tuple } from '.'
 
 export function makeTupleRestIterable<
   F extends() => Validator,
->(create: F): F & Iterable<TupleRest<Validator<InferValidationType<F>>>> {
+>(create: F): F & Iterable<TupleRest<InferValidationType<F>>> {
   const validator = create()
-  ;(<any>create)[Symbol.iterator] = function* (): Generator<TupleRest<Validator<InferValidationType<F>>>> {
+  ;(<any>create)[Symbol.iterator] = function* (): Generator<TupleRest<InferValidationType<F>>> {
     yield { [tupleRest]: validator }
   }
   return create as any
