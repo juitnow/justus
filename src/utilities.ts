@@ -9,7 +9,7 @@ import { ObjectValidator } from './objects'
  * ========================================================================== */
 
 export function makeTupleRestIterable<
-  F extends() => Validator,
+  F extends () => Validator,
 >(create: F): F & Iterable<TupleRestParameter<InferValidation<F>>> {
   const validator = create()
   ;(<any>create)[Symbol.iterator] = function* (): Generator<TupleRestParameter<InferValidation<F>>> {

@@ -7,7 +7,6 @@ import {
   object,
   string,
   validate,
-  schemaValidator,
 } from '../src'
 
 printType('__file_marker__')

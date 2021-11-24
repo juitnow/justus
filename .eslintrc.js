@@ -46,6 +46,13 @@ module.exports = {
       ],
     } ],
 
+    // Spaces before function parenthesis, for TypeScript
+    'space-before-function-paren': [ 'off' ],
+    '@typescript-eslint/space-before-function-paren': [ 'error', {
+      asyncArrow: 'always',
+      anonymous: 'never',
+      named: 'never',
+    } ],
 
     // Always have spaces around arrays and objects
     'array-bracket-spacing': [ 'error', 'always' ],
