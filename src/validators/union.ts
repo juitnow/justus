@@ -42,7 +42,7 @@ export class OneOfValidator<A extends UnionArguments> extends Validator<InferOne
   }
 }
 
-export function oneOf<A extends UnionArguments>(args: A): OneOfValidator<A> {
+export function oneOf<A extends UnionArguments>(...args: A): OneOfValidator<A> {
   return new OneOfValidator(args)
 }
 
@@ -73,6 +73,6 @@ export class AllOfValidator<A extends UnionArguments> extends Validator<InferAll
   }
 }
 
-export function allOf<A extends UnionArguments>(args: A): AllOfValidator<A> {
+export function allOf<A extends UnionArguments>(...args: A): AllOfValidator<A> {
   return new AllOfValidator(args)
 }
