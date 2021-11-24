@@ -59,7 +59,7 @@ interface OptionalModifier<V extends Validator = Validator> extends Modifier<V> 
 }
 
 interface CombinedModifier<V extends Validator = Validator>
-extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
+  extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
   readonly: true,
   optional: true,
 }
