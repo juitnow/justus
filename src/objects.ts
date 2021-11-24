@@ -1,8 +1,9 @@
-import { InferSchema, Schema, additionalProperties } from './schemas'
+import { InferSchema, Schema } from './schemas'
 import { assert, ValidationError, ValidationErrorBuilder } from './errors'
 import { ValidationOptions } from './validation'
 import { Validator } from './validator'
 import { getValidator, isValidation } from './utilities'
+import { additionalProperties, schemaValidator } from './symbols'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -112,9 +113,22 @@ const anyObjectValidator = new class extends Validator<Record<string, any>> {
   }
 }
 
+type ObjectValidation<S extends Schema> = Omit<S, schemaValidator> & {
+  [ schemaValidator ]: ObjectValidator<S>;
+}
+
 
 export function object(): Validator<Record<string, any>>
-export function object<S extends Schema>(schema: S): ObjectValidator<S>
-export function object(schema?: Schema): Validator<Record<string, any>> | ObjectValidator<Schema> {
-  return schema ? new ObjectValidator(schema) : anyObjectValidator
+export function object<S extends Schema>(schema: S): ObjectValidation<S>
+export function object(schema?: Schema): Validator<Record<string, any>> | ObjectValidation<Schema> {
+  if (! schema) return anyObjectValidator
+
+  const validator = new ObjectValidator(schema)
+  const validation: ObjectValidation<Schema> = { [schemaValidator]: validator }
+
+  for (const key of Object.keys(schema)) {
+    if (typeof key === 'string') validation[key] = schema[key]
+  }
+
+  return validation
 }
