@@ -20,6 +20,20 @@ describe('Types test', () => {
       testFiles,
     })
 
+    diagnostics.sort((d1, d2): number => {
+      const num =
+        d1.fileName < d2.fileName ? -1 :
+        d1.fileName > d2.fileName ? +1 :
+        (d1.line || 0) < (d2.line || 0) ? -1 :
+        (d1.line || 0) > (d2.line || 0) ? +1 :
+        (d1.column || 0) < (d2.column || 0) ? -1 :
+        (d1.column || 0) > (d2.column || 0) ? +1 :
+        d1.message < d2.message ? -1 :
+        d1.message > d2.message ? +1 :
+        0
+      return num
+    })
+
     let errors = 0
     diagnostics
         // normalize file names
