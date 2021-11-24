@@ -1,9 +1,6 @@
-import { InferSchema, modifierValidator, Schema } from './types'
+import { additionalProperties, InferSchema, modifierValidator, Schema, schemaValidator, ValidationOptions, Validator } from './types'
 import { assert, ValidationError, ValidationErrorBuilder } from './errors'
-import { ValidationOptions } from './validation'
-import { Validator } from './validator'
 import { getValidator, isValidation } from './utilities'
-import { additionalProperties, schemaValidator } from './symbols'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -114,7 +111,7 @@ const anyObjectValidator = new class extends Validator<Record<string, any>> {
 }
 
 type ObjectValidation<S extends Schema> = S & {
-  [ schemaValidator ]: ObjectValidator<S>;
+  [schemaValidator]: ObjectValidator<S>;
 }
 
 

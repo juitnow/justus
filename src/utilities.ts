@@ -1,10 +1,7 @@
-import { Validation } from './validation'
-import { Validator } from './validator'
 import { any } from './validators/any'
 import { constant } from './validators/constant'
-import { TupleRestParameter } from './types'
-import { schemaValidator, restValidator } from './symbols'
-import { InferValidation, tuple } from '.'
+import { InferValidation, restValidator, schemaValidator, TupleRestParameter, Validation, Validator } from './types'
+import { tuple } from './tuples'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
@@ -66,6 +63,7 @@ export function getValidator(validation?: Validation): Validator {
 
 export function isValidation(what: any): what is Validation {
   if (what instanceof Validator) return true
+  // TODO: tuples, schemas!
   switch (typeof what) {
     case 'function':
     case 'boolean':

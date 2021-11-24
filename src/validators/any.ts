@@ -1,4 +1,4 @@
-import { Validator } from '../validator'
+import { Validator } from '../types'
 
 export class AnyValidator extends Validator<any> {
   validate(value: unknown): any {

@@ -1,4 +1,4 @@
-import { Validator } from '../validator'
+import { Validator } from '../types'
 import { ValidationError } from '../errors'
 
 export class BooleanValidator extends Validator<boolean> {

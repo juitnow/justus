@@ -1,4 +1,4 @@
-import { Validator } from '../validator'
+import { Validator } from '../types'
 import { ValidationError } from '../errors'
 
 export class ConstantValidator<T extends string | number | boolean | null> extends Validator<T> {

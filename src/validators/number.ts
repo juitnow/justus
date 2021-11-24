@@ -1,4 +1,4 @@
-import { Validator } from '../validator'
+import { Validator } from '../types'
 import { assert, ValidationError } from '../errors'
 import { makeTupleRestIterable } from '../utilities'
 

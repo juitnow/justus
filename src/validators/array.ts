@@ -1,6 +1,5 @@
-import { InferValidation, Validation, ValidationOptions } from '../validation'
 import { ValidationError, ValidationErrorBuilder, assert } from '../errors'
-import { Validator } from '../validator'
+import { InferValidation, Validation, ValidationOptions, Validator } from '../types'
 import { getValidator, makeTupleRestIterable } from '../utilities'
 import { any } from './any'
 
