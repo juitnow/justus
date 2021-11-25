@@ -3,7 +3,7 @@
 export PATH="${PATH}:./node_modules/.bin"
 export NODE_OPTIONS='--enable-source-maps'
 
-# set -xe
+set -xe
 
 rm -rf build dist
 mkdir -p build dist
