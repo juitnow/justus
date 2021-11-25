@@ -9,7 +9,7 @@
     "build": "build.sh",
     "dev": "nodemon -e ts -x build.sh -w src -w test -w test-d",
     "lint": "eslint src test test-d",
-    "prepare": "patch -N -p0 -i .nyc.patch"
+    "prepare": "patch -N -p0 -i .nyc.patch || true"
   },
   "author": "Juit Developers <developers@juit.com>",
   "license": "MIT",
