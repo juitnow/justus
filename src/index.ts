@@ -1,10 +1,12 @@
 import type { InferValidation, Validation, ValidationOptions } from './types'
 import { getValidator } from './utilities'
 
-export { allowAdditionalProperties, readonly, optional } from './schema'
 export { ValidationError } from './errors'
 
+// All our types and utilities
+export * from './schema'
 export * from './types'
+export * from './utilities'
 
 // Validators
 export { allOf, oneOf, AllOfValidator, OneOfValidator } from './validators/union'
