@@ -1,22 +1,14 @@
 import { any } from './validators/any'
-import { constant } from './validators/constant'
-import { InferValidation, restValidator, Schema, schemaValidator, TupleRestParameter, Validation, Validator } from './types'
-import { tuple } from './validators/tuple'
-import { ObjectValidator } from './objects'
+import { ConstantValidator } from './validators/constant'
+import { Schema, schemaValidator, Validation, Validator } from './types'
+import { TupleValidator } from './validators/tuple'
+import { ObjectValidator } from './validators/object'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
  * ========================================================================== */
 
-export function makeTupleRestIterable<
-  F extends () => Validator,
->(create: F): F & Iterable<TupleRestParameter<InferValidation<F>>> {
-  const validator = create()
-  ;(<any>create)[Symbol.iterator] = function* (): Generator<TupleRestParameter<InferValidation<F>>> {
-    yield { [restValidator]: validator }
-  }
-  return create as any
-}
+const nullValidator = new ConstantValidator(null)
 
 /**
  * Return the `Validator` for the given `Validation`.
@@ -26,15 +18,10 @@ export function makeTupleRestIterable<
 export function getValidator(validation?: Validation): Validator {
   // Undefined maps to `any`, null is a constant
   if (validation === undefined) return any
-  if (validation === null) return constant(null)
+  if (validation === null) return nullValidator
 
   // Validator instances are simply returned
   if (validation instanceof Validator) return validation
-
-  // Tuples
-  if (Array.isArray(validation)) return tuple(validation)
-
-  // TODO: cleanup... here validation can _still_ be a tuple!
 
   // Other types
   switch (typeof validation) {
@@ -42,19 +29,20 @@ export function getValidator(validation?: Validation): Validator {
     case 'boolean':
     case 'string':
     case 'number':
-      return constant(validation)
+      return new ConstantValidator(validation)
 
     // validator generator
     case 'function':
       return validation()
 
-    // schema validator
+    // other objects...
     case 'object':
-      if (schemaValidator in validation) {
-        return (<any>validation)[schemaValidator]
-      } else {
-        return new ObjectValidator(validation as Schema)
-      }
+      // pre-compiled schema with validator
+      if (schemaValidator in validation) return (<any> validation)[schemaValidator]
+      // arrays are tuples
+      if (Array.isArray(validation)) return new TupleValidator(validation)
+      // any other object is a schema
+      return new ObjectValidator(validation as Schema)
 
     // definitely not one of our types
     default:
