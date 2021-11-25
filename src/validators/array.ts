@@ -1,7 +1,8 @@
 import { ValidationError, ValidationErrorBuilder, assert } from '../errors'
 import { InferValidation, Validation, ValidationOptions, Validator } from '../types'
-import { getValidator, makeTupleRestIterable } from '../utilities'
+import { getValidator } from '../utilities'
 import { any } from './any'
+import { makeTupleRestIterable } from './tuple'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *

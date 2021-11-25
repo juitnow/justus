@@ -1,6 +1,6 @@
 import { Validator } from '../types'
 import { assert, ValidationError } from '../errors'
-import { makeTupleRestIterable } from '../utilities'
+import { makeTupleRestIterable } from './tuple'
 
 /**
  * Constraints to validate a `number` with.
