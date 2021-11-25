@@ -1,7 +1,6 @@
 import type { InferValidation, Validation, ValidationOptions } from './types'
 import { getValidator } from './utilities'
 
-export { object } from './objects'
 export { allowAdditionalProperties, readonly, optional } from './schema'
 export { ValidationError } from './errors'
 
@@ -14,6 +13,7 @@ export { array, arrayOf, ArrayValidator } from './validators/array'
 export { boolean, BooleanValidator } from './validators/boolean'
 export { constant, ConstantValidator } from './validators/constant'
 export { number, NumberValidator } from './validators/number'
+export { object, ObjectValidator } from './validators/object'
 export { string, StringValidator } from './validators/string'
 export { tuple, TupleValidator } from './validators/tuple'
 

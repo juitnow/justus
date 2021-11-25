@@ -1,7 +1,8 @@
-import { additionalValidator, InferSchema, modifierValidator, never, Schema, schemaValidator, ValidationOptions, Validator } from './types'
-import { ValidationError, ValidationErrorBuilder } from './errors'
-import { getValidator } from './utilities'
-import { isModifier } from './schema'
+import { additionalValidator, InferSchema, modifierValidator, never, Schema, schemaValidator, ValidationOptions, Validator } from '../types'
+import { ValidationError, ValidationErrorBuilder } from '../errors'
+import { getValidator } from '../utilities'
+import { isModifier } from '../schema'
+import { makeTupleRestIterable } from './tuple'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -112,20 +113,24 @@ const anyObjectValidator = new class extends Validator<Record<string, any>> {
 }
 
 
-export function object(): Validator<Record<string, any>>
-export function object<S extends Schema>(schema: S): Readonly<S>
-export function object(schema?: Schema): Validator<Record<string, any>> | Readonly<Schema> {
+function _object(): Validator<Record<string, any>>
+function _object<S extends Schema>(schema: S): Readonly<S>
+function _object(schema?: Schema): Validator<Record<string, any>> | Readonly<Schema> {
   if (! schema) return anyObjectValidator
 
   const validator = new ObjectValidator(schema)
   const validation: Schema = {
     [additionalValidator]: schema[additionalValidator],
-    [schemaValidator]: validator,
+    // [schemaValidator]: validator,
   }
 
   for (const key of Object.keys(schema)) {
     if (typeof key === 'string') validation[key] = schema[key]
   }
 
-  return validation
+  Object.defineProperty(validation, schemaValidator, { enumerable: false, value: validator })
+
+  return Object.freeze(validation)
 }
+
+export const object = makeTupleRestIterable(_object)
