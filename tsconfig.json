@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
-    "lib": [ "es2020" ],
-    "target": "es2020",
-    "removeComments": false,
+    "lib": [ "esnext" ],
+    "target": "esnext",
     "noImplicitAny": true,
-    "outDir": "./build",
-    "rootDir": ".",
-    "sourceMap": true,
-    "inlineSourceMap": false,
+    "outDir": "./build/types",
+    "rootDir": "src",
     "strict": true,
-    "module": "commonjs",
+    "module": "esnext",
+    "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
-    "allowJs": false
+    "emitDeclarationOnly": true,
+    "allowJs": false,
   },
-  "include": [ "src", "test" ],
-  "exclude": []
+  "include": [ "src" ],
 }
