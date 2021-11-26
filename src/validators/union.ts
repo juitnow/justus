@@ -34,11 +34,10 @@ export class OneOfValidator<A extends UnionArguments> extends Validator<InferOne
       try {
         return validator.validate(value, options)
       } catch (error) {
-        builder.record(undefined, error)
+        builder.record(error)
       }
     }
-    builder.assert()
-    return <any> value
+    return builder.assert(value as InferOneOfValidationType<A>)
   }
 }
 
@@ -69,7 +68,7 @@ export class AllOfValidator<A extends UnionArguments> extends Validator<InferAll
     for (const validator of this.validators) {
       value = validator.validate(value, options)
     }
-    return <any> value
+    return value as InferAllOfValidationType<A>
   }
 }
 
