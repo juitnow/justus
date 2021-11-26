@@ -1,9 +1,9 @@
 import { Validator } from '../types'
-import { ValidationError } from '../errors'
+import { assertValidation } from '../errors'
 
 export class BooleanValidator extends Validator<boolean> {
   validate(value: unknown): boolean {
-    ValidationError.assert(typeof value === 'boolean', 'Value is not a "boolean"')
+    assertValidation(typeof value === 'boolean', 'Value is not a "boolean"')
     return value
   }
 }

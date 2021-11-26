@@ -1,4 +1,4 @@
-import { ValidationError, ValidationErrorBuilder, assert } from '../errors'
+import { assertSchema, assertValidation, ValidationErrorBuilder } from '../errors'
 import { InferValidation, Validation, ValidationOptions, Validator } from '../types'
 import { getValidator } from '../utilities'
 import { any } from './any'
@@ -36,9 +36,9 @@ export class ArrayValidator<T> extends Validator<T[]> {
       uniqueItems = false,
     } = options
 
-    assert(minItems >= 0, `Constraint "minItems" (${minItems}) must be non-negative`)
-    assert(maxItems >= 0, `Constraint "maxItems" (${maxItems}) must be non-negative`)
-    assert(minItems <= maxItems, `Constraint "minItems" (${minItems}) is greater than "maxItems" (${maxItems})`)
+    assertSchema(minItems >= 0, `Constraint "minItems" (${minItems}) must be non-negative`)
+    assertSchema(maxItems >= 0, `Constraint "maxItems" (${maxItems}) must be non-negative`)
+    assertSchema(minItems <= maxItems, `Constraint "minItems" (${minItems}) is greater than "maxItems" (${maxItems})`)
 
     this.items = items
     this.maxItems = maxItems
@@ -47,12 +47,12 @@ export class ArrayValidator<T> extends Validator<T[]> {
   }
 
   validate(value: unknown, options: ValidationOptions): T[] {
-    ValidationError.assert(Array.isArray(value), 'Value is not an "array"')
+    assertValidation(Array.isArray(value), 'Value is not an "array"')
 
-    ValidationError.assert(value.length >= this.minItems,
+    assertValidation(value.length >= this.minItems,
         `Array must have a minimum length of ${this.minItems}`)
 
-    ValidationError.assert(value.length <= this.maxItems,
+    assertValidation(value.length <= this.maxItems,
         `Array must have a maximum length of ${this.maxItems}`)
 
     const builder = new ValidationErrorBuilder()
@@ -64,22 +64,21 @@ export class ArrayValidator<T> extends Validator<T[]> {
         if (position === i) {
           this.items.validate(item, options)
         } else if (this.uniqueItems) {
-          builder.record(i, `Duplicate of item at index ${position}`)
+          builder.record(`Duplicate of item at index ${position}`, i)
         }
         clone[i] = item
       } catch (error) {
-        builder.record(i, error)
+        builder.record(error, i)
       }
     })
 
-    builder.assert()
-    return clone
+    return builder.assert(clone)
   }
 }
 
 const anyArrayValidator = new class extends Validator<any[]> {
   validate(value: unknown): any[] {
-    ValidationError.assert(Array.isArray(value), 'Value is not an "array"')
+    assertValidation(Array.isArray(value), 'Value is not an "array"')
     return value
   }
 }

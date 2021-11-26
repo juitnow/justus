@@ -1,5 +1,5 @@
 import { Validator } from '../types'
-import { ValidationError, assert } from '../errors'
+import { assertValidation, assertSchema } from '../errors'
 import { makeTupleRestIterable } from './tuple'
 
 /** Constraints to validate a `string` with. */
@@ -26,9 +26,9 @@ export class StringValidator<S extends string = string> extends Validator<S> {
       pattern,
     } = constraints
 
-    assert(minLength >= 0, `Constraint "minLength" (${minLength}) must be non-negative`)
-    assert(maxLength >= 0, `Constraint "maxLength" (${maxLength}) must be non-negative`)
-    assert(minLength <= maxLength, `Constraint "minLength" (${minLength}) is greater than "maxLength" (${maxLength})`)
+    assertSchema(minLength >= 0, `Constraint "minLength" (${minLength}) must be non-negative`)
+    assertSchema(maxLength >= 0, `Constraint "maxLength" (${maxLength}) must be non-negative`)
+    assertSchema(minLength <= maxLength, `Constraint "minLength" (${minLength}) is greater than "maxLength" (${maxLength})`)
 
     this.maxLength = maxLength
     this.minLength = minLength
@@ -36,15 +36,15 @@ export class StringValidator<S extends string = string> extends Validator<S> {
   }
 
   validate(value: unknown): S {
-    ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
+    assertValidation(typeof value == 'string', 'Value is not a "string"')
 
-    ValidationError.assert(value.length >= this.minLength,
+    assertValidation(value.length >= this.minLength,
         `String must have a minimum length of ${this.minLength}`)
 
-    ValidationError.assert(value.length <= this.maxLength,
+    assertValidation(value.length <= this.maxLength,
         `String must have a maximum length of ${this.maxLength}`)
 
-    ValidationError.assert(this.pattern ? this.pattern.test(value) : true,
+    assertValidation(this.pattern ? this.pattern.test(value) : true,
         `String does not match required pattern ${this.pattern}`)
 
     return value as S
@@ -53,7 +53,7 @@ export class StringValidator<S extends string = string> extends Validator<S> {
 
 const anyStringValidator = new class extends Validator<string> {
   validate(value: unknown): string {
-    ValidationError.assert(typeof value == 'string', 'Value is not a "string"')
+    assertValidation(typeof value == 'string', 'Value is not a "string"')
     return value
   }
 }

@@ -7,11 +7,6 @@ function pathToString(path: (string | number)[]): string {
   }, '')
 }
 
-/** Simple assertion function */
-export function assert(what: boolean | undefined, message: string): asserts what {
-  if (! what) throw new TypeError(message)
-}
-
 export class ValidationError extends Error {
   readonly errors!: ValidationErrors
 
@@ -33,16 +28,24 @@ export class ValidationError extends Error {
     Error.captureStackTrace(this, constructor || ValidationError)
     Object.defineProperty(this, 'errors', { value: errors })
   }
-
-  static assert(what: boolean | undefined, message: string): asserts what {
-    if (! what) throw new ValidationError(message, ValidationError.assert)
-  }
 }
 
+/**
+ * Helper class to build a `ValidationError` associated p
+ */
 export class ValidationErrorBuilder {
+  /** The current list of validation errors */
   readonly errors: ValidationErrors = []
 
-  record(key: string | number | undefined, error: any): void {
+  /**
+   * Record a validation error associated with the specified key.
+   *
+   * @param error - The error (normally a `string` or a `ValidationError`)
+   *                to record and associate with the given key
+   * @param key - The key in an object, or index in an array where the
+   *              vaildation error was encountered
+   */
+  record(error: any, key?: string | number): void {
     const path = key === undefined ? [] : [ key ]
     if (error instanceof ValidationError) {
       error.errors.forEach(({ path: subpath, message }) => {
@@ -53,7 +56,29 @@ export class ValidationErrorBuilder {
     }
   }
 
-  assert(): void {
+  /**
+   * Assert there are no validation errors and return the specified value, or
+   * throw a `ValidationError` combining all errors
+   *
+   * @param value - The value to return if no errors have been recorded
+   */
+  assert<T>(value: T): T {
     if (this.errors.length > 0) throw new ValidationError(this.errors, this.assert)
+    return value
   }
+}
+
+/**
+ * Simple assertion function throwing `ValidationError`(s) with an empty path
+ */
+export function assertValidation(what: boolean | undefined, message: string): asserts what {
+  if (! what) throw new ValidationError(message, assertValidation)
+}
+
+/**
+ * Simple assertion function throwing `TypeError`(s) to be used when
+ * constructing a `Validator` from a `Schema` or validation constraints.
+ */
+export function assertSchema(what: boolean | undefined, message: string): asserts what {
+  if (! what) throw new TypeError(message)
 }

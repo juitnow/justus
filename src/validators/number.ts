@@ -1,5 +1,5 @@
 import { Validator } from '../types'
-import { assert, ValidationError } from '../errors'
+import { assertSchema, assertValidation } from '../errors'
 import { makeTupleRestIterable } from './tuple'
 
 /**
@@ -42,25 +42,25 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
       multipleOf,
     } = constraints
 
-    assert(maximum >= minimum, `Constraint "minimum" (${minimum}) is greater than "maximum" (${maximum})`)
+    assertSchema(maximum >= minimum, `Constraint "minimum" (${minimum}) is greater than "maximum" (${maximum})`)
 
     if (exclusiveMaximum !== undefined) {
-      assert(exclusiveMaximum > minimum,
+      assertSchema(exclusiveMaximum > minimum,
           `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "minimum" (${minimum})`)
     }
 
     if (exclusiveMinimum !== undefined) {
-      assert(maximum > exclusiveMinimum,
+      assertSchema(maximum > exclusiveMinimum,
           `Constraint "maximum" (${maximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`)
     }
 
     if ((exclusiveMinimum != undefined) && (exclusiveMaximum !== undefined)) {
-      assert(exclusiveMaximum > exclusiveMinimum,
+      assertSchema(exclusiveMaximum > exclusiveMinimum,
           `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`)
     }
 
     if (multipleOf !== undefined) {
-      assert(multipleOf > 0, `Constraint "multipleOf" (${multipleOf}) must be greater than zero`)
+      assertSchema(multipleOf > 0, `Constraint "multipleOf" (${multipleOf}) must be greater than zero`)
 
       // Split the multiple of in integer and fraction
       const bigMultipleOf = multipleOf * NumberValidator.PRECISION
@@ -75,7 +75,7 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
         this.#isMultipleOf = (value): boolean => ! ((value * NumberValidator.PRECISION) % bigMultipleOf)
       } else {
         // Required precision was too much (more than 6 decimal digits)
-        assert(false, `Constraint "multipleOf" (${multipleOf}) requires too much precision`)
+        assertSchema(false, `Constraint "multipleOf" (${multipleOf}) requires too much precision`)
       }
     }
 
@@ -88,23 +88,23 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
   }
 
   validate(value: unknown): N {
-    ValidationError.assert(typeof value == 'number', 'Value is not a "number"')
+    assertValidation(typeof value == 'number', 'Value is not a "number"')
 
     if (isNaN(value)) {
-      ValidationError.assert(this.allowNaN, 'Number is "NaN"')
+      assertValidation(this.allowNaN, 'Number is "NaN"')
       return value as N
     }
 
-    ValidationError.assert(value >= this.minimum, `Number is less than ${this.minimum}`)
-    ValidationError.assert(value <= this.maximum, `Number is greater than ${this.maximum}`)
+    assertValidation(value >= this.minimum, `Number is less than ${this.minimum}`)
+    assertValidation(value <= this.maximum, `Number is greater than ${this.maximum}`)
 
-    ValidationError.assert((this.exclusiveMinimum == undefined) || (value > this.exclusiveMinimum),
+    assertValidation((this.exclusiveMinimum == undefined) || (value > this.exclusiveMinimum),
         `Number is less than or equal to ${this.exclusiveMinimum}`)
 
-    ValidationError.assert((this.exclusiveMaximum == undefined) || (value < this.exclusiveMaximum),
+    assertValidation((this.exclusiveMaximum == undefined) || (value < this.exclusiveMaximum),
         `Number is greater than or equal to ${this.exclusiveMaximum}`)
 
-    ValidationError.assert(this.#isMultipleOf ? this.#isMultipleOf(value) : true,
+    assertValidation(this.#isMultipleOf ? this.#isMultipleOf(value) : true,
         `Number is not a multiple of ${this.multipleOf}`)
 
     return value as N
@@ -115,8 +115,8 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
 
 const anyNumberValidator = new class extends Validator<number> {
   validate(value: unknown): number {
-    ValidationError.assert(typeof value == 'number', 'Value is not a "number"')
-    ValidationError.assert(! isNaN(value), 'Number is "NaN"')
+    assertValidation(typeof value == 'number', 'Value is not a "number"')
+    assertValidation(! isNaN(value), 'Number is "NaN"')
     return value
   }
 }

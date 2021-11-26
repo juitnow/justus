@@ -1,5 +1,5 @@
 import { Validator } from '../types'
-import { ValidationError } from '../errors'
+import { assertValidation } from '../errors'
 
 export class ConstantValidator<T extends string | number | boolean | null> extends Validator<T> {
   readonly constant: T
@@ -10,7 +10,7 @@ export class ConstantValidator<T extends string | number | boolean | null> exten
   }
 
   validate(value: unknown): T {
-    ValidationError.assert(value === this.constant, `Value does not match constant "${this.constant}"`)
+    assertValidation(value === this.constant, `Value does not match constant "${this.constant}"`)
     return value as T
   }
 }

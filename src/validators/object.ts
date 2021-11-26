@@ -1,5 +1,5 @@
 import { additionalValidator, InferSchema, modifierValidator, never, Schema, schemaValidator, ValidationOptions, Validator } from '../types'
-import { ValidationError, ValidationErrorBuilder } from '../errors'
+import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { getValidator } from '../utilities'
 import { isModifier } from '../schema'
 import { makeTupleRestIterable } from './tuple'
@@ -40,8 +40,8 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
   }
 
   validate(value: unknown, options: ValidationOptions): InferSchema<S> {
-    ValidationError.assert(typeof value === 'object', 'Value is not an "object"')
-    ValidationError.assert(value !== null, 'Value is "null"')
+    assertValidation(typeof value === 'object', 'Value is not an "object"')
+    assertValidation(value !== null, 'Value is "null"')
 
     const record: { [ k in string | number | symbol ]?: unknown } = value
     const builder = new ValidationErrorBuilder()
@@ -49,14 +49,14 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
 
     for (const [ key, validator ] of Object.entries(this.#requiredProperties)) {
       if (record[key] === undefined) {
-        builder.record(key, 'Required property missing')
+        builder.record('Required property missing', key)
         continue
       }
 
       try {
         clone[key] = validator.validate(record[key], options)
       } catch (error) {
-        builder.record(key, error)
+        builder.record(error, key)
       }
     }
 
@@ -66,14 +66,14 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
       try {
         clone[key] = validator.validate(record[key], options)
       } catch (error) {
-        builder.record(key, error)
+        builder.record(error, key)
       }
     }
 
     for (const key of this.#neverProperties) {
       if (record[key] === undefined) continue
       if (options.stripForbiddenProperties) continue
-      builder.record(key, 'Forbidden property')
+      builder.record('Forbidden property', key)
     }
 
     const additional = this.#additionalProperties
@@ -90,24 +90,23 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
         try {
           clone[key] = additional.validate(record[key], options)
         } catch (error) {
-          builder.record(key, error)
+          builder.record(error, key)
         }
       })
     } else if (! options.stripAdditionalProperties) {
       additionalKeys.forEach((key) => {
-        if (record[key] !== undefined) builder.record(key, 'Unknown property')
+        if (record[key] !== undefined) builder.record('Unknown property', key)
       })
     }
 
-    builder.assert()
-    return <any> clone
+    return builder.assert(clone as InferSchema<S>)
   }
 }
 
 const anyObjectValidator = new class extends Validator<Record<string, any>> {
   validate(value: unknown): Record<string, any> {
-    ValidationError.assert(typeof value == 'object', 'Value is not an "object"')
-    ValidationError.assert(value !== null, 'Value is "null"')
+    assertValidation(typeof value == 'object', 'Value is not an "object"')
+    assertValidation(value !== null, 'Value is "null"')
     return value
   }
 }
@@ -121,7 +120,6 @@ function _object(schema?: Schema): Validator<Record<string, any>> | Readonly<Sch
   const validator = new ObjectValidator(schema)
   const validation: Schema = {
     [additionalValidator]: schema[additionalValidator],
-    // [schemaValidator]: validator,
   }
 
   for (const key of Object.keys(schema)) {
