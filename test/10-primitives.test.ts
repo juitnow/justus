@@ -1,4 +1,4 @@
-import { ValidationError, any, boolean, validate, number, constant, string } from '../src'
+import { ValidationError, any, boolean, validate, number, constant, string, NumberValidator, StringValidator } from '../src'
 import { expect } from 'chai'
 
 describe('Primitive validators', () => {
@@ -207,6 +207,11 @@ describe('Primitive validators', () => {
           ])
       expect(validate(number({ allowNaN: true }), NaN)).to.be.NaN
     })
+
+    it('should validate a number using the NumberValidator class', () => {
+      const validator = new NumberValidator()
+      expect(validate(validator, 12345)).to.equal(12345)
+    })
   })
 
   describe('string', () => {
@@ -253,6 +258,11 @@ describe('Primitive validators', () => {
           .with.property('errors').to.eql([
             { path: [], message: 'String does not match required pattern /^$/' },
           ])
+    })
+
+    it('should validate a string using the StringValidator class', () => {
+      const validator = new StringValidator()
+      expect(validate(validator, 'foo')).to.equal('foo')
     })
   })
 })

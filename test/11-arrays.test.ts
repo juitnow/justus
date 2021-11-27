@@ -1,4 +1,4 @@
-import { ValidationError, validate, array, arrayOf, string } from '../src'
+import { ValidationError, validate, array, arrayOf, string, ArrayValidator } from '../src'
 import { expect } from 'chai'
 
 describe('Array validators', () => {
@@ -91,5 +91,10 @@ describe('Array validators', () => {
           { path: [ 2 ], message: 'Duplicate of item at index 0' },
           { path: [ 3 ], message: 'Value does not match constant "a"' },
         ])
+  })
+
+  it('should validate an array using the ArrayValidator class', () => {
+    const validator = new ArrayValidator()
+    expect(validate(validator, [ 1, 'foo', true ])).to.eql([ 1, 'foo', true ])
   })
 })
