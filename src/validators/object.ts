@@ -9,7 +9,7 @@ import { makeTupleRestIterable } from './tuple'
  * ========================================================================== */
 
 export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>> {
-  readonly schema: S
+  readonly schema: Readonly<S>
 
   #additionalProperties?: Validator
   #requiredProperties: Record<string, Validator<any>> = {}
@@ -111,20 +111,14 @@ const anyObjectValidator = new class extends Validator<Record<string, any>> {
 
 
 function _object(): Validator<Record<string, any>>
-function _object<S extends Schema>(schema: S): Readonly<S>
-function _object(schema?: Schema): Validator<Record<string, any>> | Readonly<Schema> {
+function _object<S extends Schema>(schema: S): S
+function _object(schema?: Schema): Validator<Record<string, any>> | Schema {
   if (! schema) return anyObjectValidator
 
-  const validator = new ObjectValidator(schema)
-  const validation: Schema = {
-    [additionalValidator]: schema[additionalValidator],
-  }
-
-  for (const key of Object.keys(schema)) validation[key] = schema[key]
-
-  Object.defineProperty(validation, schemaValidator, { enumerable: false, value: validator })
-
-  return Object.freeze(validation)
+  return Object.defineProperty(schema, schemaValidator, {
+    value: new ObjectValidator(schema),
+    enumerable: false,
+  })
 }
 
 export const object = makeTupleRestIterable(_object)
