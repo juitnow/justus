@@ -63,7 +63,7 @@ export function readonly(): ReadonlyModifier<any>
 export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidation<V>>>
 export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
 
-export function readonly(options: Modifier | Validation = any): Modifier {
+export function readonly(options?: Modifier | Validation): Modifier {
   const { [modifierValidator]: validation = any, optional = false } =
     isModifier(options) ? options : { [modifierValidator]: options }
 
