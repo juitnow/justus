@@ -18,6 +18,7 @@ import {
  * ADDITIONAL PROPERTIES IN SCHEMAS                                           *
  * ========================================================================== */
 
+/** Internal definition of `allowAdditionalProperties(...)` */
 function _allowAdditionalProperties(): AdditionalProperties<Validator<any>>
 function _allowAdditionalProperties(allow: true): AdditionalProperties<Validator<any>>
 function _allowAdditionalProperties(allow: false): AdditionalProperties<false>
@@ -30,11 +31,19 @@ function _allowAdditionalProperties(options?: Validation | boolean): AdditionalP
   return { [additionalValidator]: getValidator(options) }
 }
 
+/**
+ * Allow additional properties in `Schema`s.
+ *
+ * This function can be called with a `boolean` argument (`true` allow _any_
+ * additional property, `false` do not allow additional properties) or with a
+ * `Validation` that will be used to validate additional properties.
+ *
+ * @param allow - A `boolean` or a `Validator` instance
+ */
 export const allowAdditionalProperties = _allowAdditionalProperties as
   typeof _allowAdditionalProperties & AdditionalProperties<Validator<any>>
 
 allowAdditionalProperties[additionalValidator] = any
-
 
 /* ========================================================================== *
  * SCHEMA KEYS MODIFIERS                                                      *
@@ -53,12 +62,18 @@ type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
 
 /* -------------------------------------------------------------------------- */
 
+/** Type guard for `Modifier` instances */
 export function isModifier(what: any): what is Modifier<any> {
   return (what && (typeof what === 'object') && (modifierValidator in what))
 }
 
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Ensure that the property is marked as _read only_ in the `Schema`.
+ *
+ * @param validation - A `Validation` to be marked as _read only_.
+ */
 export function readonly(): ReadonlyModifier<any>
 export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidation<V>>>
 export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
@@ -74,6 +89,13 @@ export function readonly(options?: Modifier | Validation): Modifier {
     { [modifierValidator]: validator, readonly: true }
 }
 
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Ensure that the property is marked as _optional_ in the `Schema`.
+ *
+ * @param validation - A `Validation` to be marked as _optional_.
+ */
 export function optional(): OptionalModifier<any>
 export function optional<V extends Validation>(validation: V): OptionalModifier<Validator<InferValidation<V>>>
 export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
