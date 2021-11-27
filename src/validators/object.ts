@@ -23,8 +23,6 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
     if (additional) this.#additionalProperties = getValidator(additional)
 
     for (const key of Object.keys(properties)) {
-      if (typeof key !== 'string') continue
-
       const definition = properties[key]
 
       if (definition === never) {
@@ -122,9 +120,7 @@ function _object(schema?: Schema): Validator<Record<string, any>> | Readonly<Sch
     [additionalValidator]: schema[additionalValidator],
   }
 
-  for (const key of Object.keys(schema)) {
-    if (typeof key === 'string') validation[key] = schema[key]
-  }
+  for (const key of Object.keys(schema)) validation[key] = schema[key]
 
   Object.defineProperty(validation, schemaValidator, { enumerable: false, value: validator })
 
