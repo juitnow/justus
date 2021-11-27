@@ -1,8 +1,6 @@
 import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never } from '../src'
 import { expect } from 'chai'
 
-// TODO: test removing additionalproperties
-
 describe('Object validator', () => {
   it('should validate a generic object', () => {
     expect(validate(object, {})).to.eql({})
@@ -223,6 +221,18 @@ describe('Object validator', () => {
     expect(() => validate(validator, { foo: true, bar: 'whatever', baz: 'forbidden' }, {
       stripForbiddenProperties: true,
     }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'bar' ], message: 'Unknown property' },
+        ])
+  })
+
+  it('should extends and remove additional properties', () => {
+    const object1 = object({ foo: string, ...allowAdditionalProperties(number) })
+    const object2 = object({ ...object1, ...allowAdditionalProperties(false) })
+
+    expect(validate(object1, { foo: 'bar', bar: 123 })).to.eql({ foo: 'bar', bar: 123 })
+    expect(() => validate(object2, { foo: 'bar', bar: 123 }))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([
           { path: [ 'bar' ], message: 'Unknown property' },
