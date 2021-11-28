@@ -18,3 +18,5 @@ export class ConstantValidator<T extends string | number | boolean | null> exten
 export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
   return new ConstantValidator(constant)
 }
+
+export const nullValidator = new ConstantValidator(null)

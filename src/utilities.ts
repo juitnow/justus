@@ -1,5 +1,5 @@
 import { any } from './validators/any'
-import { ConstantValidator } from './validators/constant'
+import { ConstantValidator, nullValidator } from './validators/constant'
 import { Schema, schemaValidator, Validation, Validator } from './types'
 import { TupleValidator } from './validators/tuple'
 import { ObjectValidator } from './validators/object'
@@ -7,8 +7,6 @@ import { ObjectValidator } from './validators/object'
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
  * ========================================================================== */
-
-const nullValidator = new ConstantValidator(null)
 
 /**
  * Return the `Validator` for the given `Validation`.
