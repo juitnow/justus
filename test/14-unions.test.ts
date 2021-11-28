@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { allOf, number, oneOf, string, validate, ValidationError } from '../src'
 
-describe('Unions', () => {
+describe('Union validators', () => {
   it('should validate one of the given options', () => {
     const validator = oneOf(string, number)
 
