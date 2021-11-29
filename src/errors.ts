@@ -1,5 +1,6 @@
 type ValidationErrors = { path: (string | number)[], message: string }[]
 
+/** Combine the components of a _path_ into a human readable string */
 function pathToString(path: (string | number)[]): string {
   return path.reduce((string: string, key, index): string => {
     if (typeof key === 'number') return `${string}[${key}]`
@@ -7,31 +8,54 @@ function pathToString(path: (string | number)[]): string {
   }, '')
 }
 
+/**
+ * A `ValidationError` wraps one or more errors encountered during validation.
+ */
 export class ValidationError extends Error {
+  /** An `Array` of validation errors encountered while validating */
   readonly errors!: ValidationErrors
+  /** Our stack, always present as we enforce it in the constructor */
   readonly stack!: string
 
-  constructor(message: string, constructor?: Function)
-  constructor(message: string, path: (string | number)[], constructor?: Function)
-  constructor(errors: ValidationErrors, constructor?: Function)
+  /**
+   * Create a new `ValidationError` instance for a message (optionally tied)
+   */
+  constructor(builder: ValidationErrorBuilder)
+  constructor(error: any, constructor?: Function)
+  constructor(error: any, path: (string | number)[], constructor?: Function)
 
   constructor(
-      errors: ValidationErrors | string,
+      builderOrError: any,
       constructorOrPath?: Function | ((string | number)[]),
       maybeConstructor?: Function,
   ) {
-    const path = Array.isArray(constructorOrPath) ? constructorOrPath : []
-    const constructor =
+    let constructor: Function
+    let errors: ValidationErrors
+
+    if (builderOrError instanceof ValidationErrorBuilder) {
+      errors = builderOrError.errors
+      constructor = builderOrError.assert
+    } else {
+      const path = Array.isArray(constructorOrPath) ? constructorOrPath : []
+
+      if (builderOrError instanceof ValidationError) {
+        errors = builderOrError.errors.map(({ path: subpath, message }) =>
+          ({ path: [ ...path, ...subpath ], message }))
+      } else {
+        errors = [ { path, message: `${builderOrError}` } ]
+      }
+
+      constructor =
         typeof maybeConstructor === 'function' ? maybeConstructor :
         typeof constructorOrPath === 'function' ? constructorOrPath :
         ValidationError
-
-    if (typeof errors === 'string') errors = [ { path, message: errors } ]
+    }
 
     const details = errors
         .map(({ path, message }) => ({ key: pathToString(path), message }))
         .map(({ key, message }) => key ? `${key}: ${message}` : message)
         .join('\n  ')
+
     const message = errors.length !== 1 ?
       `Found ${errors.length} validation errors` :
       'Found 1 validation error'
@@ -77,7 +101,7 @@ export class ValidationErrorBuilder {
    * @param value - The value to return if no errors have been recorded
    */
   assert<T>(value: T): T {
-    if (this.errors.length > 0) throw new ValidationError(this.errors, this.assert)
+    if (this.errors.length > 0) throw new ValidationError(this)
     return value
   }
 }

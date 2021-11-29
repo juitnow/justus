@@ -12,47 +12,38 @@ describe('Errors', () => {
     })
 
     it('should create a validation error with a path', () => {
-      const error1 = new ValidationError([ { path: [], message: 'This is a test' } ])
+      const error1 = new ValidationError('This is a test', [])
       expect(error1.message).to.equal('Found 1 validation error\n  This is a test')
       expect(error1.errors).to.eql([
         { path: [], message: 'This is a test' },
       ])
 
-      const error2 = new ValidationError([ { path: [ 123 ], message: 'This is a test' } ])
+      const error2 = new ValidationError('This is a test', [ 123 ])
       expect(error2.message).to.equal('Found 1 validation error\n  [123]: This is a test')
       expect(error2.errors).to.eql([
         { path: [ 123 ], message: 'This is a test' },
       ])
 
-      const error3 = new ValidationError([ { path: [ 'foo' ], message: 'This is a test' } ])
+      const error3 = new ValidationError('This is a test', [ 'foo' ])
       expect(error3.message).to.equal('Found 1 validation error\n  foo: This is a test')
       expect(error3.errors).to.eql([
         { path: [ 'foo' ], message: 'This is a test' },
       ])
 
-      const error4 = new ValidationError([ { path: [ 'foo', 'bar', 123, 456, 'baz', 789 ], message: 'This is a test' } ])
+      const error4 = new ValidationError('This is a test', [ 'foo', 'bar', 123, 456, 'baz', 789 ])
       expect(error4.message).to.equal('Found 1 validation error\n  foo.bar[123][456].baz[789]: This is a test')
       expect(error4.errors).to.eql([
         { path: [ 'foo', 'bar', 123, 456, 'baz', 789 ], message: 'This is a test' },
       ])
-
-      const error5 = new ValidationError('A message', [ 'myKey', 123 ])
-      expect(error5.message).to.equal('Found 1 validation error\n  myKey[123]: A message')
-      expect(error5.errors).to.eql([
-        { path: [ 'myKey', 123 ], message: 'A message' },
-      ])
     })
 
-    it('should create a validation error with multiple errors', () => {
-      const error = new ValidationError([
-        { path: [ 'foo', 1 ], message: 'This is foo' },
-        { path: [ 2, 'bar' ], message: 'This is bar' },
-      ])
+    it('should wrap another ValidationError', () => {
+      const error1 = new ValidationError('This is a test', [ 123 ])
+      const error2 = new ValidationError(error1, [ 'foo' ])
 
-      expect(error.message).to.equal('Found 2 validation errors\n  foo[1]: This is foo\n  [2].bar: This is bar')
-      expect(error.errors).to.eql([
-        { path: [ 'foo', 1 ], message: 'This is foo' },
-        { path: [ 2, 'bar' ], message: 'This is bar' },
+      expect(error2.message).to.equal('Found 1 validation error\n  foo[123]: This is a test')
+      expect(error2.errors).to.eql([
+        { path: [ 'foo', 123 ], message: 'This is a test' },
       ])
     })
 
@@ -96,7 +87,7 @@ describe('Errors', () => {
 
     it('should properly wrap another ValidationError', () => {
       const error1 = new ValidationError('This has no path')
-      const error2 = new ValidationError([ { path: [ 'myKey' ], message: 'A message' } ])
+      const error2 = new ValidationError('A message', [ 'myKey' ])
 
       const builder = new ValidationErrorBuilder()
           .record(error1)
