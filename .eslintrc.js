@@ -112,6 +112,7 @@ module.exports = {
   },
   overrides: [ {
     files: [ '*.js' ],
+    parser: 'espree',
     env: {
       node: true,
     },
