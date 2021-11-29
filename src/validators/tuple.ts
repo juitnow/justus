@@ -1,9 +1,8 @@
 import { Tuple, InferTuple, Validator, TupleRestParameter, InferValidation, restValidator } from '../types'
 import { ValidationOptions } from '../types'
-import { assertValidation, ValidationErrorBuilder } from '../errors'
+import { assertValidation, ValidationErrorBuilder, ValidationError } from '../errors'
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
-import { ValidationError } from '..'
 
 export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
   readonly tuple: T
