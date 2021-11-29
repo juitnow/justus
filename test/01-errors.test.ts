@@ -1,6 +1,5 @@
-import { ValidationError } from '../src'
+import { ValidationError, assertSchema, assertValidation, ValidationErrorBuilder } from '../src'
 import { expect } from 'chai'
-import { assertSchema, assertValidation, ValidationErrorBuilder } from '../src/errors'
 
 describe('Errors', () => {
   describe('ValidationError', () => {
@@ -36,6 +35,12 @@ describe('Errors', () => {
       expect(error4.errors).to.eql([
         { path: [ 'foo', 'bar', 123, 456, 'baz', 789 ], message: 'This is a test' },
       ])
+
+      const error5 = new ValidationError('A message', [ 'myKey', 123 ])
+      expect(error5.message).to.equal('Found 1 validation error\n  myKey[123]: A message')
+      expect(error5.errors).to.eql([
+        { path: [ 'myKey', 123 ], message: 'A message' },
+      ])
     })
 
     it('should create a validation error with multiple errors', () => {
@@ -49,6 +54,24 @@ describe('Errors', () => {
         { path: [ 'foo', 1 ], message: 'This is foo' },
         { path: [ 2, 'bar' ], message: 'This is bar' },
       ])
+    })
+
+    it('should create a validation error ignoring certain stack trace elements', () => {
+      function _testCreate_(
+          constructorOrPath?: Function | string[],
+          maybeConstructor?: Function,
+      ): ValidationError {
+        return new ValidationError('This is a test', <any> constructorOrPath, <any> maybeConstructor)
+      }
+
+      expect(_testCreate_().stack.match(/^\s+at\s+.*_testCreate_/gm))
+          .to.be.an('array')
+      expect(_testCreate_(_testCreate_).stack.match(/^\s+at\s+.*_testCreate_/gm))
+          .to.be.null
+      expect(_testCreate_([]).stack.match(/^\s+at\s+.*_testCreate_/gm))
+          .to.be.an('array')
+      expect(_testCreate_([], _testCreate_).stack.match(/^\s+at\s+.*_testCreate_/gm))
+          .to.be.null
     })
   })
 

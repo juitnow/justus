@@ -9,11 +9,24 @@ function pathToString(path: (string | number)[]): string {
 
 export class ValidationError extends Error {
   readonly errors!: ValidationErrors
+  readonly stack!: string
 
   constructor(message: string, constructor?: Function)
+  constructor(message: string, path: (string | number)[], constructor?: Function)
   constructor(errors: ValidationErrors, constructor?: Function)
-  constructor(errors: ValidationErrors | string, constructor?: Function) {
-    if (typeof errors === 'string') errors = [ { path: [], message: errors } ]
+
+  constructor(
+      errors: ValidationErrors | string,
+      constructorOrPath?: Function | ((string | number)[]),
+      maybeConstructor?: Function,
+  ) {
+    const path = Array.isArray(constructorOrPath) ? constructorOrPath : []
+    const constructor =
+        typeof maybeConstructor === 'function' ? maybeConstructor :
+        typeof constructorOrPath === 'function' ? constructorOrPath :
+        ValidationError
+
+    if (typeof errors === 'string') errors = [ { path, message: errors } ]
 
     const details = errors
         .map(({ path, message }) => ({ key: pathToString(path), message }))
@@ -25,7 +38,7 @@ export class ValidationError extends Error {
 
     super(`${message}\n  ${details}`)
 
-    Error.captureStackTrace(this, constructor || ValidationError)
+    Error.captureStackTrace(this, constructor)
     Object.defineProperty(this, 'errors', { value: errors })
   }
 }
