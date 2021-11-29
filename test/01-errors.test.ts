@@ -38,11 +38,11 @@ describe('Errors', () => {
     })
 
     it('should wrap another ValidationError', () => {
-      const error1 = new ValidationError('This is a test', [ 123 ])
-      const error2 = new ValidationError(error1, [ 'foo' ])
+      const error0 = new ValidationError('This is a test', [ 123 ])
+      const error1 = new ValidationError(error0, [ 'foo' ])
 
-      expect(error2.message).to.equal('Found 1 validation error\n  foo[123]: This is a test')
-      expect(error2.errors).to.eql([
+      expect(error1.message).to.equal('Found 1 validation error\n  foo[123]: This is a test')
+      expect(error1.errors).to.eql([
         { path: [ 'foo', 123 ], message: 'This is a test' },
       ])
     })

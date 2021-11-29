@@ -18,31 +18,35 @@ export class ValidationError extends Error {
   readonly stack!: string
 
   /**
-   * Create a new `ValidationError` instance for a message (optionally tied)
+   * Create a new `ValidationError` instance from a `ValidationErrorBuilder`
+   * or with a `cause` (a string, or another error) and optional path.
+   *
+   * The `constructor` (optional last parameter) will restrict creation of
+   * this instance's stack up to the specified function.
    */
   constructor(builder: ValidationErrorBuilder)
-  constructor(error: any, constructor?: Function)
-  constructor(error: any, path: (string | number)[], constructor?: Function)
+  constructor(cause: any, constructor?: Function)
+  constructor(cause: any, path: (string | number)[], constructor?: Function)
 
   constructor(
-      builderOrError: any,
+      builderOrCause: any,
       constructorOrPath?: Function | ((string | number)[]),
       maybeConstructor?: Function,
   ) {
     let constructor: Function
     let errors: ValidationErrors
 
-    if (builderOrError instanceof ValidationErrorBuilder) {
-      errors = builderOrError.errors
-      constructor = builderOrError.assert
+    if (builderOrCause instanceof ValidationErrorBuilder) {
+      errors = builderOrCause.errors
+      constructor = builderOrCause.assert
     } else {
       const path = Array.isArray(constructorOrPath) ? constructorOrPath : []
 
-      if (builderOrError instanceof ValidationError) {
-        errors = builderOrError.errors.map(({ path: subpath, message }) =>
+      if (builderOrCause instanceof ValidationError) {
+        errors = builderOrCause.errors.map(({ path: subpath, message }) =>
           ({ path: [ ...path, ...subpath ], message }))
       } else {
-        errors = [ { path, message: `${builderOrError}` } ]
+        errors = [ { path, message: `${builderOrCause}` } ]
       }
 
       constructor =

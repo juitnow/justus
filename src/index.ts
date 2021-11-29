@@ -1,5 +1,6 @@
-import type { InferValidation, Validation, ValidationOptions } from './types'
-import { getValidator } from './utilities'
+/* ========================================================================== *
+ * EXPORTS                                                                    *
+ * ========================================================================== */
 
 // All our types and utilities
 export * from './errors'
@@ -19,13 +20,21 @@ export { object, ObjectValidator } from './validators/object'
 export { string, StringValidator } from './validators/string'
 export { tuple, TupleValidator } from './validators/tuple'
 
-// Validate function
+/* ========================================================================== *
+ * VALIDATE FUNCTION (our main entry point)                                   *
+ * ========================================================================== */
+
+import type { InferValidation, Validation, ValidationOptions } from './types'
+import { getValidator } from './utilities'
+
+/** Options for `validate` */
 export type ValidateOptions = {
   -readonly [ key in keyof ValidationOptions ]?: ValidationOptions[key] | undefined
 }
 
+/** Validate a _value_ using the specified `Validation` */
 export function validate<V extends Validation>(
-    validator: V,
+    validation: V,
     value: any,
     options: ValidateOptions = {},
 ): InferValidation<V> {
@@ -35,5 +44,5 @@ export function validate<V extends Validation>(
     ...options,
   }
 
-  return getValidator(validator).validate(value, opts)
+  return getValidator(validation).validate(value, opts)
 }
