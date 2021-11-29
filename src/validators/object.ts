@@ -8,6 +8,7 @@ import { makeTupleRestIterable } from './tuple'
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
 
+/** A `Validator` validating `object`s according to a `Schema` */
 export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>> {
   readonly schema: Readonly<S>
 
@@ -101,6 +102,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
   }
 }
 
+/** Validate _any_ `object` */
 const anyObjectValidator = new class extends Validator<Record<string, any>> {
   validate(value: unknown): Record<string, any> {
     assertValidation(typeof value == 'object', 'Value is not an "object"')
@@ -108,7 +110,6 @@ const anyObjectValidator = new class extends Validator<Record<string, any>> {
     return value
   }
 }
-
 
 function _object(): Validator<Record<string, any>>
 function _object<S extends Schema>(schema: S): S
@@ -121,4 +122,5 @@ function _object(schema?: Schema): Validator<Record<string, any>> | Schema {
   })
 }
 
+/** Validate `object`s. */
 export const object = makeTupleRestIterable(_object)

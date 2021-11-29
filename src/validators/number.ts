@@ -2,9 +2,7 @@ import { Validator } from '../types'
 import { assertSchema, assertValidation } from '../errors'
 import { makeTupleRestIterable } from './tuple'
 
-/**
- * Constraints to validate a `number` with.
- */
+/** Constraints to validate a `number` with. */
 export interface NumberConstraints {
   /** The value for which a `number` must be multiple of for it to be valid */
   multipleOf?: number,
@@ -20,6 +18,7 @@ export interface NumberConstraints {
   allowNaN?: boolean,
 }
 
+/** A `Validator` validating `number`s. */
 export class NumberValidator<N extends number = number> extends Validator<N> {
   #isMultipleOf?: ((value: number) => boolean)
 
@@ -128,4 +127,5 @@ function _number(constraints?: NumberConstraints): Validator<number> {
   return constraints ? new NumberValidator(constraints) : anyNumberValidator
 }
 
+/** Validate `number`s. */
 export const number = makeTupleRestIterable(_number)

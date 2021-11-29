@@ -12,6 +12,7 @@ export interface StringConstraints {
   pattern?: RegExp,
 }
 
+/** A `Validator` validating `string`s. */
 export class StringValidator<S extends string = string> extends Validator<S> {
   readonly maxLength: number
   readonly minLength: number
@@ -65,4 +66,5 @@ function _string(constraints?: StringConstraints): Validator<string> {
   return constraints ? new StringValidator(constraints) : anyStringValidator
 }
 
+/** Validate `string`s. */
 export const string = makeTupleRestIterable(_string)

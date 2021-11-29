@@ -20,6 +20,7 @@ type InferOneOfValidationType<A extends UnionArguments> =
     never :
   never
 
+/** A `Validator` validating a value as _one of_ the specified arguments. */
 export class OneOfValidator<A extends UnionArguments> extends Validator<InferOneOfValidationType<A>> {
   readonly validators: readonly Validator[]
 
@@ -41,6 +42,7 @@ export class OneOfValidator<A extends UnionArguments> extends Validator<InferOne
   }
 }
 
+/** Validate a value as _one of_ the specified arguments */
 export function oneOf<A extends UnionArguments>(...args: A): OneOfValidator<A> {
   return new OneOfValidator(args)
 }
@@ -56,6 +58,7 @@ type InferAllOfValidationType<A extends UnionArguments> =
     never :
   never
 
+/** A `Validator` validating a value as _all of_ the specified arguments. */
 export class AllOfValidator<A extends UnionArguments> extends Validator<InferAllOfValidationType<A>> {
   readonly validators: readonly Validator[]
 
@@ -72,6 +75,7 @@ export class AllOfValidator<A extends UnionArguments> extends Validator<InferAll
   }
 }
 
+/** Validate a value as _all of_ the specified arguments */
 export function allOf<A extends UnionArguments>(...args: A): AllOfValidator<A> {
   return new AllOfValidator(args)
 }

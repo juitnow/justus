@@ -4,6 +4,7 @@ import { assertValidation, ValidationError } from '../errors'
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
 
+/** A `Validator` for _tuples_. */
 export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
   readonly tuple: T
 
@@ -69,6 +70,7 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
   }
 }
 
+/** Validate _tuples_. */
 export function tuple<T extends Tuple>(tuple: T): Validator<InferTuple<T>> {
   return new TupleValidator(tuple)
 }

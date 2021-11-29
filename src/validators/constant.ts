@@ -1,6 +1,7 @@
 import { Validator } from '../types'
 import { assertValidation } from '../errors'
 
+/** A `Validator` for _constants_. */
 export class ConstantValidator<T extends string | number | boolean | null> extends Validator<T> {
   readonly constant: T
 
@@ -15,8 +16,10 @@ export class ConstantValidator<T extends string | number | boolean | null> exten
   }
 }
 
+/** Validate _constants_. */
 export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
   return new ConstantValidator(constant)
 }
 
+/** The `Validator` for the `null` constant. */
 export const nullValidator = new ConstantValidator(null)

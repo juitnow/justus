@@ -20,6 +20,9 @@ export interface ArrayConstraints<V extends Validation> {
   items?: V,
 }
 
+/**
+ * A validator for `Array` instances.
+ */
 export class ArrayValidator<T> extends Validator<T[]> {
   readonly maxItems: number
   readonly minItems: number
@@ -86,9 +89,6 @@ const anyArrayValidator = new class extends Validator<any[]> {
 
 /* -------------------------------------------------------------------------- */
 
-/**
- * A function returning a `Validator` for an `Array` containing `any` item.
- */
 function _array(): Validator<any[]>
 function _array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>>
 
@@ -99,8 +99,10 @@ function _array(options?: ArrayConstraints<Validation>): Validator<any[]> {
   return new ArrayValidator({ ...options, items })
 }
 
+/** Validate `Array`s. */
 export const array = makeTupleRestIterable(_array)
 
+/** Validate `Array`s containing only the specified elements. */
 export function arrayOf<V extends Validation>(validation: V): ArrayValidator<InferValidation<V>> {
   return new ArrayValidator({ items: getValidator(validation) })
 }
