@@ -23,8 +23,6 @@ export const never = Symbol.for('justus.never')
 
 /**
  * Options to be using while validating.
- *
- * @public
  */
 export interface ValidationOptions {
   /** Strip additional, undeclared properties from objects */
@@ -36,8 +34,6 @@ export interface ValidationOptions {
 /**
  * A `Validator` is an object capable of validating a given _value_ and
  * (possibly) converting it the required type `T`.
- *
- * @public
  */
 export abstract class Validator<T = any> implements Iterable<TupleRestParameter<T>> {
   /** Validate a _value_ and optionally convert it to the required `Type` */
@@ -58,8 +54,6 @@ export abstract class Validator<T = any> implements Iterable<TupleRestParameter<
  * * A `Validator` instance or a _zero-arguments_ function returning one
  * * A `Tuple` or a `Schema`, validated as arrays or object
  * * Either `null`, a `boolean`, a `number` or a `string` for constants
- *
- * @public
  */
 export type Validation =
   (() => Validator) | Validator | // Validator instances or their creators
@@ -68,8 +62,6 @@ export type Validation =
 
 /**
  * Infer the type returned by a `Validation` when validating.
- *
- * @public
  */
 export type InferValidation<V> =
   // Let `InferValidationType<T>` be liberal in the type it accepts and check
@@ -132,8 +124,6 @@ type InferValidationOrTupleRest<T> =
 
 /**
  * A `Tuple` is defined to be an array of `Validation` or `TupleRest`
- *
- * @public
  */
 export type Tuple = readonly (Validation | TupleRestParameter)[]
 
@@ -149,8 +139,6 @@ export type Tuple = readonly (Validation | TupleRestParameter)[]
  * const nonEmptyString = string({ minLength: 1 })
  * const myTuple = tuple([ number, ...nonEmptyString ])
  * ```
- *
- * @public
  */
 export type TupleRestParameter<T = any> = {
   [restValidator] : Validator<T>
@@ -158,8 +146,6 @@ export type TupleRestParameter<T = any> = {
 
 /**
  * Infer the type returned by a `TupleValidator` when validating an array.
- *
- * @public
  */
 export type InferTuple<T> =
   T extends Tuple ?
@@ -185,8 +171,6 @@ export type InferTuple<T> =
 /**
  * The `Schema` interface defines what properties are defined for objects and
  * how they should be validated.
- *
- * @public
  */
 export interface Schema {
   [ key: string ] : Validation | Modifier | typeof never
@@ -196,8 +180,6 @@ export interface Schema {
 /**
  * An interface defining whether a `Schema` should include additional
  * properties, and the `Validator` used to validate them.
- *
- * @internal
  */
 export interface AdditionalProperties<V extends Validator | false> {
   [ additionalValidator ]: V
@@ -207,8 +189,6 @@ export interface AdditionalProperties<V extends Validator | false> {
 
 /**
  * A `Modifier` marks a `Schema` property either _read only_ and/or _optional_.
- *
- * @internal
  */
 export interface Modifier<V extends Validator = Validator> {
   [ modifierValidator ]: V
@@ -218,8 +198,6 @@ export interface Modifier<V extends Validator = Validator> {
 
 /**
  * Mark a `Schema` property as _read only_.
- *
- * @public
  */
 export interface ReadonlyModifier<V extends Validator = Validator> extends Modifier<V> {
   readonly: true,
@@ -227,8 +205,6 @@ export interface ReadonlyModifier<V extends Validator = Validator> extends Modif
 
 /**
  * Mark a `Schema` property as _optional_.
- *
- * @public
  */
 export interface OptionalModifier<V extends Validator = Validator> extends Modifier<V> {
   optional: true,
@@ -236,8 +212,6 @@ export interface OptionalModifier<V extends Validator = Validator> extends Modif
 
 /**
  * Mark a `Schema` property as both _optional_ and _read only_.
- *
- * @public
  */
 export interface CombinedModifier<V extends Validator = Validator>
   extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
