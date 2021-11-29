@@ -82,10 +82,18 @@ describe('Tuple validator', () => {
           path: [ 1 ], message: 'Value does not match constant "null"',
         } ])
 
-    expect(() => validate([ ...number ], [ 'foo' ]))
+    expect(() => validate(validator, [ 'foo', null, 123, true ]))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([ {
           path: [], message: 'Found 1 extra element in tuple',
         } ])
+  })
+
+  it('should validate a tuple with only rest parameters', () => {
+    const v1 = tuple([ ...string, ...number ])
+    expect(validate(v1, [ 'foo', 'bar', 123, 456 ])).to.eql([ 'foo', 'bar', 123, 456 ])
+    expect(validate(v1, [ 'foo', 'bar' ])).to.eql([ 'foo', 'bar' ])
+    expect(validate(v1, [ 123, 456 ])).to.eql([ 123, 456 ])
+    expect(validate(v1, [])).to.eql([])
   })
 })
