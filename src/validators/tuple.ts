@@ -1,6 +1,6 @@
 import { Tuple, InferTuple, Validator, TupleRestParameter, InferValidation, restValidator } from '../types'
 import { ValidationOptions } from '../types'
-import { assertValidation, ValidationErrorBuilder, ValidationError } from '../errors'
+import { assertValidation, ValidationError } from '../errors'
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
 
@@ -46,7 +46,7 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
         if (single) ({ single, validator } = this.#validators[++ needle] || {})
         haystack ++
       } catch (error) {
-        if (single) new ValidationErrorBuilder().record(error, haystack).assert(null)
+        if (single) throw new ValidationError(error, [ haystack ])
         else ({ single, validator } = this.#validators[++ needle] || {})
       }
     }
