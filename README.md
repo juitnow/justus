@@ -138,8 +138,8 @@ Number validators are created using the `number` function:
 ```typescript
 import { number } from 'justus'
 
-const s1 = number() // validates any number
-const s2 = number({ minimum: 123 }) // validate numbers 123 and greater
+const n1 = number() // validates any number
+const n2 = number({ minimum: 123 }) // validate numbers 123 and greater
 ```
 
 #### Options
@@ -180,4 +180,76 @@ import { number } from 'justus'
 const validator = object({
   foo: number // yep, no parenthesis, just "number"
 })
+```
+
+
+Boolean Validator
+-----------------
+
+The boolean validator is represented by the `boolean` constant:
+
+```typescript
+import { boolean, object } from 'justus'
+
+const validator = object({
+  foo: boolean // it's a constant, no options!
+})
+```
+
+
+Constant Validator
+------------------
+
+Cosntant validators are created using the `constant` function:
+
+```typescript
+import { constant } from 'justus'
+
+const c1 = constant('foo') // validates the `string` constant "foo"
+const c2 = constant(12345) // validates the `number` constant 12345
+const c3 = constant(false) // validates the `boolean` constant `false`
+const c4 = constant(null) // validates the `null` constant
+```
+
+The constant validator requires a `string`, `number`, `boolean` or `null`
+constant.
+
+#### Shorthand syntax
+
+The shorthand syntax for constant validators is simply its value. For example:
+
+```typescript
+import { object, validate } from 'justus'
+
+const validator = object({
+  foo: 'foo', // the string "foo"
+  bar: 12345, // the number 12345
+  baz: false, // the boolean false
+  nil: null, // the null constant
+} as const) // yep, don't forget "as const" to infer types correctly
+
+const result = validate(validator, something)
+
+result.foo // <- its type will be `"foo"` (or "string" if you didn't use "as const")
+result.bar // <- its type will be `12345` (or "number" if you didn't use "as const")
+result.baz // <- its type will be `false` (or "boolean" if you didn't use "as const")
+result.nil // <- its type will be `null` (or "any" if you didn't use "as const")
+```
+
+
+Any Validator
+-------------
+
+The _any_ validator is represented by the `any` constant:
+
+```typescript
+import { any, object, validate } from 'justus'
+
+const validator = object({
+  foo: any // it's a constant, no options!
+})
+
+const result = validate(validator, something)
+
+result.foo // <- its type will be `any`
 ```
