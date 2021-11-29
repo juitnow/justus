@@ -99,13 +99,14 @@ const s2 = string({ minLength: 1 }) // validate non empty strings
 
 #### Branded strings
 
-Type _branding_ can be used for string primitives, conveying additional
-semantic meaning to the value being validated. For example:
+Type _branding_ can be used for string primitives. For example:
 
 ```typescript
+import { string } from 'justus'
+
 type UUID = string & { __brand_uuid: never }
 
-const uuidValidator = string({
+const uuidValidator = string<UUID>({
   pattern: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/,
   minLength: 36,
   maxLength: 36,
@@ -121,7 +122,62 @@ value = 'foo' // <- will fail, as "foo" is a `string`, while "value" is a `UUID`
 The shorthand syntax for string validators is simply `string`. For example:
 
 ```typescript
+import { string } from 'justus'
+
 const validator = object({
   foo: string // yep, no parenthesis, just "string"
+})
+```
+
+
+Number Validator
+----------------
+
+Number validators are created using the `number` function:
+
+```typescript
+import { number } from 'justus'
+
+const s1 = number() // validates any number
+const s2 = number({ minimum: 123 }) // validate numbers 123 and greater
+```
+
+#### Options
+
+* `multipleOf?: number`: The value for which a `number` must be multiple of for it to be valid
+* `maximum?: number`: The _inclusive_ maximum value for a valid `number`
+* `minimum?: number`: The _inclusive_ minimum value for a valid `number`
+* `exclusiveMaximum?: number`: The _exclusive_ maximum value for a valid `number`
+* `exclusiveMinimum?: number`: The _exclusive_ minimum value for a valid `number`
+* `allowNaN?: boolean`: Whether to allow `NaN` or not (default: `false`)
+
+#### Branded numbers
+
+Type _branding_ can be used for number primitives. For example:
+
+```typescript
+import { number } from 'justus'
+
+type Price = string & { __brand_price: never }
+
+const priceValidator = number<Price>({
+  multipleOf: 0.01, // cents, anyone? :-)
+  minimum: 0, // no negative prices, those are _discounts_
+})
+
+const value = validate(priceValidator, 123.45)
+
+value = 432 // <- will fail, as 432 is a `number`, while "value" is a `Price`
+```
+
+#### Shorthand syntax
+
+The shorthand syntax for number validators is simply `number`. For example:
+
+```typescript
+import { number } from 'justus'
+
+const validator = object({
+  foo: number // yep, no parenthesis, just "number"
 })
 ```
