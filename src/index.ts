@@ -1,9 +1,8 @@
 import type { InferValidation, Validation, ValidationOptions } from './types'
 import { getValidator } from './utilities'
 
-export { ValidationError } from './errors'
-
 // All our types and utilities
+export * from './errors'
 export * from './schema'
 export * from './types'
 export * from './utilities'
@@ -19,7 +18,7 @@ export { object, ObjectValidator } from './validators/object'
 export { string, StringValidator } from './validators/string'
 export { tuple, TupleValidator } from './validators/tuple'
 
-
+// Validate function
 export type ValidateOptions = {
   -readonly [ key in keyof ValidationOptions ]?: ValidationOptions[key] | undefined
 }
