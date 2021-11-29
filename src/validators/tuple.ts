@@ -35,14 +35,14 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
     }
 
     // Validate iterating...
-    const clone = []
+    const clone = new Array(value.length)
     let needle = 0
     let haystack = 0
     let { single, validator } = this.#validators[needle]
 
     while ((needle < this.#validators.length) && (haystack < value.length)) {
       try {
-        clone.push(validator.validate(value[haystack], options))
+        clone[haystack] = validator.validate(value[haystack], options)
         if (single) ({ single, validator } = this.#validators[++ needle] || {})
         haystack ++
       } catch (error) {

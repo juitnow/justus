@@ -62,11 +62,12 @@ export class ArrayValidator<T> extends Validator<T[]> {
       try {
         const position = value.indexOf(value[i])
         if (position === i) {
-          this.items.validate(item, options)
+          clone[i] = this.items.validate(item, options)
         } else if (this.uniqueItems) {
           builder.record(`Duplicate of item at index ${position}`, i)
+        } else {
+          clone[i] = clone[position]
         }
-        clone[i] = item
       } catch (error) {
         builder.record(error, i)
       }
