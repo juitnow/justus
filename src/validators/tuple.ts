@@ -36,19 +36,24 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
     }
 
     // Validate iterating...
+    const clone = []
     let needle = 0
     let haystack = 0
     let { single, validator } = this.#validators[needle]
 
     while ((needle < this.#validators.length) && (haystack < value.length)) {
       try {
-        validator.validate(value[haystack], options)
+        clone.push(validator.validate(value[haystack], options))
         if (single) ({ single, validator } = this.#validators[++ needle] || {})
         haystack ++
       } catch (error) {
         if (single) new ValidationErrorBuilder().record(error, haystack).assert(null)
         else ({ single, validator } = this.#validators[++ needle] || {})
       }
+    }
+
+    while ((needle < this.#validators.length) && (this.#validators[needle].single === false)) {
+      needle ++
     }
 
     const missing = this.#validators.length - needle
@@ -61,7 +66,7 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
     const extra = value.length - haystack
     assertValidation(extra === 0, `Found ${extra} extra element${extra === 1 ? '' : 's'} in tuple`)
 
-    return [ ...value ] as InferTuple<T>
+    return clone as InferTuple<T>
   }
 }
 
