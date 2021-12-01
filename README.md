@@ -24,8 +24,9 @@ typing can be inferred.
   * [Arrays](#array-validator)
   * [Dates](#date-validator)
   * [Tuples](#tuple-validator)
-  * [Objects](#object-validator)
-  * [Any of, all of](#union-validator)
+  * [Objects](#object-validator) (yes, this is the important one!!!)
+  * [Any of, all of](#union-validators)
+* [A (slightly more) complex example](#a-complex-example)
 * [Copyright Notice](NOTICE.md)
 * [License](LICENSE.md)
 
@@ -512,4 +513,98 @@ const o1 = object({
   baz: readonly(boolean), // read-only property as "readonly boolean"
   xxx: readonly(optional(string)) // ... guess what it'll be?
 })
+```
+
+
+Union Validators
+----------------
+
+Unions (either _all_ or _any_) are defined using the `allOf` or `anyOf`
+functions.
+
+To make sure all validations pass use `allOf`:
+
+```typescript
+import { allOf, object, string, number } from 'justus'
+
+const o1 = object({ foo: string })
+const o2 = object({ bar: number })
+
+const result = validate(allOf(o1, o2), ... some object ...)
+// result here will have the type of what's inferred by o1 _and_ o2
+
+result.foo // <-- this is a "string"
+result.bar // <-- this is a "number"
+
+// be careful about never!
+const result2 = validate(allOf(number, string), ... some primitive ...)
+// obviously "result2" will be of type "never" as "number" and "string" do not match!
+```
+
+More useful, to make sure all validations pass use `anyOf`:
+
+```typescript
+import { anyOf, string, number } from 'justus'
+
+const result = validate(anyOf(number, string), ... some primitive ...)
+
+result // <-- its type will be "number | string"
+```
+
+
+A complex example
+-----------------
+
+This example is not complicated at all, but it outlines the simplicity
+of the syntax intended for JUSTUS.
+
+Let's assume we have some _time series_ data, but we can expect this in a
+couple of different flavors, either V1 or V2 with some subtle differences:
+
+```typescript
+// Our V1 time-series tuple is simply a timestamp followed by a numeric value
+const entryv1 = tuple([ date, number ] as const)
+
+// Our V1 response from the time series database declares the version and data
+const responsev1 = object({
+  version: 1,
+  entries: arrayOf(entryv1)
+} as const)
+
+// Our V2 time-series tuple is a timestamp, followed by a number and zero or
+// more strings indicating some remarks on the measurements
+const entryv2 = tuple([ date, number, ...string ] as const)
+
+// Response for V2 is the same as V1, with some extra stuff
+const responsev2 = object({
+  version: 2,
+  entries: arrayOf(entryv2)
+  average: number, // this is extra!
+})
+
+// Our combined response is either V1 or V2
+const response = anyOf(responsev1, responsev2)
+
+// GO! Validate!
+const result = validate(response, ... something ...)
+
+if (response.version === 1) {
+  response.version // the type here will be the literal number 1
+  response.entries.forEach((entry) => {
+    entry[0] // this will be a `Date` instance
+    entry[1] // this will be a "number"
+    // entry[2] will generate a typescript error
+  })
+  // response.from will generate a typescript error
+  // response.until will generate a typescript error
+} else {
+  response.version // the type here will be the literal number 2
+  response.entries.forEach((entry) => {
+    entry[0] // this will be a `Date` instance
+    entry[1] // this will be a "number"
+    entry[2] // this will be a "string"
+    entry[999] // this too will be a "string"
+  })
+  response.average // this will be a "number""
+}
 ```
