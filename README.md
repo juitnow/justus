@@ -297,3 +297,39 @@ import { array, arrayOf } from 'justus'
 const a1 = array({ items: string })
 const a2 = arrayOf(string) // same as above, just more readable
 ```
+
+
+Date Validator
+--------------
+
+Date validators are created using the `date` function:
+
+```typescript
+import { date } from 'justus'
+
+const d1 = date() // validates any date
+const d2 = date({ format: 'iso' }) // validate ISO dates
+```
+
+> **NOTE:** Date validators also _convert_ dates (in string format), or
+> timestamps (milliseconds from the epoch) into proper `Date` instances.
+
+#### Options
+
+* `format?: 'iso' | 'timestamp'`: The format for dates, `iso` for _ISO Dates_
+  (as outlined in RFC 3339) or `timestamp` for the number of milliseconds since
+  the epoch
+* `from?: Date`: The earliest value a date can have
+* `until?: Date`: The latest value a date can have
+
+#### Shorthand syntax
+
+The shorthand syntax for number validators is simply `date`. For example:
+
+```typescript
+import { date } from 'justus'
+
+const validator = object({
+  foo: date // anything that can be converted to `Date` will be!
+})
+```
