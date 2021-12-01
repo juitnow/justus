@@ -253,3 +253,47 @@ const result = validate(validator, something)
 
 result.foo // <- its type will be `any`
 ```
+
+
+Array Validator
+---------------
+
+Array validators are created using the `array` or `arrayOf` functions:
+
+```typescript
+import { array, arrayOf, number, string } from 'justus'
+
+const a1 = array() // validates any array
+const a2 = string({ maxItems: 10, items: string }) // array of strings
+const a3 = arrayOf(number) // array of numbers
+```
+
+#### Options
+
+* `maxItems?: number`: The _maximum_ number of elements a valid `Array`
+* `minItems?: number`: The _minimum_ number of elements a valid `Array`
+* `uniqueItems?: boolean`: Indicates if the `Array`'s elements must be unique
+* `items?: V`: The _type_ of each individual item in the `Array` */
+
+#### Shorthand syntax
+
+The shorthand syntax for string validators is simply `array`. For example:
+
+```typescript
+import { array } from 'justus'
+
+const validator = object({
+  foo: array // validate any array, of any length, containing anything
+})
+```
+
+The `arrayOf` function can also be considered a _shorthand_ of the full
+`array({ items: ... })`. For example the two following declarations are
+equivalent:
+
+```typescript
+import { array, arrayOf } from 'justus'
+
+const a1 = array({ items: string })
+const a2 = arrayOf(string) // same as above, just more readable
+```
