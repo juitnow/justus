@@ -333,3 +333,47 @@ const validator = object({
   foo: date // anything that can be converted to `Date` will be!
 })
 ```
+
+
+Tuple Validator
+---------------
+
+A _tuple_ is (by definition) _a finite ordered list (sequence) of elements_.
+
+Tuple validators are created using the `tuple` function:
+
+```typescript
+import { tuple, string, number, boolean } from 'justus'
+
+// Validates 3 elements tuple: (in order) a string, a number and a boolean
+const t1 = tuple([ string, number, boolean ])
+
+// Validates a tuple whose first element is a string, followed by zero or more
+// numbers, and wholse last element is a boolean
+const t2 = tuple([ string, ...number, boolean ]) // yay! rest parameters!
+```
+
+As shown above, any `Validator` (or one of its shorthands) can be used as a
+_rest parameter_ implying zero or more elements of the specified kind.
+
+A more complext example:
+
+```typescript
+import { tuple, string, number, object } from 'justus'
+
+const myObject = object({
+  version: number,
+  title: string,
+})
+
+// This is the silliest tuple ever written, but outlines our intentions:
+const sillyTuple = tuple([ 'start', ...myObject, 'end' ] as const)
+
+// Validate using our tuple:
+validate(tuple, [
+  'start', // yep, a constant
+  { version: 1, title: 'Hello world' },
+  { version: 2, title: 'Foo, bar and baz' },
+  'end', // the last
+])
+```
