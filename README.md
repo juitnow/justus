@@ -377,3 +377,139 @@ validate(tuple, [
   'end', // the last
 ])
 ```
+
+
+Object Validator
+----------------
+
+As seen in the examples above, object validators are created using the
+`object` function:
+
+```typescript
+import { object, string, number, boolean } from 'justus'
+
+const o1 = object() // any object (excluding null - darn JavaScript)
+const o2 = object({
+  foo: string, // any string
+  bar: number, // any number
+  baz: 'Hello, world!', // the constant "Hello, world!"
+} as const)
+```
+
+#### Shorthand syntax
+
+The shorthand syntax for object validators is simply `object`. For example:
+
+```typescript
+import { arrayOf, object } from 'justus'
+
+const validator = arrayOf(object) // won't validate if the array has numbers, strings, ...
+```
+
+#### Allow additional properties
+
+Sometimes it's necessary to allow additional properties in an object.
+
+Destructuring `...allowAdditionalProperties` in an objects does the trick!
+
+```typescript
+import { object, string, number, boolean } from 'justus'
+
+const o1 = object({
+  foo: string, // any string
+  bar: number, // any number
+  ...allowAdditionalProperties, // any other key will be "any"
+})
+
+const result1 = validate(o1, ... some object ...)
+
+result1.foo // <-- this will be a "string"
+result1.bar // <-- this will be a "number"
+result1.baz // <-- additional property, this will be "any"
+
+// additional properties with a type
+
+const o2 = object({
+  foo: string, // any string
+  bar: number, // any number
+  ...allowAdditionalProperties(boolean), // any other key will be "boolean"
+})
+
+const result2 = validate(o2, ... some object ...)
+
+result2.foo // <-- this will be a "string"
+result2.bar // <-- this will be a "number"
+result2.baz // <-- additional property, this will be "boolean"
+
+```
+
+Here `allowAdditionalProperties` is also a function, which can take some
+parameters to configure its behaviour:
+
+* `...allowAdditionalProperties`: default shorthand, allows additional
+  properties and will infer the `any` type for them.
+* `...allowAdditionalProperties()`: as a function, and same as above, it allows
+  additional properties and will infer the `any` type for them.
+* `...allowAdditionalProperties(true)`: as a function, and same as above, it
+  allows additional properties and will infer the `any` type for them.
+* `...allowAdditionalProperties(false)`: as a function, it _forbids_ any
+  additional property in objects, useful when extending objects (see below)
+* `...allowAdditionalProperties(... type ...)`: as a function, it allows
+  additional properties in objects and ensures their type is correct
+
+#### Extending objects
+
+Simply destructure one into another. For example:
+
+```typescript
+import { object, string, number, boolean } from 'justus'
+
+const o1 = object({
+  foo: string, // any string
+  bar: number, // any number
+})
+
+const o2 = object({
+  ...o1, // anything part of "o1" will be here as well!
+  bar: boolean, // here "bar" is no longer a number, but a boolean
+  baz: number, // add the "baz" property as a number
+} as const)
+```
+
+A slightly more complex scenario arises when considering additional properties
+in the base object, but forcedly forbidding them in an extend one.
+
+To do so, simply override in the extended object as follows:
+
+Simply destructure one into another. For example:
+
+```typescript
+import { object, string, number, boolean } from 'justus'
+
+const o1 = object({
+  foo: string, // any string
+  bar: number, // any number
+  ...allowAdditionalProperties(boolean), // any other property is a boolean
+})
+
+const o2 = object({
+  ...o1, // anything part of "o1" will be here as well!
+  baz: boolean, // add "baz" to "o1", forcing it to be a "boolean"
+  ...allowAdditionaProperties(false), // no more additional properties here!
+} as const)
+```
+
+#### Optional and read-only properties
+
+Optional and read-only properties can also be declared in objects:
+
+```typescript
+import { object, readonly, optional, string, number, boolean } from 'justus'
+
+const o1 = object({
+  foo: string, // any string, but must be a string
+  bar: optional(number), // optional property as "number | undefined"
+  baz: readonly(boolean), // read-only property as "readonly boolean"
+  xxx: readonly(optional(string)) // ... guess what it'll be?
+})
+```
