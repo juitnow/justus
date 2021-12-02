@@ -1,4 +1,4 @@
-import { Validator } from '../types'
+import { Branding, Validator } from '../types'
 import { assertSchema, assertValidation } from '../errors'
 import { makeTupleRestIterable } from './tuple'
 
@@ -16,6 +16,12 @@ export interface NumberConstraints {
   exclusiveMinimum?: number,
   /** Whether to allow `NaN` or not (default: `false`) */
   allowNaN?: boolean,
+}
+
+/** Constraints to validate a `number` with extra branding information. */
+export interface BrandedNumberConstraints<B extends string> extends NumberConstraints {
+  /** The _brand_ of the string (will generate a `__brand_${B}` type property */
+  brand: B
 }
 
 /** A `Validator` validating `number`s. */
@@ -122,6 +128,7 @@ const anyNumberValidator = new class extends Validator<number> {
 
 function _number(): Validator<number>
 function _number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N>
+function _number<B extends string>(constraints: BrandedNumberConstraints<B>): NumberValidator<number & Branding<B>>
 
 function _number(constraints?: NumberConstraints): Validator<number> {
   return constraints ? new NumberValidator(constraints) : anyNumberValidator

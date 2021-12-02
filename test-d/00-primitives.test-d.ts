@@ -40,3 +40,7 @@ type BrandedString = string & { __branded_string: never }
 
 expectType<BrandedNumber>(validate(number<BrandedNumber>(), null))
 expectType<BrandedString>(validate(string<BrandedString>(), null))
+
+// implicit branding
+expectType<never>(validate(number({ brand: 'test' }), null).__brand_test)
+expectType<never>(validate(string({ brand: 'test' }), null).__brand_test)

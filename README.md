@@ -118,6 +118,27 @@ const value = validate(uuidValidator, 'C274773D-1444-41E1-9D3A-9F9D584FE8B5')
 value = 'foo' // <- will fail, as "foo" is a `string`, while "value" is a `UUID`
 ```
 
+#### Implicit branding
+
+Sometimes it might be useful to declare the _branding_ of a string without
+recurring to an external type. We can easily do so by adding the `brand`
+property our string constraints. Following the example above:
+
+```typescript
+import { string } from 'justus'
+
+const uuidValidator = string({
+  pattern: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/,
+  minLength: 36,
+  maxLength: 36,
+  brand: 'uuid',
+})
+
+const value = validate(uuidValidator, 'C274773D-1444-41E1-9D3A-9F9D584FE8B5')
+
+value = 'foo' // <- fail! the type of "value" is "string & __brand_uuid: never"
+```
+
 #### Shorthand syntax
 
 The shorthand syntax for string validators is simply `string`. For example:
@@ -169,6 +190,26 @@ const priceValidator = number<Price>({
 const value = validate(priceValidator, 123.45)
 
 value = 432 // <- will fail, as 432 is a `number`, while "value" is a `Price`
+```
+
+#### Implicit branding
+
+Sometimes it might be useful to declare the _branding_ of a number without
+recurring to an external type. We can easily do so by adding the `brand`
+property our number constraints. Following the example above:
+
+```typescript
+import { number } from 'justus'
+
+const priceValidator = number({
+  multipleOf: 0.01, // cents, anyone? :-)
+  minimum: 0, // no negative prices, those are _discounts_
+  brand: 'price',
+})
+
+const value = validate(priceValidator, 123.45)
+
+value = 432 // <- fail! the type of "value" is "number & __brand_price: never"
 ```
 
 #### Shorthand syntax

@@ -296,3 +296,12 @@ type InferNever<S extends Schema> =
       never
     ] : never
   }
+
+/* ========================================================================== *
+ * TYPE BRANDING                                                              *
+ * ========================================================================== */
+
+/** Utility type to infer primitive branding according to a string */
+export type Branding<S extends string> = {
+  [ key in keyof { __brand: never } as `__brand_${S}` ] : never
+}

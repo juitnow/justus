@@ -1,4 +1,4 @@
-import { Validator } from '../types'
+import { Branding, Validator } from '../types'
 import { assertValidation, assertSchema } from '../errors'
 import { makeTupleRestIterable } from './tuple'
 
@@ -10,6 +10,12 @@ export interface StringConstraints {
   minLength?: number,
   /** A `RegExp` enforcing a particular pattern for a valid `string`: `pattern.test(value)` */
   pattern?: RegExp,
+}
+
+/** Constraints to validate a `string` with extra branding information. */
+export interface BrandedStringConstraints<B extends string> extends StringConstraints {
+  /** The _brand_ of the string (will generate a `__brand_${B}` type property */
+  brand: B
 }
 
 /** A `Validator` validating `string`s. */
@@ -61,6 +67,7 @@ const anyStringValidator = new class extends Validator<string> {
 
 function _string(): Validator<string>
 function _string<S extends string = string>(constraints?: StringConstraints): StringValidator<S>
+function _string<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
 
 function _string(constraints?: StringConstraints): Validator<string> {
   return constraints ? new StringValidator(constraints) : anyStringValidator
