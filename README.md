@@ -441,7 +441,6 @@ const result2 = validate(o2, ... some object ...)
 result2.foo // <-- this will be a "string"
 result2.bar // <-- this will be a "number"
 result2.baz // <-- additional property, this will be "boolean"
-
 ```
 
 Here `allowAdditionalProperties` is also a function, which can take some
@@ -497,6 +496,32 @@ const o2 = object({
   ...o1, // anything part of "o1" will be here as well!
   baz: boolean, // add "baz" to "o1", forcing it to be a "boolean"
   ...allowAdditionaProperties(false), // no more additional properties here!
+} as const)
+```
+
+#### Ensure properties never exist
+
+When allowing extra properties, or extending objects, we might want to validate
+the _non-existance_ of a specific property. We can do this setting a property
+to `never`:
+
+```typescript
+import { object, string, number, never } from 'justus'
+
+const o1 = object({
+  foo: string, // any string
+  bar: number, // any number
+})
+
+const o2 = object({
+  ...o1, // anything part of "o1" will be here as well!
+  bar: never, // remove "bar" from the properties inherited by "o1"
+} as const)
+
+const o3 = object({
+  ...o1, // anything part of "o1" will be here as well!
+  ...allowAdditionalProperties, // allow additional properties as "any"
+  baz: never, // even with additional properties, "baz" must not exist
 } as const)
 ```
 
