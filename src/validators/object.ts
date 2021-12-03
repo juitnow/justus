@@ -1,4 +1,13 @@
-import { additionalValidator, InferSchema, modifierValidator, never, Schema, schemaValidator, ValidationOptions, Validator } from '../types'
+import {
+  InferSchema,
+  Schema,
+  ValidationOptions,
+  Validator,
+  additionalValidator,
+  modifierValidator,
+  never,
+  schemaValidator,
+} from '../types'
 import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { getValidator } from '../utilities'
 import { isModifier } from '../schema'
@@ -27,8 +36,7 @@ export class AnyObjectValidator extends Validator<Record<string, any>> {
 export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>> {
   readonly schema: Readonly<S>
 
-  properties = new Map<string, ObjectProperty>()
-  neverProperties = new Set<string>()
+  properties = new Map<string, ObjectProperty | undefined>()
   additionalProperties?: Validator
 
   constructor(schema: S) {
@@ -41,7 +49,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
       const definition = properties[key]
 
       if (definition === never) {
-        this.neverProperties.add(key)
+        this.properties.set(key, undefined)
       } else if (isModifier(definition)) {
         this.properties.set(key, {
           validator: definition[modifierValidator],
@@ -64,7 +72,16 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
     const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
 
-    for (const [ key, { validator, optional } ] of this.properties.entries()) {
+    for (const [ key, property ] of this.properties.entries()) {
+      const { validator, optional } = property || {}
+
+      if (! validator) {
+        if (record[key] === undefined) continue
+        if (options.stripForbiddenProperties) continue
+        builder.record('Forbidden property', key)
+        continue
+      }
+
       if (record[key] === undefined) {
         if (! optional) builder.record('Required property missing', key)
         continue
@@ -77,15 +94,8 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
       }
     }
 
-    for (const key of this.neverProperties) {
-      if (record[key] === undefined) continue
-      if (options.stripForbiddenProperties) continue
-      builder.record('Forbidden property', key)
-    }
-
     const additional = this.additionalProperties
-    const additionalKeys = Object.keys(record).filter((k) =>
-      ! (this.properties.has(k) || this.neverProperties.has(k)))
+    const additionalKeys = Object.keys(record).filter((k) => !this.properties.has(k))
 
     if (additional) {
       additionalKeys.forEach((key) => {
