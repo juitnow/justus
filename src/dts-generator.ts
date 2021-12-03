@@ -13,6 +13,7 @@ import {
   DateValidator,
   getValidator,
   NumberValidator,
+  ObjectValidator,
   OneOfValidator,
   StringValidator,
   TupleValidator,
@@ -91,6 +92,12 @@ const recordType = ts.factory.createMappedTypeNode(
     undefined, // question token
     anyType, // type of the mapped key
     undefined) // members
+
+// Modifiers and tokens
+
+const readonlyKeyword = [ ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword) ]
+const optionalKeyword = ts.factory.createToken(ts.SyntaxKind.QuestionToken)
+
 
 /* ========================================================================== */
 
@@ -196,4 +203,36 @@ registerTypeGenerator(OneOfValidator, (validator) => {
   return ts.factory.createUnionTypeNode(members)
 })
 
-// TODO: ObjectValidator
+registerTypeGenerator(ObjectValidator, (validator) => {
+  const properties: ts.PropertySignature[] = []
+
+  for (const [ key, property ] of validator.properties.entries()) {
+    const { validator, readonly, optional } = property || { optional: true }
+    const type = validator ? generateTypeNode(validator) : neverType
+
+    const signature = ts.factory.createPropertySignature(
+          readonly ? readonlyKeyword : undefined,
+          key,
+          optional ? optionalKeyword : undefined,
+          type)
+
+    properties.push(signature)
+  }
+
+  if (validator.additionalProperties) {
+    const extra = ts.factory.createMappedTypeNode(
+        undefined, // readonly
+        ts.factory.createTypeParameterDeclaration('key', stringType),
+        undefined, // name type
+        undefined, // question token
+        generateTypeNode(validator.additionalProperties),
+        undefined) // members
+
+    if (properties.length == 0) return extra
+
+    const type = ts.factory.createTypeLiteralNode(properties)
+    return ts.factory.createIntersectionTypeNode([ type, extra ])
+  } else {
+    return ts.factory.createTypeLiteralNode(properties)
+  }
+})
