@@ -1,6 +1,22 @@
 import { expect } from 'chai'
-import { allOf, any, array, arrayOf, boolean, constant, date, number, object, oneOf, string } from '../src'
 import { generateTypes } from '../src/dts-generator'
+import {
+  allOf,
+  allowAdditionalProperties,
+  any,
+  array,
+  arrayOf,
+  boolean,
+  constant,
+  date,
+  never,
+  number,
+  object,
+  oneOf,
+  optional,
+  readonly,
+  string,
+} from '../src'
 
 describe('DTS Generation', () => {
   it('should generate the DTS for some basic types', () => {
@@ -134,5 +150,74 @@ describe('DTS Generation', () => {
     expect(generateTypes({
       test: oneOf(string, number, boolean),
     })).to.equal('type test = string | number | boolean;')
+  })
+
+  it('should generate the DTS for objects', () => {
+    expect(generateTypes({
+      test: object,
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { [key in string]: any; };')
+
+    expect(generateTypes({
+      test: object(),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { [key in string]: any; };')
+
+    expect(generateTypes({
+      test: object({}),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = {};')
+
+    expect(generateTypes({
+      test: object({
+        s: string,
+        n: number,
+        b: boolean,
+        x: null,
+      }),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { s: string; n: number; b: boolean; x: null; };')
+
+    expect(generateTypes({
+      test: object({
+        s: readonly(string),
+        n: optional(number),
+        ro: readonly(optional('RO')),
+        or: optional(readonly('OR')),
+        x: never,
+      }),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { readonly s: string; n?: number; readonly ro?: "RO"; readonly or?: "OR"; x?: never; };')
+
+    expect(generateTypes({
+      test: object({
+        s: string,
+        ...allowAdditionalProperties,
+      }),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { s: string; } & { [key in string]: any; };')
+
+    expect(generateTypes({
+      test: object({
+        s: string,
+        ...allowAdditionalProperties(),
+      }),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { s: string; } & { [key in string]: any; };')
+
+    expect(generateTypes({
+      test: object({
+        s: string,
+        ...allowAdditionalProperties(number),
+      }),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { s: string; } & { [key in string]: number; };')
+
+    expect(generateTypes({
+      test: object({
+        ...allowAdditionalProperties(number),
+      }),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('type test = { [key in string]: number; };')
   })
 })
