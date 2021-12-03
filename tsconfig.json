@@ -9,7 +9,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "emitDeclarationOnly": true,
     "allowJs": false,
   },
