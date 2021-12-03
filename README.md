@@ -103,7 +103,7 @@ const s2 = string({ minLength: 1 }) // validate non empty strings
 Type _branding_ can be used for string primitives. For example:
 
 ```typescript
-import { string } from 'justus'
+import { string, validate } from 'justus'
 
 type UUID = string & { __brand_uuid: never }
 
