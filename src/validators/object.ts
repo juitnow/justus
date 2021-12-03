@@ -8,6 +8,12 @@ import { makeTupleRestIterable } from './tuple'
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
 
+type ObjectProperty = {
+  validator: Validator,
+  readonly?: true,
+  optional?: true,
+}
+
 /** A `Validator` validating any `object`. */
 export class AnyObjectValidator extends Validator<Record<string, any>> {
   validate(value: unknown): Record<string, any> {
@@ -21,26 +27,29 @@ export class AnyObjectValidator extends Validator<Record<string, any>> {
 export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>> {
   readonly schema: Readonly<S>
 
-  #additionalProperties?: Validator
-  #requiredProperties: Record<string, Validator<any>> = {}
-  #optionalProperties: Record<string, Validator<any>> = {}
-  #neverProperties: Set<string> = new Set<string>()
+  properties = new Map<string, ObjectProperty>()
+  neverProperties = new Set<string>()
+  additionalProperties?: Validator
 
   constructor(schema: S) {
     super()
     const { [additionalValidator]: additional, ...properties } = schema
 
-    if (additional) this.#additionalProperties = getValidator(additional)
+    if (additional) this.additionalProperties = getValidator(additional)
 
     for (const key of Object.keys(properties)) {
       const definition = properties[key]
 
       if (definition === never) {
-        this.#neverProperties.add(key)
+        this.neverProperties.add(key)
       } else if (isModifier(definition)) {
-        (definition.optional ? this.#optionalProperties : this.#requiredProperties)[key] = definition[modifierValidator]
+        this.properties.set(key, {
+          validator: definition[modifierValidator],
+          readonly: definition.readonly,
+          optional: definition.optional,
+        })
       } else {
-        this.#requiredProperties[key] = getValidator(definition)
+        this.properties.set(key, { validator: getValidator(definition) })
       }
     }
 
@@ -55,9 +64,9 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
     const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
 
-    for (const [ key, validator ] of Object.entries(this.#requiredProperties)) {
+    for (const [ key, { validator, optional } ] of this.properties.entries()) {
       if (record[key] === undefined) {
-        builder.record('Required property missing', key)
+        if (! optional) builder.record('Required property missing', key)
         continue
       }
 
@@ -68,29 +77,15 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
       }
     }
 
-    for (const [ key, validator ] of Object.entries(this.#optionalProperties)) {
-      if (record[key] === undefined) continue
-
-      try {
-        clone[key] = validator.validate(record[key], options)
-      } catch (error) {
-        builder.record(error, key)
-      }
-    }
-
-    for (const key of this.#neverProperties) {
+    for (const key of this.neverProperties) {
       if (record[key] === undefined) continue
       if (options.stripForbiddenProperties) continue
       builder.record('Forbidden property', key)
     }
 
-    const additional = this.#additionalProperties
-    const additionalKeys = Object.keys(record).filter((k) => {
-      if (k in this.#requiredProperties) return false
-      if (k in this.#optionalProperties) return false
-      if (this.#neverProperties.has(k)) return false
-      return true
-    })
+    const additional = this.additionalProperties
+    const additionalKeys = Object.keys(record).filter((k) =>
+      ! (this.properties.has(k) || this.neverProperties.has(k)))
 
     if (additional) {
       additionalKeys.forEach((key) => {
