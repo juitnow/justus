@@ -96,8 +96,8 @@ describe('Object modifiers', () => {
     expect(() => validate(schema1, { foo: 'hello', bar: 40, baz: 60 }))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').eql([
-          { path: [ 'baz' ], message: 'Number is greater than 50' },
           { path: [ 'bar' ], message: 'Number is less than 50' },
+          { path: [ 'baz' ], message: 'Number is greater than 50' },
         ])
   })
 })
