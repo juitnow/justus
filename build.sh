@@ -12,14 +12,33 @@ mkdir -p build dist
 tsc
 
 # Prep sources and tests
-find "src" "test" -type f -name "*.ts" -print0 | \
+esbuild \
+  --format=cjs \
+  --platform=node \
+  --target=node16 \
+  --sourcemap \
+  --sources-content=false \
+  --bundle \
+  --outfile=build/src/index.js \
+  src/index.ts
+
+esbuild \
+  --format=cjs \
+  --platform=node \
+  --target=node16 \
+  --sourcemap \
+  --sources-content=false \
+  --outfile=build/src/dts-generator.js \
+  src/dts-generator.ts
+
+find "test" -type f -name "*.ts" -print0 | \
   xargs -0 esbuild \
     --format=cjs \
     --platform=node \
     --target=node16 \
     --sourcemap \
     --sources-content=false \
-    --outdir=build
+    --outdir=build/test
 
 # Run tests and collect coverage
 nyc --reporter=html --reporter=text mocha 'build/test/**/*.js'
@@ -50,3 +69,23 @@ esbuild \
   --bundle \
   --outfile=dist/index.mjs \
   src/index.ts
+
+esbuild \
+  --format=cjs \
+  --platform=node \
+  --target=node16 \
+  --sourcemap \
+  --sources-content=false \
+  --outfile=dist/dts-generator.cjs \
+  src/dts-generator.ts
+
+esbuild \
+  --format=esm \
+  --platform=node \
+  --target=node16 \
+  --sourcemap \
+  --sources-content=false \
+  --outfile=dist/dts-generator.mjs \
+  src/dts-generator.ts
+
+cp build/types/dts-generator.d.ts dist/dts-generator.d.ts
