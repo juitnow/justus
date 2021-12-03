@@ -75,6 +75,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
     for (const [ key, property ] of this.properties.entries()) {
       const { validator, optional } = property || {}
 
+      // no validator? this is "never" (forbidden)
       if (! validator) {
         if (record[key] === undefined) continue
         if (options.stripForbiddenProperties) continue
@@ -82,11 +83,13 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
         continue
       }
 
+      // no value? might be optional, but definitely not validated
       if (record[key] === undefined) {
         if (! optional) builder.record('Required property missing', key)
         continue
       }
 
+      // all the rest gets validated normally
       try {
         clone[key] = validator.validate(record[key], options)
       } catch (error) {
@@ -94,8 +97,8 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
       }
     }
 
-    const additional = this.additionalProperties
     const additionalKeys = Object.keys(record).filter((k) => !this.properties.has(k))
+    const additional = this.additionalProperties
 
     if (additional) {
       additionalKeys.forEach((key) => {
