@@ -19,7 +19,7 @@ import {
   TupleValidator,
   Validation,
   Validator,
-} from '.'
+} from './index'
 
 /* ========================================================================== *
  * LOCAL TYPES                                                                *
