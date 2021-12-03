@@ -4,32 +4,36 @@ import { assertValidation, ValidationError } from '../errors'
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
 
+interface TupleMember { single: boolean, validator: Validator }
+
 /** A `Validator` for _tuples_. */
 export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
+  readonly members: readonly TupleMember[]
   readonly tuple: T
-
-  #validators: ({ single: boolean, validator: Validator })[] = []
 
   constructor(tuple: T) {
     super()
 
-    this.tuple = tuple
+    const members: TupleMember[] = []
     for (const item of tuple) {
       if (item === null) { // god knows why typeof null === "object"
-        this.#validators.push({ single: true, validator: nullValidator })
+        members.push({ single: true, validator: nullValidator })
       } else if ((typeof item === 'object') && (restValidator in item)) {
-        this.#validators.push({ single: false, validator: (<any>item)[restValidator] })
+        members.push({ single: false, validator: (<any>item)[restValidator] })
       } else {
-        this.#validators.push({ single: true, validator: getValidator(item) })
+        members.push({ single: true, validator: getValidator(item) })
       }
     }
+
+    this.members = members
+    this.tuple = tuple
   }
 
   validate(value: unknown, options: ValidationOptions): InferTuple<T> {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
 
     // Empty tuples
-    if (this.#validators.length === 0) {
+    if (this.members.length === 0) {
       const size = value.length
       assertValidation(size === 0, `Found ${size} element${size === 1 ? '' : 's'} validating empty tuple`)
       return value as InferTuple<T>
@@ -39,24 +43,24 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
     const clone = new Array(value.length)
     let needle = 0
     let haystack = 0
-    let { single, validator } = this.#validators[needle]
+    let { single, validator } = this.members[needle]
 
-    while ((needle < this.#validators.length) && (haystack < value.length)) {
+    while ((needle < this.members.length) && (haystack < value.length)) {
       try {
         clone[haystack] = validator.validate(value[haystack], options)
-        if (single) ({ single, validator } = this.#validators[++ needle] || {})
+        if (single) ({ single, validator } = this.members[++ needle] || {})
         haystack ++
       } catch (error) {
         if (single) throw new ValidationError(error, [ haystack ])
-        else ({ single, validator } = this.#validators[++ needle] || {})
+        else ({ single, validator } = this.members[++ needle] || {})
       }
     }
 
-    while ((needle < this.#validators.length) && (this.#validators[needle].single === false)) {
+    while ((needle < this.members.length) && (this.members[needle].single === false)) {
       needle ++
     }
 
-    const missing = this.#validators.length - needle
+    const missing = this.members.length - needle
     if ((missing === 1) && single) {
       throw new ValidationError('Tuple defines 1 missing validation')
     } else if (missing > 1) {

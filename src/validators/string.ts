@@ -18,11 +18,20 @@ export interface BrandedStringConstraints<B extends string> extends StringConstr
   brand: B
 }
 
-/** A `Validator` validating `string`s. */
+/** A `Validator` validating any `string`. */
+export class AnyStringValidator extends Validator<string> {
+  validate(value: unknown): string {
+    assertValidation(typeof value == 'string', 'Value is not a "string"')
+    return value
+  }
+}
+
+/** A `Validator` validating `string`s with constraints. */
 export class StringValidator<S extends string = string> extends Validator<S> {
   readonly maxLength: number
   readonly minLength: number
   readonly pattern?: RegExp
+  readonly brand?: string
 
   constructor(constraints: StringConstraints = {}) {
     super()
@@ -32,6 +41,8 @@ export class StringValidator<S extends string = string> extends Validator<S> {
       maxLength = Number.MAX_SAFE_INTEGER,
       pattern,
     } = constraints
+
+    if ('brand' in constraints) this.brand = (<any> constraints).brand
 
     assertSchema(minLength >= 0, `Constraint "minLength" (${minLength}) must be non-negative`)
     assertSchema(maxLength >= 0, `Constraint "maxLength" (${maxLength}) must be non-negative`)
@@ -58,12 +69,7 @@ export class StringValidator<S extends string = string> extends Validator<S> {
   }
 }
 
-const anyStringValidator = new class extends Validator<string> {
-  validate(value: unknown): string {
-    assertValidation(typeof value == 'string', 'Value is not a "string"')
-    return value
-  }
-}
+const anyStringValidator = new AnyStringValidator()
 
 function _string(): Validator<string>
 function _string<S extends string = string>(constraints?: StringConstraints): StringValidator<S>

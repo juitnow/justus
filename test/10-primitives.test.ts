@@ -212,6 +212,12 @@ describe('Primitive validators', () => {
       const validator = new NumberValidator()
       expect(validate(validator, 12345)).to.equal(12345)
     })
+
+    it('should support implicit branding', () => {
+      const validator = number({ brand: 'foo' })
+      expect(validate(validator, 12345)).to.equal(12345)
+      expect(validator.brand).to.equal('foo')
+    })
   })
 
   describe('string', () => {
@@ -263,6 +269,12 @@ describe('Primitive validators', () => {
     it('should validate a string using the StringValidator class', () => {
       const validator = new StringValidator()
       expect(validate(validator, 'foo')).to.equal('foo')
+    })
+
+    it('should support implicit branding', () => {
+      const validator = string({ brand: 'foo' })
+      expect(validate(validator, 'foo')).to.equal('foo')
+      expect(validator.brand).to.equal('foo')
     })
   })
 })

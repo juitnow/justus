@@ -20,9 +20,16 @@ export interface ArrayConstraints<V extends Validation> {
   items?: V,
 }
 
-/**
- * A validator for `Array` instances.
- */
+/** Basic validator for `Array` instances. */
+export class AnyArrayValidator<T = any> extends Validator<T[]> {
+  validate(value: unknown, options: ValidationOptions): T[] {
+    void options
+    assertValidation(Array.isArray(value), 'Value is not an "array"')
+    return [ ...value ]
+  }
+}
+
+/** A validator for `Array` instances with constraints. */
 export class ArrayValidator<T> extends Validator<T[]> {
   readonly maxItems: number
   readonly minItems: number
@@ -80,12 +87,7 @@ export class ArrayValidator<T> extends Validator<T[]> {
   }
 }
 
-const anyArrayValidator = new class extends Validator<any[]> {
-  validate(value: unknown): any[] {
-    assertValidation(Array.isArray(value), 'Value is not an "array"')
-    return value
-  }
-}
+const anyArrayValidator = new AnyArrayValidator()
 
 /* -------------------------------------------------------------------------- */
 

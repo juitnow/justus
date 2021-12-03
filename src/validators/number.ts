@@ -24,7 +24,16 @@ export interface BrandedNumberConstraints<B extends string> extends NumberConstr
   brand: B
 }
 
-/** A `Validator` validating `number`s. */
+/** A `Validator` validating any `number`. */
+export class AnyNumberValidator extends Validator<number> {
+  validate(value: unknown): number {
+    assertValidation(typeof value == 'number', 'Value is not a "number"')
+    assertValidation(! isNaN(value), 'Number is "NaN"')
+    return value
+  }
+}
+
+/** A `Validator` validating `number`s with constaints. */
 export class NumberValidator<N extends number = number> extends Validator<N> {
   #isMultipleOf?: ((value: number) => boolean)
 
@@ -34,6 +43,7 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
   readonly maximum: number
   readonly minimum: number
   readonly multipleOf?: number
+  readonly brand?: string
 
   constructor(constraints: NumberConstraints = {}) {
     super()
@@ -46,6 +56,8 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
       minimum = Number.NEGATIVE_INFINITY,
       multipleOf,
     } = constraints
+
+    if ('brand' in constraints) this.brand = (<any> constraints).brand
 
     assertSchema(maximum >= minimum, `Constraint "minimum" (${minimum}) is greater than "maximum" (${maximum})`)
 
@@ -118,13 +130,7 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
   static readonly PRECISION = 1000000
 }
 
-const anyNumberValidator = new class extends Validator<number> {
-  validate(value: unknown): number {
-    assertValidation(typeof value == 'number', 'Value is not a "number"')
-    assertValidation(! isNaN(value), 'Number is "NaN"')
-    return value
-  }
-}
+const anyNumberValidator = new AnyNumberValidator()
 
 function _number(): Validator<number>
 function _number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N>
