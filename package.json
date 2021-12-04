@@ -10,6 +10,7 @@
       "require": "./dist/index.js"
     },
     "./dts-generator": {
+      "import": "./dist/dts-generator.mjs",
       "require": "./dist/dts-generator.js"
     }
   },
