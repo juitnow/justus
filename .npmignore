@@ -1,10 +1,10 @@
-
 *.bak
 *.svg
 *.tgz
 .*
 api-extractor.json
 build.sh
+build.ts
 build/
 coverage/
 node_modules/
