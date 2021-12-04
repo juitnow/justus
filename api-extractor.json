@@ -7,7 +7,7 @@
 
   "dtsRollup": {
     "enabled": true,
-    "untrimmedFilePath": "<projectFolder>/dist/index.d.ts"
+    "untrimmedFilePath": "<projectFolder>./index.d.ts"
   },
 
   "docModel": {

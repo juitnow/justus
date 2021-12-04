@@ -48,6 +48,8 @@ eslint src test test-d
 
 # Extract and bundle our DTS
 api-extractor run
+cp build/types/dts-generator.d.ts ./dts-generator.d.ts
+
 
 # Prepare distribution bundles for MJS and CJS
 esbuild \
@@ -57,7 +59,7 @@ esbuild \
   --sourcemap \
   --sources-content=false \
   --bundle \
-  --outfile=dist/index.cjs \
+  --outfile=dist/index.js \
   src/index.ts
 
 esbuild \
@@ -70,22 +72,12 @@ esbuild \
   --outfile=dist/index.mjs \
   src/index.ts
 
+# Our "dts-bundler" works only with "require" (for now)
 esbuild \
   --format=cjs \
   --platform=node \
   --target=node16 \
   --sourcemap \
   --sources-content=false \
-  --outfile=dist/dts-generator.cjs \
+  --outfile=dist/dts-generator.js \
   src/dts-generator.ts
-
-esbuild \
-  --format=esm \
-  --platform=node \
-  --target=node16 \
-  --sourcemap \
-  --sources-content=false \
-  --outfile=dist/dts-generator.mjs \
-  src/dts-generator.ts
-
-cp build/types/dts-generator.d.ts dist/dts-generator.d.ts
