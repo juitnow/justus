@@ -1,5 +1,5 @@
+import { date, validate, ValidationError } from '../src/index'
 import { expect } from 'chai'
-import { date, validate, ValidationError } from '../src'
 
 describe('Date validator', () => {
   it('should validate a simple date', () => {

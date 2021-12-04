@@ -1,4 +1,4 @@
-import { ValidationError, assertSchema, assertValidation, ValidationErrorBuilder } from '../src'
+import { ValidationError, assertSchema, assertValidation, ValidationErrorBuilder } from '../src/index'
 import { expect } from 'chai'
 
 describe('Errors', () => {

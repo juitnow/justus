@@ -1,5 +1,5 @@
-import { expect } from 'chai'
 import { generateTypes } from '../src/dts-generator'
+import { expect } from 'chai'
 import {
   allOf,
   allowAdditionalProperties,
@@ -16,7 +16,7 @@ import {
   optional,
   readonly,
   string,
-} from '../src'
+} from '../src/index'
 
 describe('DTS Generation', () => {
   it('should generate the DTS for some basic types', () => {

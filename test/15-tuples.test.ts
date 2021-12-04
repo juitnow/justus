@@ -1,5 +1,5 @@
+import { boolean, number, string, tuple, validate, ValidationError } from '../src/index'
 import { expect } from 'chai'
-import { boolean, number, string, tuple, validate, ValidationError } from '../src'
 
 describe('Tuple validator', () => {
   it('should not validate non-arrays', () => {

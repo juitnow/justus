@@ -1,5 +1,5 @@
+import { arrayOf, date, object, tuple, validate } from '../src/index'
 import { expect } from 'chai'
-import { arrayOf, date, object, tuple, validate } from '../src'
 
 describe('Type conversion', () => {
   it('should convert types in arrays', () => {

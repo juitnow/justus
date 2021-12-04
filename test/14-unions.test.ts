@@ -1,5 +1,5 @@
+import { allOf, number, oneOf, string, validate, ValidationError } from '../src/index'
 import { expect } from 'chai'
-import { allOf, number, oneOf, string, validate, ValidationError } from '../src'
 
 describe('Union validators', () => {
   it('should validate one of the given options', () => {
