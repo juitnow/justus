@@ -1,11 +1,13 @@
 import {
   InferSchema,
   Schema,
+  TupleRestParameter,
   ValidationOptions,
   Validator,
   additionalValidator,
   modifierValidator,
   never,
+  restValidator,
   schemaValidator,
 } from '../types'
 import { assertValidation, ValidationErrorBuilder } from '../errors'
@@ -122,13 +124,20 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
 const anyObjectValidator = new AnyObjectValidator()
 
 function _object(): Validator<Record<string, any>>
-function _object<S extends Schema>(schema: S): S
+function _object<S extends Schema>(schema: S): S & {
+  [Symbol.iterator](): Generator<TupleRestParameter<InferSchema<S>>>
+}
 function _object(schema?: Schema): Validator<Record<string, any>> | Schema {
   if (! schema) return anyObjectValidator
 
-  return Object.defineProperty(schema, schemaValidator, {
-    value: new ObjectValidator(schema),
-    enumerable: false,
+  const validator = new ObjectValidator(schema)
+  function* iterator(): Generator<TupleRestParameter> {
+    yield { [restValidator]: validator }
+  }
+
+  return Object.defineProperties(schema, {
+    [schemaValidator]: { value: validator, enumerable: false },
+    [Symbol.iterator]: { value: iterator, enumerable: false },
   })
 }
 

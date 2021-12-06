@@ -1,4 +1,4 @@
-import { boolean, number, string, tuple, validate, ValidationError } from '../src/index'
+import { boolean, number, object, string, tuple, validate, ValidationError } from '../src/index'
 import { expect } from 'chai'
 
 describe('Tuple validator', () => {
@@ -31,7 +31,8 @@ describe('Tuple validator', () => {
   it('should validate a simple tuple', () => {
     const validator = tuple([ string, number, boolean ])
 
-    expect(validate(validator, [ 'foo', 123, true ])).to.eql([ 'foo', 123, true ])
+    expect(validate(validator, [ 'foo', 123, true ]))
+        .to.eql([ 'foo', 123, true ])
 
     expect(() => validate(validator, [ 123 ]))
         .to.throw(ValidationError, 'Found 1 validation error')
@@ -91,9 +92,30 @@ describe('Tuple validator', () => {
 
   it('should validate a tuple with only rest parameters', () => {
     const v1 = tuple([ ...string, ...number ])
-    expect(validate(v1, [ 'foo', 'bar', 123, 456 ])).to.eql([ 'foo', 'bar', 123, 456 ])
-    expect(validate(v1, [ 'foo', 'bar' ])).to.eql([ 'foo', 'bar' ])
-    expect(validate(v1, [ 123, 456 ])).to.eql([ 123, 456 ])
-    expect(validate(v1, [])).to.eql([])
+    expect(validate(v1, [ 'foo', 'bar', 123, 456 ]))
+        .to.eql([ 'foo', 'bar', 123, 456 ])
+
+    expect(validate(v1, [ 'foo', 'bar' ]))
+        .to.eql([ 'foo', 'bar' ])
+
+    expect(validate(v1, [ 123, 456 ]))
+        .to.eql([ 123, 456 ])
+
+    expect(validate(v1, []))
+        .to.eql([])
+  })
+
+  it('should validate a tuple with an object rest parameter', () => {
+    const o1 = object({ foo: string } as const)
+    const v1 = tuple([ number, ...o1, boolean ])
+
+    expect(validate(v1, [ 123, true ]))
+        .to.eql([ 123, true ])
+
+    expect(validate(v1, [ 123, { foo: 'bar' }, true ]))
+        .to.eql([ 123, { foo: 'bar' }, true ])
+
+    expect(validate(v1, [ 123, { foo: 'bar' }, { foo: 'baz' }, true ]))
+        .to.eql([ 123, { foo: 'bar' }, { foo: 'baz' }, true ])
   })
 })

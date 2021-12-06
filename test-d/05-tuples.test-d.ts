@@ -93,8 +93,31 @@ expectType<[ string, number ]>(result[9])
 
 expectType<string>(result[1][0])
 expectType<number>(result[1][1])
-// ??? why ??? expectError(result[1][2])
 
 expectType<string>(result[9][0])
 expectType<number>(result[9][1])
-// ??? why ??? expectError(result[9][2])
+
+// objects in tuples
+const testObject = object({ foo: string })
+
+const tuple3 = tuple([ string, testObject ] as const)
+const result3 = validate(tuple3, null)
+
+expectAssignable<[ string, { foo: string }]>(result3)
+expectType<string>(result3[0])
+
+expectAssignable<{ foo: string }>(result3[1])
+expectType<string>(result3[1].foo)
+
+// objects in tuples as rest parameters
+const tuple4 = tuple([ string, ...testObject ] as const)
+const result4 = validate(tuple4, null)
+
+expectAssignable<[ string, ...({ foo: string })[]]>(result4)
+expectType<string>(result4[0])
+
+expectAssignable<{ foo: string }>(result4[1])
+expectType<string>(result4[1].foo)
+
+expectAssignable<{ foo: string }>(result4[999])
+expectType<string>(result4[999].foo)
