@@ -38,7 +38,7 @@ You can use JUSTUS in your projects quite simply: import, write a schema and
 validate. For example:
 
 ```typescript
-import { validate, object, string, number } from 'justus'
+import { number, object, string, validate } from 'justus'
 
 // Create a validator, validating _objects_ with a specific schema
 const validator = object({
@@ -68,6 +68,8 @@ The `validate` function (or anywhere a _validation_ is needed) can accept a
 _shorthand_ inline syntax. From our example above:
 
 ```typescript
+import { number, string, validate } from 'justus'
+
 const validated = validate({
   foo: string({ minLength: 1 }),
   bar: number,
@@ -125,7 +127,7 @@ recurring to an external type. We can easily do so by adding the `brand`
 property our string constraints. Following the example above:
 
 ```typescript
-import { string } from 'justus'
+import { string, validate } from 'justus'
 
 const uuidValidator = string({
   pattern: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/,
@@ -144,7 +146,7 @@ value = 'foo' // <- fail! the type of "value" is "string & __brand_uuid: never"
 The shorthand syntax for string validators is simply `string`. For example:
 
 ```typescript
-import { string } from 'justus'
+import { object, string } from 'justus'
 
 const validator = object({
   foo: string // yep, no parenthesis, just "string"
@@ -178,7 +180,7 @@ const n2 = number({ minimum: 123 }) // validate numbers 123 and greater
 Type _branding_ can be used for number primitives. For example:
 
 ```typescript
-import { number } from 'justus'
+import { number, validate } from 'justus'
 
 type Price = number & { __brand_price: never }
 
@@ -199,7 +201,7 @@ recurring to an external type. We can easily do so by adding the `brand`
 property our number constraints. Following the example above:
 
 ```typescript
-import { number } from 'justus'
+import { number, validate } from 'justus'
 
 const priceValidator = number({
   multipleOf: 0.01, // cents, anyone? :-)
@@ -217,7 +219,7 @@ value = 432 // <- fail! the type of "value" is "number & __brand_price: never"
 The shorthand syntax for number validators is simply `number`. For example:
 
 ```typescript
-import { number } from 'justus'
+import { number, object } from 'justus'
 
 const validator = object({
   foo: number // yep, no parenthesis, just "number"
@@ -306,7 +308,7 @@ Array validators are created using the `array` or `arrayOf` functions:
 import { array, arrayOf, number, string } from 'justus'
 
 const a1 = array() // validates any array
-const a2 = string({ maxItems: 10, items: string }) // array of strings
+const a2 = array({ maxItems: 10, items: string }) // array of strings
 const a3 = arrayOf(number) // array of numbers
 ```
 
@@ -322,7 +324,7 @@ const a3 = arrayOf(number) // array of numbers
 The shorthand syntax for string validators is simply `array`. For example:
 
 ```typescript
-import { array } from 'justus'
+import { array, object } from 'justus'
 
 const validator = object({
   foo: array // validate any array, of any length, containing anything
@@ -334,7 +336,7 @@ The `arrayOf` function can also be considered a _shorthand_ of the full
 equivalent:
 
 ```typescript
-import { array, arrayOf } from 'justus'
+import { array, arrayOf, string } from 'justus'
 
 const a1 = array({ items: string })
 const a2 = arrayOf(string) // same as above, just more readable
@@ -369,7 +371,7 @@ const d2 = date({ format: 'iso' }) // validate ISO dates
 The shorthand syntax for number validators is simply `date`. For example:
 
 ```typescript
-import { date } from 'justus'
+import { date, object } from 'justus'
 
 const validator = object({
   foo: date // anything that can be converted to `Date` will be!
@@ -398,10 +400,10 @@ const t2 = tuple([ string, ...number, boolean ]) // yay! rest parameters!
 As shown above, any `Validator` (or one of its shorthands) can be used as a
 _rest parameter_ implying zero or more elements of the specified kind.
 
-A more complext example:
+A more complex example:
 
 ```typescript
-import { tuple, string, number, object } from 'justus'
+import { number, object, string, tuple, validate } from 'justus'
 
 const myObject = object({
   version: number,
@@ -412,7 +414,7 @@ const myObject = object({
 const sillyTuple = tuple([ 'start', ...myObject, 'end' ] as const)
 
 // Validate using our tuple:
-validate(tuple, [
+validate(sillyTuple, [
   'start', // yep, a constant
   { version: 1, title: 'Hello world' },
   { version: 2, title: 'Foo, bar and baz' },
@@ -455,7 +457,7 @@ Sometimes it's necessary to allow additional properties in an object.
 Destructuring `...allowAdditionalProperties` in an objects does the trick!
 
 ```typescript
-import { object, string, number, boolean } from 'justus'
+import { allowAdditionalProperties, boolean, number, object, string, validate } from 'justus'
 
 const o1 = object({
   foo: string, // any string
@@ -463,7 +465,7 @@ const o1 = object({
   ...allowAdditionalProperties, // any other key will be "any"
 })
 
-const result1 = validate(o1, ... some object ...)
+const result1 = validate(o1, something)
 
 result1.foo // <-- this will be a "string"
 result1.bar // <-- this will be a "number"
@@ -477,7 +479,7 @@ const o2 = object({
   ...allowAdditionalProperties(boolean), // any other key will be "boolean"
 })
 
-const result2 = validate(o2, ... some object ...)
+const result2 = validate(o2, something)
 
 result2.foo // <-- this will be a "string"
 result2.bar // <-- this will be a "number"
@@ -525,7 +527,7 @@ To do so, simply override in the extended object as follows:
 Simply destructure one into another. For example:
 
 ```typescript
-import { object, string, number, boolean } from 'justus'
+import { allowAdditionalProperties, boolean, number, object, string } from 'justus'
 
 const o1 = object({
   foo: string, // any string
@@ -536,7 +538,7 @@ const o1 = object({
 const o2 = object({
   ...o1, // anything part of "o1" will be here as well!
   baz: boolean, // add "baz" to "o1", forcing it to be a "boolean"
-  ...allowAdditionaProperties(false), // no more additional properties here!
+  ...allowAdditionalProperties(false), // no more additional properties here!
 } as const)
 ```
 
@@ -547,7 +549,7 @@ the _non-existance_ of a specific property. We can do this setting a property
 to `never`:
 
 ```typescript
-import { object, string, number, never } from 'justus'
+import { allowAdditionalProperties, never, number, object, string } from 'justus'
 
 const o1 = object({
   foo: string, // any string
@@ -591,28 +593,28 @@ functions.
 To make sure all validations pass use `allOf`:
 
 ```typescript
-import { allOf, object, string, number } from 'justus'
+import { allOf, number, object, string, validate } from 'justus'
 
 const o1 = object({ foo: string })
 const o2 = object({ bar: number })
 
-const result = validate(allOf(o1, o2), ... some object ...)
+const result = validate(allOf(o1, o2), something)
 // result here will have the type of what's inferred by o1 _and_ o2
 
 result.foo // <-- this is a "string"
 result.bar // <-- this is a "number"
 
 // be careful about never!
-const result2 = validate(allOf(number, string), ... some primitive ...)
+const result2 = validate(allOf(number, string), something)
 // obviously "result2" will be of type "never" as "number" and "string" do not match!
 ```
 
 More useful, to make sure all validations pass use `oneOf`:
 
 ```typescript
-import { oneOf, string, number } from 'justus'
+import { number, oneOf, string, validate } from 'justus'
 
-const result = validate(oneOf(number, string), ... some primitive ...)
+const result = validate(oneOf(number, string), something)
 
 result // <-- its type will be "number | string"
 ```
@@ -628,16 +630,7 @@ Let's assume we have some _time series_ data, but we can expect this in a
 couple of different flavors, either V1 or V2 with some subtle differences:
 
 ```typescript
-import {
-  arrayOf,
-  date,
-  number,
-  object,
-  oneOf,
-  string,
-  tuple,
-  validate,
-} from '../src'
+import { arrayOf, date, number, object, oneOf, string, tuple, validate } from 'justus'
 
 // Our V1 time-series tuple is simply a timestamp followed by a numeric value
 const entryv1 = tuple([ date, number ] as const)
