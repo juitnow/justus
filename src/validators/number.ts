@@ -127,7 +127,8 @@ const anyNumberValidator = new class extends Validator<number> {
 }
 
 function _number(): Validator<number>
-function _number<N extends number = number>(constraints?: NumberConstraints): NumberValidator<N>
+function _number(constraints?: NumberConstraints): NumberValidator<number>
+function _number<N extends number>(constraints?: NumberConstraints): NumberValidator<N>
 function _number<B extends string>(constraints: BrandedNumberConstraints<B>): NumberValidator<number & Branding<B>>
 
 function _number(constraints?: NumberConstraints): Validator<number> {

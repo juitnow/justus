@@ -66,7 +66,8 @@ const anyStringValidator = new class extends Validator<string> {
 }
 
 function _string(): Validator<string>
-function _string<S extends string = string>(constraints?: StringConstraints): StringValidator<S>
+function _string(constraints?: StringConstraints): StringValidator<string>
+function _string<S extends string>(constraints?: StringConstraints): StringValidator<S>
 function _string<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
 
 function _string(constraints?: StringConstraints): Validator<string> {

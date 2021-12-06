@@ -67,39 +67,35 @@ expectAssignable<{
 }>(o2)
 
 // -------------------------------------------------------------------------- //
+// constructed validators
+const o3 = validate(object({
+  n: number({}),
+  s: string({}),
+  a: array({ items: string({}) }),
+  o: object({ x: string({}) }),
+}), null)
+
+expectType<number>(o3.n)
+expectType<string>(o3.s)
+expectType<string[]>(o3.a)
+expectType<string>(o3.o.x)
+
+expectAssignable<{
+  n: number,
+  s: string,
+  a: string[],
+  o: { x : string },
+}>(o3)
+
+// -------------------------------------------------------------------------- //
 // constants
 
-const o3 = validate(object({
+const o4 = validate(object({
   z: constant(null),
   t: constant(true),
   f: constant(false),
   n: constant(12345),
   s: constant('xyz'),
-}), null)
-
-expectType<null>(o3.z)
-expectType<true>(o3.t)
-expectType<false>(o3.f)
-expectType<12345>(o3.n)
-expectType<'xyz'>(o3.s)
-
-expectAssignable<{
-  z: null,
-  t: true,
-  f: false,
-  n: 12345,
-  s: 'xyz',
-}>(o3)
-
-// -------------------------------------------------------------------------- //
-// simple constants (here we need "as const" on numbers and strings)
-
-const o4 = validate(object({
-  z: null,
-  t: true,
-  f: false,
-  n: 12345 as const,
-  s: 'xyz' as const,
 }), null)
 
 expectType<null>(o4.z)
@@ -117,17 +113,42 @@ expectAssignable<{
 }>(o4)
 
 // -------------------------------------------------------------------------- //
-// "branded" primitives
+// simple constants (here we need "as const" on numbers and strings)
 
 const o5 = validate(object({
+  z: null,
+  t: true,
+  f: false,
+  n: 12345 as const,
+  s: 'xyz' as const,
+}), null)
+
+expectType<null>(o5.z)
+expectType<true>(o5.t)
+expectType<false>(o5.f)
+expectType<12345>(o5.n)
+expectType<'xyz'>(o5.s)
+
+expectAssignable<{
+  z: null,
+  t: true,
+  f: false,
+  n: 12345,
+  s: 'xyz',
+}>(o5)
+
+// -------------------------------------------------------------------------- //
+// "branded" primitives
+
+const o6 = validate(object({
   n: number<BrandedNumber>(),
   s: string<BrandedString>(),
 }), null)
 
-expectType<BrandedNumber>(o5.n)
-expectType<BrandedString>(o5.s)
+expectType<BrandedNumber>(o6.n)
+expectType<BrandedString>(o6.s)
 
 expectAssignable<{
   n: BrandedNumber,
   s: BrandedString,
-}>(o5)
+}>(o6)
