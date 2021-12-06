@@ -27,6 +27,7 @@ typing can be inferred.
   * [Objects](#object-validator) (yes, this is the important one!!!)
   * [Any of, all of](#union-validators)
 * [A (slightly more) complex example](#a-complex-example)
+* [Generating DTS files](#generating-dts-files)
 * [Copyright Notice](NOTICE.md)
 * [License](LICENSE.md)
 
@@ -676,4 +677,63 @@ if (result.version === 1) {
   })
   result.average // this will be a "number""
 }
+```
+
+
+Generating DTS files
+--------------------
+
+Sometimes it might be necessary to generate `.d.ts` files for your schemas,
+rather than relying on the type inference provided by JUSTUS.
+
+For example, if you were to use JUSTUS on a server application to validate
+HTTP requests and responses, and wanted to have strong typing when interacting
+with it from a client, you might not necessarily want to have JUSTUS (and your
+schemas) as a client dependency.
+
+So, assuming your schemas might look something like this:
+
+```typescript
+import { number, object, string } from 'justus'
+
+// this will be exported as a type
+const uuid = string({ brand: 'uuid ' })
+
+// this will be embedded in product below
+const price = number({ brand: 'price' })
+
+// object mapping two validators above
+const product = object({
+  uuid,
+  price,
+  name: string({ minLength: 1 }),
+ })
+```
+
+We can generate the DTS for `UUID` and `Product` (we specifically not export
+`Product` in this example) using our `dts-generator` as follows:
+
+```typescript
+import { generateTypes } from 'justus/dts-generator'
+
+// Note how we rename the exports to "UUID" and "Product" (casing, ...)
+const dts = generateTypes({
+  UUID: uuid,
+  Product: product,
+})
+```
+
+The resulting `dts` will be a `string` containing the DTS as follows:
+
+```typescript
+export type UUID = string & {
+    __brand_uuid : never;
+};
+export type Product = {
+    uuid: UUID;
+    price: number & {
+        __brand_price: never;
+    };
+    name: string;
+};
 ```
