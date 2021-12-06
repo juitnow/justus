@@ -1,3 +1,4 @@
+*.d.ts
 *.tgz
 .nyc_output/
 .vscode/

@@ -12,14 +12,7 @@ mkdir -p build dist
 tsc
 
 # Prep sources and tests
-find "src" "test" -type f -name "*.ts" -print0 | \
-  xargs -0 esbuild \
-    --format=cjs \
-    --platform=node \
-    --target=node16 \
-    --sourcemap \
-    --sources-content=false \
-    --outdir=build
+esbuild --format=cjs build.ts | node -
 
 # Run tests and collect coverage
 nyc --reporter=html --reporter=text mocha 'build/test/**/*.js'
@@ -29,24 +22,4 @@ eslint src test test-d
 
 # Extract and bundle our DTS
 api-extractor run
-
-# Prepare distribution bundles for MJS and CJS
-esbuild \
-  --format=cjs \
-  --platform=node \
-  --target=node16 \
-  --sourcemap \
-  --sources-content=false \
-  --bundle \
-  --outfile=dist/index.cjs \
-  src/index.ts
-
-esbuild \
-  --format=esm \
-  --platform=node \
-  --target=node16 \
-  --sourcemap \
-  --sources-content=false \
-  --bundle \
-  --outfile=dist/index.mjs \
-  src/index.ts
+cp build/types/dts-generator.d.ts ./dts-generator.d.ts

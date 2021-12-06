@@ -11,13 +11,13 @@ export * from './utilities'
 // Validators
 export { allOf, oneOf, AllOfValidator, OneOfValidator } from './validators/union'
 export { any, AnyValidator } from './validators/any'
-export { array, arrayOf, ArrayValidator } from './validators/array'
+export { array, arrayOf, AnyArrayValidator, ArrayValidator } from './validators/array'
 export { boolean, BooleanValidator } from './validators/boolean'
 export { constant, ConstantValidator } from './validators/constant'
 export { date, DateValidator } from './validators/date'
-export { number, NumberValidator } from './validators/number'
-export { object, ObjectValidator } from './validators/object'
-export { string, StringValidator } from './validators/string'
+export { number, AnyNumberValidator, NumberValidator } from './validators/number'
+export { object, AnyObjectValidator, ObjectValidator } from './validators/object'
+export { string, AnyStringValidator, StringValidator } from './validators/string'
 export { tuple, TupleValidator } from './validators/tuple'
 
 /* ========================================================================== *
