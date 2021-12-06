@@ -183,6 +183,8 @@ describe('Primitive validators', () => {
           ])
 
       expect(validate(number({ multipleOf: 0.000001 }), 0.123456)).to.equal(0.123456)
+      expect(validate(number({ multipleOf: 0.000001 }), 1000e100)).to.equal(1000e100)
+
       expect(() => validate(number({ multipleOf: 0.000001 }), 0.0000001))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
@@ -190,8 +192,24 @@ describe('Primitive validators', () => {
           ])
 
       // too much precision
-      expect(() => number({ multipleOf: 1.2345678 }))
-          .to.throw(TypeError, 'Constraint "multipleOf" (1.2345678) requires too much precision')
+      expect(() => number({ multipleOf: 0.123456 })).to.not.throw()
+      expect(() => number({ multipleOf: 0.1234567 }))
+          .to.throw(TypeError, 'Constraint "multipleOf" (0.1234567) requires too much precision')
+
+      // this is a magical number that _multiplied_ by our precision (1 000 000)
+      // result in an integer (100820000)... so we need a different way to check
+      // for how many decimal digits a number has...
+      expect(() => validate(number({ multipleOf: 0.000001 }), 100.82000000000001 ))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { path: [], message: 'Number is not a multiple of 0.000001' },
+          ])
+
+      expect(() => validate(number({ multipleOf: 0.000001 }), Infinity ))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { path: [], message: 'Can\'t calculate digits for number "Infinity"' },
+          ])
     })
 
     it('should validate NaN', () => {

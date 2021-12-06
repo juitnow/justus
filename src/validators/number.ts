@@ -1,6 +1,23 @@
 import { Branding, Validator } from '../types'
 import { assertSchema, assertValidation } from '../errors'
 import { makeTupleRestIterable } from './tuple'
+import { ValidationError } from '..'
+
+/* ========================================================================== */
+
+const PRECISION = 6 // our default precision, in decimal digits
+const MULTIPLIER = Math.pow(10, PRECISION) // multiplier for precision
+
+function countDecimals(n: number): number {
+  // match the parts of the exponential form of the number
+  const match = n.toExponential().match(/^\d+(\.\d+)?e([+-]\d+)$/)
+  if (! match) throw new RangeError(`Can't calculate digits for number "${n}"`)
+  // number of digits in the absolute value, minus whatever is the exp
+  const digits = ((match[1] || '.').length - 1) - (parseInt(match[2]))
+  return digits < 0 ? 0 : digits
+}
+
+/* ========================================================================== */
 
 /** Constraints to validate a `number` with. */
 export interface NumberConstraints {
@@ -78,18 +95,21 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
 
     if (multipleOf !== undefined) {
       assertSchema(multipleOf > 0, `Constraint "multipleOf" (${multipleOf}) must be greater than zero`)
+      const decimals = countDecimals(multipleOf)
 
-      // Split the multiple of in integer and fraction
-      const bigMultipleOf = multipleOf * NumberValidator.PRECISION
-      const bigInteger = bigMultipleOf % NumberValidator.PRECISION
-      const bigDecimal = bigMultipleOf - Math.trunc(bigMultipleOf)
-
-      if (bigInteger === 0) {
+      if (decimals === 0) {
         // Easy case is when we only have to deal with integers...
         this.#isMultipleOf = (value): boolean => ! (value % multipleOf)
-      } else if (bigDecimal === 0) {
+      } else if (decimals <= PRECISION) {
         // We have some "decimal" part (max 6 decimal digits), multiply...
-        this.#isMultipleOf = (value): boolean => ! ((value * NumberValidator.PRECISION) % bigMultipleOf)
+        this.#isMultipleOf = (value): boolean => {
+          try {
+            if (countDecimals(value) > PRECISION) return false
+            return ! ((value * MULTIPLIER) % (multipleOf * MULTIPLIER))
+          } catch (error: any) {
+            throw new ValidationError(error.message)
+          }
+        }
       } else {
         // Required precision was too much (more than 6 decimal digits)
         assertSchema(false, `Constraint "multipleOf" (${multipleOf}) requires too much precision`)
@@ -126,8 +146,6 @@ export class NumberValidator<N extends number = number> extends Validator<N> {
 
     return value as N
   }
-
-  static readonly PRECISION = 1000000
 }
 
 const anyNumberValidator = new AnyNumberValidator()
