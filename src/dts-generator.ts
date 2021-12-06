@@ -26,7 +26,10 @@ import {
  * ========================================================================== */
 
 /** A function taking a `Validator` and producing its `TypeNode`. */
-type TypeGenerator<V extends Validator = Validator> = (validator: V) => ts.TypeNode
+type TypeGenerator<V extends Validator = Validator> = (
+  validator: V,
+  references: ReadonlyMap<Validator, string>
+) => ts.TypeNode
 
 /** The generic constructor of a `Validator` instance. */
 type ValidatorConstructor<V extends Validator = Validator> = { // <T = any> = {
@@ -50,29 +53,62 @@ export function registerTypeGenerator<V extends Validator>(
 }
 
 /** Generate typings for the given `Validation`s. */
-export function generateTypes(validators: Record<string, Validation>): string {
-  const types = Object.entries(validators).map(([ name, validation ]) => {
+export function generateTypes(validations: Record<string, Validation>): string {
+  // Create two maps (one mapping "string -> validator" and another mapping
+  // "validator -> string"). The first map will serve as our "exports" map,
+  // while the second will make sure that any exported validator gets referenced
+  // in the generated DTS, rather than being re-generated
+  const validators = new Map<string, Validator>()
+  const references = new Map<Validator, string>()
+
+  Object.entries(validations).forEach(([ name, validation ]) => {
     const validator = getValidator(validation)
-    const type = generateTypeNode(validator)
-    return ts.factory.createTypeAliasDeclaration(undefined, undefined, name, [], type)
+    // References will be added only once, first one takes precedence!
+    if (! references.has(validator)) references.set(validator, name)
+    validators.set(name, validator)
   })
 
+  // Create the array of type alias declarations to be printed and exported
+  const types: ts.TypeAliasDeclaration[] = []
+  for (const [ name, validator ] of validators.entries()) {
+    // Clone our references map, and remove the validator being exported. This
+    // will make sure that we don't have any loops in our types
+    const referenceable = new Map(references)
+    if (referenceable.get(validator) === name) {
+      referenceable.delete(validator)
+    }
+
+    // Generate the type of the validator, with our stripped reference table
+    const type = generateTypeNode(validator, referenceable)
+
+    // Create a type alias declaration with the name of the export
+    const modifiers = [ ts.factory.createModifier(ts.SyntaxKind.ExportKeyword) ]
+    const decl = ts.factory.createTypeAliasDeclaration(undefined, modifiers, name, [], type)
+    types.push(decl)
+  }
+
+  // Print out all our type aliases
   return ts.createPrinter().printList(
       ts.ListFormat.SourceFileStatements,
       ts.factory.createNodeArray(types),
       ts.createSourceFile('types.d.ts', '', ts.ScriptTarget.Latest))
 }
 
-
 /* ========================================================================== *
  * TYPE GENERATORS                                                            *
  * ========================================================================== */
 
 /** Generate a TypeScript `TypeNode` for the given validator instance. */
-function generateTypeNode(validator: Validator): ts.TypeNode {
+function generateTypeNode(
+    validator: Validator,
+    references: ReadonlyMap<Validator, string>,
+): ts.TypeNode {
+  const reference = references.get(validator)
+  if (reference) return ts.factory.createTypeReferenceNode(reference)
+
   const generator = generators.get(validator.constructor)
   assertSchema(!! generator, `Type generator for "${validator.constructor.name}" not found`)
-  return generator(validator)
+  return generator(validator, references)
 }
 
 /* ========================================================================== */
@@ -115,8 +151,8 @@ registerTypeGenerator(DateValidator, () => ts.factory.createTypeReferenceNode('D
 
 // Complex generator functions...
 
-registerTypeGenerator(ArrayValidator, (validator) => {
-  const itemType = generateTypeNode(validator.items)
+registerTypeGenerator(ArrayValidator, (validator, references) => {
+  const itemType = generateTypeNode(validator.items, references)
   return ts.factory.createArrayTypeNode(itemType)
 })
 
@@ -149,7 +185,7 @@ registerTypeGenerator(StringValidator, (validator: StringValidator) => {
   return ts.factory.createIntersectionTypeNode([ stringType, literal ])
 })
 
-registerTypeGenerator(TupleValidator, (validator: TupleValidator<any>) => {
+registerTypeGenerator(TupleValidator, (validator: TupleValidator<any>, references) => {
   const members = validator.members
 
   // count how many rest parameters do we have..
@@ -166,9 +202,9 @@ registerTypeGenerator(TupleValidator, (validator: TupleValidator<any>) => {
   // if we have zero or one rest parameter, things are easy...
   if (count < 2) {
     const types = members.map(({ single, validator }) => {
-      const memberType = generateTypeNode(validator)
+      const memberType = generateTypeNode(validator, references)
 
-      if (single) return generateTypeNode(validator)
+      if (single) return generateTypeNode(validator, references)
 
       const arrayType = ts.factory.createArrayTypeNode(memberType)
       return ts.factory.createRestTypeNode(arrayType)
@@ -180,11 +216,11 @@ registerTypeGenerator(TupleValidator, (validator: TupleValidator<any>) => {
   // We have two or more rest parameters... we need combine everything between
   // the first and the last one in a giant union!
   const before = members.slice(0, first)
-      .map(({ validator }) => generateTypeNode(validator))
+      .map(({ validator }) => generateTypeNode(validator, references))
   const types = members.slice(first, next)
-      .map(({ validator }) => generateTypeNode(validator))
+      .map(({ validator }) => generateTypeNode(validator, references))
   const after = members.slice(next)
-      .map(({ validator }) => generateTypeNode(validator))
+      .map(({ validator }) => generateTypeNode(validator, references))
 
   const union = ts.factory.createUnionTypeNode(types)
   const array = ts.factory.createArrayTypeNode(union)
@@ -193,22 +229,22 @@ registerTypeGenerator(TupleValidator, (validator: TupleValidator<any>) => {
   return ts.factory.createTupleTypeNode([ ...before, rest, ...after ])
 })
 
-registerTypeGenerator(AllOfValidator, (validator) => {
-  const members = validator.validators.map((validator) => generateTypeNode(validator))
+registerTypeGenerator(AllOfValidator, (validator, references) => {
+  const members = validator.validators.map((validator) => generateTypeNode(validator, references))
   return ts.factory.createIntersectionTypeNode(members)
 })
 
-registerTypeGenerator(OneOfValidator, (validator) => {
-  const members = validator.validators.map((validator) => generateTypeNode(validator))
+registerTypeGenerator(OneOfValidator, (validator, references) => {
+  const members = validator.validators.map((validator) => generateTypeNode(validator, references))
   return ts.factory.createUnionTypeNode(members)
 })
 
-registerTypeGenerator(ObjectValidator, (validator) => {
+registerTypeGenerator(ObjectValidator, (validator, references) => {
   const properties: ts.PropertySignature[] = []
 
   for (const [ key, property ] of validator.properties.entries()) {
     const { validator, readonly, optional } = property || { optional: true }
-    const type = validator ? generateTypeNode(validator) : neverType
+    const type = validator ? generateTypeNode(validator, references) : neverType
 
     const signature = ts.factory.createPropertySignature(
           readonly ? readonlyKeyword : undefined,
@@ -225,7 +261,7 @@ registerTypeGenerator(ObjectValidator, (validator) => {
         ts.factory.createTypeParameterDeclaration('key', stringType),
         undefined, // name type
         undefined, // question token
-        generateTypeNode(validator.additionalProperties),
+        generateTypeNode(validator.additionalProperties, references),
         undefined) // members
 
     if (properties.length == 0) return extra
