@@ -180,7 +180,7 @@ Type _branding_ can be used for number primitives. For example:
 ```typescript
 import { number } from 'justus'
 
-type Price = string & { __brand_price: never }
+type Price = number & { __brand_price: never }
 
 const priceValidator = number<Price>({
   multipleOf: 0.01, // cents, anyone? :-)
