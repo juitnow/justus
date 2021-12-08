@@ -23,3 +23,4 @@ eslint src test test-d
 # Extract and bundle our DTS
 api-extractor run
 cp build/types/dts-generator.d.ts ./dts-generator.d.ts
+cp build/types/json-generator.d.ts ./json-generator.d.ts

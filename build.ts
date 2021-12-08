@@ -49,12 +49,18 @@ async function main() {
     entryPoints: [ './src/index.ts' ],
   })
 
-  console.log('Building DTS generator for test')
+  console.log('Building DTS/JSON Schema generator for test')
 
   await build({
     bundle: false,
     outfile: 'build/src/dts-generator.js',
     entryPoints: [ './src/dts-generator.ts' ],
+  })
+
+  await build({
+    bundle: false,
+    outfile: 'build/src/json-generator.js',
+    entryPoints: [ './src/json-generator.ts' ],
   })
 
   const tests = (await fs.promises.readdir('test')).map((file) => {
@@ -76,12 +82,18 @@ async function main() {
     entryPoints: [ './src/index.ts' ],
   })
 
-  console.log('Building CommonJS DTS generator')
+  console.log('Building CommonJS DTS/JSON schema generator')
 
   await build({
     bundle: false,
     outfile: 'dist/dts-generator.js',
     entryPoints: [ './src/dts-generator.ts' ],
+  })
+
+  await build({
+    bundle: false,
+    outfile: 'dist/json-generator.js',
+    entryPoints: [ './src/json-generator.ts' ],
   })
 
   console.log('Building ESM sources')
@@ -92,13 +104,20 @@ async function main() {
     entryPoints: [ './src/index.ts' ],
   })
 
-  console.log('Building ESM DTS generator')
+  console.log('Building ESM DTS/JSON schema generator')
 
   await build({
     format: 'esm',
     bundle: false,
     outfile: 'dist/dts-generator.mjs',
     entryPoints: [ './src/dts-generator.ts' ],
+  })
+
+  await build({
+    format: 'esm',
+    bundle: false,
+    outfile: 'dist/json-generator.mjs',
+    entryPoints: [ './src/json-generator.ts' ],
   })
 }
 
