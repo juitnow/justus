@@ -77,8 +77,8 @@ export function generateJSON(
 
   // Create the JSON schema for the main validation
   const schema = generate(getValidator(validation), references)
-  schema.$defs = $defs
-  return schema
+  if (Object.keys($defs).length) schema.$defs = $defs
+  return JSON.parse(JSON.stringify(schema)) // remove all undefined
 }
 
 /* ========================================================================== *
@@ -121,7 +121,7 @@ registerJSONGenerator(ArrayValidator, ({
   type: 'array',
   minItems: minItems == 0 ? undefined : minItems,
   maxItems: maxItems == Number.POSITIVE_INFINITY ? undefined : maxItems,
-  uniqueItems: uniqueItems,
+  uniqueItems: uniqueItems ? uniqueItems : undefined,
   items: generate(items, references),
 }))
 
