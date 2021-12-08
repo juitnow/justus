@@ -7,11 +7,9 @@ import {
   AnyStringValidator,
   AnyValidator,
   ArrayValidator,
-  assertSchema,
   BooleanValidator,
   ConstantValidator,
   DateValidator,
-  getValidator,
   NumberValidator,
   ObjectValidator,
   OneOfValidator,
@@ -19,6 +17,8 @@ import {
   TupleValidator,
   Validation,
   Validator,
+  assertSchema,
+  getValidator,
 } from './index'
 
 /* ========================================================================== *
