@@ -12,6 +12,10 @@
     "./dts-generator": {
       "import": "./dist/dts-generator.mjs",
       "require": "./dist/dts-generator.js"
+    },
+    "./json-generator": {
+      "import": "./dist/json-generator.mjs",
+      "require": "./dist/json-generator.js"
     }
   },
   "types": "./index.d.ts",
