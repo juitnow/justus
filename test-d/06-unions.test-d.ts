@@ -9,12 +9,17 @@ import {
   Validator,
   object,
   InferValidation,
+  readonly,
+  optional,
 } from '../src'
 
 printType('__file_marker__')
 
 const t1 = object({ o1: string })
 const t2 = object({ o2: number })
+
+const t3 = object({ o3: optional(string) })
+const t4 = object({ o4: readonly(number) })
 
 /* -------------------------------------------------------------------------- */
 
@@ -31,6 +36,12 @@ expectAssignable<Validator<InferValidation<typeof t1 | typeof t2>>>(oneOf3)
 
 const oneOfR3 = validate(oneOf3, null)
 expectAssignable<{ o1: string } | { o2: number}>(oneOfR3)
+
+const oneOf4 = oneOf(t3, t3)
+expectAssignable<Validator<InferValidation<typeof t3 | typeof t4>>>(oneOf4)
+
+const oneOfR4 = validate(oneOf4, null)
+expectAssignable<{ o3?: string } | { readonly o4: number}>(oneOfR4)
 
 if ('o1' in oneOfR3) {
   expectType<string>(oneOfR3.o1)
