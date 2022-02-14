@@ -19,6 +19,7 @@ export { number, AnyNumberValidator, NumberValidator } from './validators/number
 export { object, AnyObjectValidator, ObjectValidator } from './validators/object'
 export { string, AnyStringValidator, StringValidator } from './validators/string'
 export { tuple, TupleValidator } from './validators/tuple'
+export { url, URLValidator } from './validators/url'
 
 /* ========================================================================== *
  * VALIDATE FUNCTION (our main entry point)                                   *

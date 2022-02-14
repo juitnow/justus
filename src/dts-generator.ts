@@ -17,6 +17,7 @@ import {
   OneOfValidator,
   StringValidator,
   TupleValidator,
+  URLValidator,
   Validation,
   Validator,
 } from './index'
@@ -146,6 +147,7 @@ registerTypeGenerator(AnyObjectValidator, () => recordType)
 registerTypeGenerator(AnyStringValidator, () => stringType)
 registerTypeGenerator(BooleanValidator, () => booleanType)
 registerTypeGenerator(DateValidator, () => ts.factory.createTypeReferenceNode('Date'))
+registerTypeGenerator(URLValidator, () => ts.factory.createTypeReferenceNode('URL'))
 
 /* ========================================================================== */
 
