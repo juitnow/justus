@@ -16,6 +16,7 @@ import {
   optional,
   readonly,
   string,
+  url,
 } from '../src/index'
 
 describe('DTS Generation', () => {
@@ -48,6 +49,10 @@ describe('DTS Generation', () => {
     expect(generateTypes({
       test: date,
     })).to.equal('export type test = Date;')
+
+    expect(generateTypes({
+      test: url,
+    })).to.equal('export type test = URL;')
   })
 
   it('should generate the DTS for arrays', () => {

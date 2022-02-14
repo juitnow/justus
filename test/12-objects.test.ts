@@ -1,4 +1,4 @@
-import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never } from '../src/index'
+import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never, strip } from '../src/index'
 import { expect } from 'chai'
 
 describe('Object validator', () => {
@@ -186,6 +186,15 @@ describe('Object validator', () => {
           { path: [ 'bar' ], message: 'Unknown property' },
         ])
 
+    expect(() => strip(validator, { foo: true, bar: 'whatever', baz: 123 }, {
+      stripAdditionalProperties: false,
+    }))
+        .to.throw(ValidationError, 'Found 2 validation errors')
+        .with.property('errors').to.eql([
+          { path: [ 'baz' ], message: 'Forbidden property' },
+          { path: [ 'bar' ], message: 'Unknown property' },
+        ])
+
     // strip with unknown properties set
     expect(validate(validator, { foo: true, bar: 'whatever' }, {
       stripAdditionalProperties: true,
@@ -193,8 +202,18 @@ describe('Object validator', () => {
         .to.eql({ foo: true })
         .to.have.keys([ 'foo' ])
 
+    expect(strip(validator, { foo: true, bar: 'whatever' }))
+        .to.eql({ foo: true })
+        .to.have.keys([ 'foo' ])
+
     // strip with forbidden properties set
     expect(validate(validator, { foo: true, baz: 'whatever' }, {
+      stripForbiddenProperties: true,
+    }))
+        .to.eql({ foo: true })
+        .to.have.keys([ 'foo' ])
+
+    expect(strip(validator, { foo: true, baz: 'whatever' }, {
       stripForbiddenProperties: true,
     }))
         .to.eql({ foo: true })

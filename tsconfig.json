@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "lib": [ "esnext" ],
+    "types": [ "node" ],
     "target": "esnext",
     "noImplicitAny": true,
     "outDir": "./build/types",

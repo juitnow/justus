@@ -86,8 +86,8 @@ export class ValidationErrorBuilder {
    * @param key - The key in an object, or index in an array where the
    *              vaildation error was encountered
    */
-  record(error: any, key?: string | number): this {
-    const path = key === undefined ? [] : [ key ]
+  record(error: any, ...key: (string | number)[]): this {
+    const path = [ ...key ]
     if (error instanceof ValidationError) {
       error.errors.forEach(({ path: subpath, message }) => {
         this.errors.push({ path: [ ...path, ...subpath ], message })
