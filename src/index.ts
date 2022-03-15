@@ -9,17 +9,17 @@ export * from './types'
 export * from './utilities'
 
 // Validators
-export { allOf, oneOf, AllOfValidator, OneOfValidator } from './validators/union'
+export { allOf, oneOf, AllOfValidator, InferAllOfValidationType, InferOneOfValidationType, OneOfValidator, UnionArguments } from './validators/union'
 export { any, AnyValidator } from './validators/any'
-export { array, arrayOf, AnyArrayValidator, ArrayValidator } from './validators/array'
+export { _array, array, arrayOf, AnyArrayValidator, ArrayConstraints, ArrayValidator } from './validators/array'
 export { boolean, BooleanValidator } from './validators/boolean'
 export { constant, ConstantValidator } from './validators/constant'
-export { date, DateValidator } from './validators/date'
-export { number, AnyNumberValidator, NumberValidator } from './validators/number'
-export { object, AnyObjectValidator, ObjectValidator } from './validators/object'
-export { string, AnyStringValidator, StringValidator } from './validators/string'
-export { tuple, TupleValidator } from './validators/tuple'
-export { url, URLValidator } from './validators/url'
+export { _date, date, DateConstraints, DateValidator } from './validators/date'
+export { _number, number, AnyNumberValidator, BrandedNumberConstraints, NumberConstraints, NumberValidator } from './validators/number'
+export { _object, object, AnyObjectValidator, ObjectProperty, ObjectValidator } from './validators/object'
+export { _string, string, AnyStringValidator, BrandedStringConstraints, StringConstraints, StringValidator } from './validators/string'
+export { tuple, TupleMember, TupleValidator } from './validators/tuple'
+export { _url, url, URLConstraints, URLValidator } from './validators/url'
 
 /* ========================================================================== *
  * VALIDATE FUNCTION (our main entry point)                                   *

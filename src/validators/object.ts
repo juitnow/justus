@@ -19,7 +19,7 @@ import { makeTupleRestIterable } from './tuple'
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
 
-type ObjectProperty = {
+export type ObjectProperty = {
   validator: Validator,
   readonly?: true,
   optional?: true,
@@ -123,11 +123,11 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
 
 const anyObjectValidator = new AnyObjectValidator()
 
-function _object(): Validator<Record<string, any>>
-function _object<S extends Schema>(schema: S): S & {
+export function _object(): Validator<Record<string, any>>
+export function _object<S extends Schema>(schema: S): S & {
   [Symbol.iterator](): Generator<TupleRestParameter<InferSchema<S>>>
 }
-function _object(schema?: Schema): Validator<Record<string, any>> | Schema {
+export function _object(schema?: Schema): Validator<Record<string, any>> | Schema {
   if (! schema) return anyObjectValidator
 
   const validator = new ObjectValidator(schema)

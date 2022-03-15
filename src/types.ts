@@ -115,7 +115,7 @@ export type InferValidation<V> =
  * ========================================================================== */
 
 /** Infer the type validated by a `Validation` or `TupleRestParameter` */
-type InferValidationOrTupleRest<T> =
+export type InferValidationOrTupleRest<T> =
   T extends TupleRestParameter<infer X> ? X :
   T extends Validation ? InferValidation<T> :
   never
@@ -237,7 +237,7 @@ export type InferSchema<S extends Schema> =
 /* -------------------------------------------------------------------------- */
 
 /** Infer the type of keys associated with `Validation`s */
-type InferRequired<S extends Schema> = {
+export type InferRequired<S extends Schema> = {
   [ key in keyof S as
       key extends string ?
         S[key] extends Validation ? key :
@@ -251,7 +251,7 @@ type InferRequired<S extends Schema> = {
 /* -------------------------------------------------------------------------- */
 
 /** Infer the type of _read only_ `Schema` properties  */
-type InferReadonlyModifiers<S extends Schema> = {
+export type InferReadonlyModifiers<S extends Schema> = {
   readonly [ key in keyof S as
     key extends string ?
       S[key] extends OptionalModifier<Validator> ? never :
@@ -263,7 +263,7 @@ type InferReadonlyModifiers<S extends Schema> = {
 }
 
 /** Infer the type of _optional_ `Schema` properties  */
-type InferOptionalModifiers<S extends Schema> = {
+export type InferOptionalModifiers<S extends Schema> = {
   [ key in keyof S as
     key extends string ?
       S[key] extends ReadonlyModifier<Validator> ? never :
@@ -275,7 +275,7 @@ type InferOptionalModifiers<S extends Schema> = {
 }
 
 /** Infer the type of  _read only_ **and** _optional_ `Schema` properties  */
-type InferCombinedModifiers<S extends Schema> = {
+export type InferCombinedModifiers<S extends Schema> = {
   readonly [ key in keyof S as
     key extends string ?
       S[key] extends CombinedModifier ? key :
@@ -288,7 +288,7 @@ type InferCombinedModifiers<S extends Schema> = {
 /* -------------------------------------------------------------------------- */
 
 /** Ensure that we properly type `never` properties */
-type InferNever<S extends Schema> =
+export type InferNever<S extends Schema> =
   { [ key in keyof S as
       key extends string ?
         S[key] extends typeof never ? key :

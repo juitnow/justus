@@ -67,10 +67,10 @@ export class DateValidator extends Validator<Date> {
 
 const anyDateValidator = new DateValidator()
 
-function _date(): DateValidator
-function _date(constraints: DateConstraints): DateValidator
+export function _date(): DateValidator
+export function _date(constraints: DateConstraints): DateValidator
 
-function _date(constraints?: DateConstraints): DateValidator {
+export function _date(constraints?: DateConstraints): DateValidator {
   return constraints ? new DateValidator(constraints) : anyDateValidator
 }
 
