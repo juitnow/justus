@@ -1,4 +1,4 @@
-type ValidationErrors = { path: (string | number)[], message: string }[]
+export type ValidationErrors = { path: (string | number)[], message: string }[]
 
 /** Combine the components of a _path_ into a human readable string */
 function pathToString(path: (string | number)[]): string {

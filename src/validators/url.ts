@@ -129,10 +129,10 @@ export class URLValidator extends Validator<URL> {
 
 const anyURLValidator = new URLValidator()
 
-function _url(): URLValidator
-function _url(constraints: URLConstraints): URLValidator
+export function _url(): URLValidator
+export function _url(constraints: URLConstraints): URLValidator
 
-function _url(constraints?: URLConstraints): URLValidator {
+export function _url(constraints?: URLConstraints): URLValidator {
   return constraints ? new URLValidator(constraints) : anyURLValidator
 }
 

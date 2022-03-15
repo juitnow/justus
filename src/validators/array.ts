@@ -91,10 +91,10 @@ const anyArrayValidator = new AnyArrayValidator()
 
 /* -------------------------------------------------------------------------- */
 
-function _array(): Validator<any[]>
-function _array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>>
+export function _array(): Validator<any[]>
+export function _array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>>
 
-function _array(options?: ArrayConstraints<Validation>): Validator<any[]> {
+export function _array(options?: ArrayConstraints<Validation>): Validator<any[]> {
   if (! options) return anyArrayValidator
 
   const items = getValidator(options.items)

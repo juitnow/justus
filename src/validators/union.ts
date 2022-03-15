@@ -7,11 +7,11 @@ import {
   Validator,
 } from '../types'
 
-type UnionArguments = readonly [ Validation, ...Validation[] ]
+export type UnionArguments = readonly [ Validation, ...Validation[] ]
 
 /* -------------------------------------------------------------------------- */
 
-type InferOneOfValidationType<A extends UnionArguments> =
+export type InferOneOfValidationType<A extends UnionArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
       Rest extends UnionArguments ?
@@ -49,7 +49,7 @@ export function oneOf<A extends UnionArguments>(...args: A): OneOfValidator<A> {
 
 /* -------------------------------------------------------------------------- */
 
-type InferAllOfValidationType<A extends UnionArguments> =
+export type InferAllOfValidationType<A extends UnionArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
       Rest extends UnionArguments ?

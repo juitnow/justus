@@ -4,7 +4,7 @@ import { assertValidation, ValidationError } from '../errors'
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
 
-interface TupleMember { single: boolean, validator: Validator }
+export interface TupleMember { single: boolean, validator: Validator }
 
 /** A `Validator` for _tuples_. */
 export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {

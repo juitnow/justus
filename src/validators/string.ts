@@ -71,12 +71,12 @@ export class StringValidator<S extends string = string> extends Validator<S> {
 
 const anyStringValidator = new AnyStringValidator()
 
-function _string(): Validator<string>
-function _string(constraints?: StringConstraints): StringValidator<string>
-function _string<S extends string>(constraints?: StringConstraints): StringValidator<S>
-function _string<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
+export function _string(): Validator<string>
+export function _string(constraints?: StringConstraints): StringValidator<string>
+export function _string<S extends string>(constraints?: StringConstraints): StringValidator<S>
+export function _string<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
 
-function _string(constraints?: StringConstraints): Validator<string> {
+export function _string(constraints?: StringConstraints): Validator<string> {
   return constraints ? new StringValidator(constraints) : anyStringValidator
 }
 
