@@ -17,7 +17,7 @@
   "types": "./index.d.ts",
   "scripts": {
     "build": "./build.sh",
-    "dev": "nodemon -e ts -x build.sh -w src -w test -w test-d",
+    "dev": "nodemon -e ts -x ./build.sh -w src -w test -w test-d",
     "lint": "eslint src test test-d",
     "prepare": "patch -N -p0 -i .nyc.patch || true"
   },
