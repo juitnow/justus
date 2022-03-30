@@ -47,6 +47,7 @@ export function validate<V extends Validation>(
   const opts: ValidationOptions = {
     stripAdditionalProperties: false,
     stripForbiddenProperties: false,
+    stripOptionalNulls: false,
     ...options,
   }
 
@@ -55,7 +56,17 @@ export function validate<V extends Validation>(
 
 /**
  * Validate a _value_ using the specified `Validation`, automatically stripping
- * additional properties (but not forbidden ones).
+ * additional properties and optional `null`s (but not forbidden ones).
+ *
+ * This is equivalent to:
+ *
+ * ```
+ * validate(validation, value, {
+ *   stripAdditionalProperties: true,
+ *   stripForbiddenProperties: false,
+ *   stripOptionalNulls: true,
+ * })
+ * ```
  */
 export function strip<V extends Validation>(
     validation: V,
@@ -65,6 +76,7 @@ export function strip<V extends Validation>(
   const opts: ValidationOptions = {
     stripAdditionalProperties: true,
     stripForbiddenProperties: false,
+    stripOptionalNulls: true,
     ...options,
   }
 

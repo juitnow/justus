@@ -70,6 +70,8 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
     assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
 
+    const { stripAdditionalProperties, stripForbiddenProperties, stripOptionalNulls } = options
+
     const record: { [ k in string | number | symbol ]?: unknown } = value
     const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
@@ -80,7 +82,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
       // no validator? this is "never" (forbidden)
       if (! validator) {
         if (record[key] === undefined) continue
-        if (options.stripForbiddenProperties) continue
+        if (stripForbiddenProperties) continue
         builder.record('Forbidden property', key)
         continue
       }
@@ -88,6 +90,11 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
       // no value? might be optional, but definitely not validated
       if (record[key] === undefined) {
         if (! optional) builder.record('Required property missing', key)
+        continue
+      }
+
+      // strip any optional "null" value if told to do so
+      if (stripOptionalNulls && optional && (record[key] === null)) {
         continue
       }
 
@@ -111,7 +118,7 @@ export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>>
           builder.record(error, key)
         }
       })
-    } else if (! options.stripAdditionalProperties) {
+    } else if (! stripAdditionalProperties) {
       additionalKeys.forEach((key) => {
         if (record[key] !== undefined) builder.record('Unknown property', key)
       })

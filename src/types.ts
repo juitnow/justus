@@ -27,6 +27,8 @@ export const never = Symbol.for('justus.never')
 export interface ValidationOptions {
   /** Strip additional, undeclared properties from objects */
   readonly stripAdditionalProperties: boolean,
+  /** Strip `null`s from an object when associated with an optional key */
+  readonly stripOptionalNulls: boolean,
   /** Ignore and strip forbidden (`never`) properties from objects */
   readonly stripForbiddenProperties: boolean,
 }

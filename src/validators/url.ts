@@ -21,6 +21,7 @@ const KEYS: Exclude<keyof URLConstraints, 'searchParams'>[] = [
 const OPTIONS: ValidationOptions = {
   stripAdditionalProperties: false,
   stripForbiddenProperties: false,
+  stripOptionalNulls: false,
 }
 
 /** Constraints to validate a `URL` with. */
