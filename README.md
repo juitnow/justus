@@ -26,6 +26,7 @@ typing can be inferred.
   * [Tuples](#tuple-validator)
   * [Objects](#object-validator) (yes, this is the important one!!!)
   * [Any of, all of](#union-validators)
+* [Validation Options](#validation-options)
 * [A (slightly more) complex example](#a-complex-example)
 * [Generating DTS files](#generating-dts-files)
 * [Copyright Notice](NOTICE.md)
@@ -618,6 +619,40 @@ import { number, oneOf, string, validate } from 'justus'
 const result = validate(oneOf(number, string), something)
 
 result // <-- its type will be "number | string"
+```
+
+
+Validation Options
+------------------
+
+The `validate(...)` function accepts (as a third parameter) some validation
+options. Those are:
+
+* `stripAdditionalProperties`: the `validate(...)` function will ignore any
+  object property that was not declared in the schema, and will strip them
+  out of the returned object (rather than failing).
+* `stripForbiddenProperties`: the `validate(...)` function will ignore any
+  _forbidden_ property that was declared in the schema (for more info see
+  [below](#ensure-properties-never-exist)), and will strip them out of the
+  returned object (rather than failing).
+* `stripOptionalNulls`: the `validate(...)` function will ignore _optional_
+  properties with `null` values and strip them out of the returned object.
+  This is convenient when validating/stripping results coming from a database
+  table, where columns are declared as _nullable_.
+
+The `strip(...)` function is a convenience wrapper around `validate(...)`
+implying `stripAdditionalProperties` and `stripOptionalNulls`. Therefore:
+
+```typescript
+const result1 = strip(schema, object)
+
+// is equivalent to
+
+const result2 = validate(schema, object, {
+  stripAdditionalProperties: true,
+  stripForbiddenProperties: false,
+  stripOptionalNulls: true,
+})
 ```
 
 
