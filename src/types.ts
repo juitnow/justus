@@ -231,7 +231,7 @@ export type InferSchema<S extends Schema> =
   InferOptionalModifiers<S> &
   InferCombinedModifiers<S> &
   ( S extends AdditionalProperties<Validator<infer V>> ?
-      Record<string, V> &
+      Record<string, V | undefined> &
       InferNever<S> &
       InferRequired<S> :
     InferRequired<S> )
