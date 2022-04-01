@@ -122,6 +122,7 @@ const booleanType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeywor
 const numberType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
 const neverType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
 const stringType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+const undefinedType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
 const recordType = ts.factory.createMappedTypeNode(
     undefined, // readonly
     ts.factory.createTypeParameterDeclaration('key', stringType),
@@ -258,12 +259,15 @@ registerTypeGenerator(ObjectValidator, (validator, references) => {
   }
 
   if (validator.additionalProperties) {
+    const propertyType = generateTypeNode(validator.additionalProperties, references)
+    const optionalPropertyType = ts.factory.createUnionTypeNode([ propertyType, undefinedType ])
+
     const extra = ts.factory.createMappedTypeNode(
         undefined, // readonly
         ts.factory.createTypeParameterDeclaration('key', stringType),
         undefined, // name type
         undefined, // question token
-        generateTypeNode(validator.additionalProperties, references),
+        optionalPropertyType, // (type | undefined)
         undefined) // members
 
     if (properties.length == 0) return extra
