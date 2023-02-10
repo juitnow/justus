@@ -84,7 +84,7 @@ export function generateTypes(validations: Record<string, Validation>): string {
 
     // Create a type alias declaration with the name of the export
     const modifiers = [ ts.factory.createModifier(ts.SyntaxKind.ExportKeyword) ]
-    const decl = ts.factory.createTypeAliasDeclaration(undefined, modifiers, name, [], type)
+    const decl = ts.factory.createTypeAliasDeclaration(modifiers, name, [], type)
     types.push(decl)
   }
 
