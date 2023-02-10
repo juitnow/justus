@@ -1,4 +1,4 @@
-import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never, strip } from '../src/index'
+import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never, strip, Schema } from '../src/index'
 import { expect } from 'chai'
 
 describe('Object validator', () => {
@@ -110,6 +110,20 @@ describe('Object validator', () => {
           { path: [ 'contents', 0, 'description' ], message: 'Required property missing' },
           { path: [ 'contents', 0, 'value' ], message: 'Required property missing' },
           { path: [ 'contents', 1 ], message: 'Value is not an "object"' },
+        ])
+  })
+
+  it('should validate an object tree', () => {
+    const object1 = object({ zero: string })
+    const object2 = object({ one: object1 })
+    const object3 = object({ two: object2 })
+
+    validate(object3, { two: { one: { zero: 'zero' } } })
+
+    expect(() => validate(object3, { two: { one: { zero: 0 } } } ))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'two', 'one', 'zero' ], message: 'Value is not a "string"' },
         ])
   })
 
