@@ -125,7 +125,7 @@ const stringType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
 const undefinedType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
 const recordType = ts.factory.createMappedTypeNode(
     undefined, // readonly
-    ts.factory.createTypeParameterDeclaration('key', stringType),
+    ts.factory.createTypeParameterDeclaration([], 'key', stringType),
     undefined, // name type
     undefined, // question token
     anyType, // type of the mapped key
@@ -264,7 +264,7 @@ registerTypeGenerator(ObjectValidator, (validator, references) => {
 
     const extra = ts.factory.createMappedTypeNode(
         undefined, // readonly
-        ts.factory.createTypeParameterDeclaration('key', stringType),
+        ts.factory.createTypeParameterDeclaration([], 'key', stringType),
         undefined, // name type
         undefined, // question token
         optionalPropertyType, // (type | undefined)
