@@ -1,4 +1,4 @@
-import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never, strip, Schema } from '../src/index'
+import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never, strip } from '../src/index'
 import { expect } from 'chai'
 
 describe('Object validator', () => {
