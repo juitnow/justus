@@ -86,7 +86,7 @@ const s4 = object({
 const o4 = validate(s4, null)
 
 expectType<number>(o4.a)
-expectError(o4.b) // does not exist on the returned object
+expectType<never>(o4.b)
 expectType<string>(o4.c)
 expectError(o4.extra) // no additional properties
 

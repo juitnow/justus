@@ -227,77 +227,25 @@ export interface CombinedModifier<V extends Validator = Validator>
 
 /** Infer the type validated by a `Schema` */
 export type InferSchema<S extends Schema> =
-  InferReadonlyModifiers<S> &
-  InferOptionalModifiers<S> &
-  InferCombinedModifiers<S> &
-  ( S extends AdditionalProperties<Validator<infer V>> ?
-      Record<string, V | undefined> &
-      InferNever<S> &
-      InferRequired<S> :
-    InferRequired<S> )
+  S extends AdditionalProperties<Validator<infer V>> ?
+    { [ key in string ] : V | undefined } & InferSchema2<S> :
+    InferSchema2<S>
 
-/* -------------------------------------------------------------------------- */
-
-/** Infer the type of keys associated with `Validation`s */
-export type InferRequired<S extends Schema> = {
-  [ key in keyof S as
-      key extends string ?
-        S[key] extends Validation ? key :
-        never :
-      never
-  ] :
-    S[key] extends Validation ? InferValidation<S[key]> :
+/** Infer the property types described by a `Schema` */
+export type InferSchema2<S extends Schema> =
+  { [ key in keyof S as key extends string ? key : never ]:
+    S[key] extends CombinedModifier<infer V> ? InferValidation<V> | undefined :
+    S[key] extends OptionalModifier<infer V> ? InferValidation<V> | undefined :
+    S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> :
+    S[key] extends typeof never ? never :
+    InferValidation<S[key]>
+  } | {
+    readonly [ key in keyof S as key extends string ? key : never ]:
+    S[key] extends CombinedModifier<infer V> ? InferValidation<V> | undefined :
+    S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> :
     never
-}
-
-/* -------------------------------------------------------------------------- */
-
-/** Infer the type of _read only_ `Schema` properties  */
-export type InferReadonlyModifiers<S extends Schema> = {
-  readonly [ key in keyof S as
-    key extends string ?
-      S[key] extends OptionalModifier<Validator> ? never :
-      S[key] extends ReadonlyModifier<Validator> ? key :
-      never :
-    never
-  ] :
-    S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> : never
-}
-
-/** Infer the type of _optional_ `Schema` properties  */
-export type InferOptionalModifiers<S extends Schema> = {
-  [ key in keyof S as
-    key extends string ?
-      S[key] extends ReadonlyModifier<Validator> ? never :
-      S[key] extends OptionalModifier<Validator> ? key :
-      never :
-    never
-  ] ? :
-    S[key] extends OptionalModifier<infer V> ? InferValidation<V> : never
-}
-
-/** Infer the type of  _read only_ **and** _optional_ `Schema` properties  */
-export type InferCombinedModifiers<S extends Schema> = {
-  readonly [ key in keyof S as
-    key extends string ?
-      S[key] extends CombinedModifier ? key :
-      never :
-    never
-  ] ? :
-    S[key] extends CombinedModifier<infer V> ? InferValidation<V> : never
-}
-
-/* -------------------------------------------------------------------------- */
-
-/** Ensure that we properly type `never` properties */
-export type InferNever<S extends Schema> =
-  { [ key in keyof S as
-      key extends string ?
-        S[key] extends typeof never ? key :
-        never :
-      never
-    ] : never
   }
+
 
 /* ========================================================================== *
  * TYPE BRANDING                                                              *
