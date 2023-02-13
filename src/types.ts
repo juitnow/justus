@@ -11,9 +11,6 @@ export const restValidator = Symbol.for('justus.restValidator')
 /** A symbol indicating the `Validator` for a `Schema`. */
 export const schemaValidator = Symbol.for('justus.schemaValidator')
 
-/** A symbol indicating the `Validator` for a `Modifier`. */
-export const modifierValidator = Symbol.for('justus.modifierValidator')
-
 /** A symbol indicating the `Validator` for a `Schema`'s additional properties. */
 export const additionalValidator = Symbol.for('justus.additionalValidator')
 
@@ -43,6 +40,9 @@ export interface ValidationOptions {
 export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
   [isValidator]: true
 
+  readonly?: boolean
+  optional?: boolean
+
   /** Validate a _value_ and optionally convert it to the required `Type` */
   validate(value: unknown, options: ValidationOptions): T
 
@@ -61,6 +61,8 @@ export function makeValidatorFactory<
   F extends (...args: any[]) => Validator,
 >(validator: V, factory: F): F & V {
   return Object.assign(factory, {
+    readonly: validator.readonly,
+    optional: validator.optional,
     validate: validator.validate.bind(validator),
     [Symbol.iterator]: validator[Symbol.iterator].bind(validator),
     [isValidator]: true,
@@ -73,6 +75,9 @@ export function makeValidatorFactory<
  */
 export abstract class AbstractValidator<T = any> implements Iterable<TupleRestParameter<T>> {
   [isValidator]: true = true
+
+  readonly?: boolean = undefined
+  optional?: boolean = undefined
 
   /** Validate a _value_ and optionally convert it to the required `Type` */
   abstract validate(value: unknown, options: ValidationOptions): T
@@ -184,7 +189,7 @@ export type InferTuple<T> =
  * how they should be validated.
  */
 export interface Schema {
-  [ key: string ] : Validation | Modifier | typeof never
+  [ key: string ] : Validation | typeof never
   [ additionalValidator ]?: Validator | false
 }
 
@@ -194,40 +199,6 @@ export interface Schema {
  */
 export interface AdditionalProperties<V extends Validator | false> {
   [ additionalValidator ]: V
-}
-
-/* -------------------------------------------------------------------------- */
-
-/**
- * A `Modifier` marks a `Schema` property either _read only_ and/or _optional_.
- */
-export interface Modifier<V extends Validator = Validator> {
-  [ modifierValidator ]: V
-  readonly?: true,
-  optional?: true,
-}
-
-/**
- * Mark a `Schema` property as _read only_.
- */
-export interface ReadonlyModifier<V extends Validator = Validator> extends Modifier<V> {
-  readonly: true,
-}
-
-/**
- * Mark a `Schema` property as _optional_.
- */
-export interface OptionalModifier<V extends Validator = Validator> extends Modifier<V> {
-  optional: true,
-}
-
-/**
- * Mark a `Schema` property as both _optional_ and _read only_.
- */
-export interface CombinedModifier<V extends Validator = Validator>
-  extends ReadonlyModifier<V>, OptionalModifier<V>, Modifier<V> {
-  optional: true,
-  readonly: true,
 }
 
 /* ========================================================================== *
@@ -243,14 +214,10 @@ export type InferSchema<S extends Schema> =
 /** Infer the property types described by a `Schema` */
 export type InferSchema2<S extends Schema> =
   { [ key in keyof S as key extends string ? key : never ]:
-    S[key] extends CombinedModifier<infer V> ? InferValidation<V> | undefined :
-    S[key] extends OptionalModifier<infer V> ? InferValidation<V> | undefined :
-    S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> :
     InferValidation<S[key]>
   } | {
     readonly [ key in keyof S as key extends string ? key : never ]:
-    S[key] extends CombinedModifier<infer V> ? InferValidation<V> | undefined :
-    S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> :
+    S[key] extends Validator & { readonly: true } ? InferValidation<S[key]> :
     never
   }
 
