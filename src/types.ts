@@ -2,6 +2,9 @@
  * SYMBOLS IDENTIFYING SPECIAL FUNCTIONALITIES                                *
  * ========================================================================== */
 
+/** A symbol indicating that an instance is (in fact) a `Validator`. */
+export const isValidator = Symbol.for('justus.isValidator')
+
 /** A symbol indicating the `Validator` for a `Tuple`'s rest parameter. */
 export const restValidator = Symbol.for('justus.restValidator')
 
@@ -38,6 +41,8 @@ export interface ValidationOptions {
  * (possibly) converting it the required type `T`.
  */
 export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
+  [isValidator]: true
+
   /** Validate a _value_ and optionally convert it to the required `Type` */
   validate(value: unknown, options: ValidationOptions): T
 
@@ -58,6 +63,7 @@ export function makeValidatorFactory<
   return Object.assign(factory, {
     validate: validator.validate.bind(validator),
     [Symbol.iterator]: validator[Symbol.iterator].bind(validator),
+    [isValidator]: true,
   }) as F & V
 }
 
@@ -66,6 +72,8 @@ export function makeValidatorFactory<
  * (possibly) converting it the required type `T`.
  */
 export abstract class AbstractValidator<T = any> implements Iterable<TupleRestParameter<T>> {
+  [isValidator]: true = true
+
   /** Validate a _value_ and optionally convert it to the required `Type` */
   abstract validate(value: unknown, options: ValidationOptions): T
 
