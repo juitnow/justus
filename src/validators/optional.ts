@@ -1,20 +1,40 @@
-import { AbstractValidator, Validator, ValidationOptions, Validation, InferValidation } from '../types'
+import { AbstractValidator, InferValidation, Validation, ValidationOptions, Validator } from '../types'
 import { getValidator } from '../utilities'
 
 /**
  * A `Validator` for _optional_ properties (that is `type | undefined`).
  */
-export class OptionalValidator<T = any> extends AbstractValidator<T | undefined> {
+export class OptionalValidator<
+  T = any, // the type of the "validation", that is the optional type to validate
+  D extends (T | undefined) = undefined, // the default value (or undefined)
+> extends AbstractValidator<D extends undefined ? T | undefined : T> {
   validator: Validator<T>
-  optional: true = true
+  defaultValue: D
+  optional: D extends undefined ? true : false
 
-  constructor(validator: Validator<T>) {
+  constructor(validator: Validator<T>)
+  constructor(validator: Validator<T>, defaultValue: D)
+  constructor(validator: Validator<T>, defaultValue?: void)
+  constructor(validator: Validator<T>, defaultValue?: D) {
     super()
     this.validator = validator
+    this.optional = (defaultValue === undefined) as any
+    this.defaultValue = defaultValue as D
+    if (this.optional) return
+
+    try {
+      validator.validate(defaultValue, {
+        stripAdditionalProperties: false,
+        stripForbiddenProperties: false,
+        stripOptionalNulls: false,
+      })
+    } catch (cause) {
+      throw new TypeError('Default value does not match validator', { cause })
+    }
   }
 
-  validate(value: unknown, options: ValidationOptions): T | undefined {
-    if (value === undefined) return value
+  validate(value: unknown, options: ValidationOptions): D extends undefined ? T | undefined : T {
+    if (value === undefined) return this.defaultValue as any // do not validate defaults!
     return this.validator.validate(value, options)
   }
 }
@@ -24,7 +44,19 @@ export class OptionalValidator<T = any> extends AbstractValidator<T | undefined>
  *
  * @param validation - A `Validation` to be marked as _optional_.
  */
-export function optional<V extends Validation>(validation: V): OptionalValidator<InferValidation<V>> {
+export function optional<
+  V extends Validation
+>(validation: V): OptionalValidator<InferValidation<V>, undefined>
+
+export function optional<
+  V extends Validation,
+  D extends InferValidation<V>,
+>(validation: V, defaultValue: D): OptionalValidator<InferValidation<V>, D>
+
+export function optional<
+  V extends Validation,
+  D extends InferValidation<V>,
+>(validation: V, defaultValue?: D): OptionalValidator<InferValidation<V>> {
   const validator = getValidator(validation)
-  return new OptionalValidator(validator)
+  return new OptionalValidator(validator, defaultValue)
 }
