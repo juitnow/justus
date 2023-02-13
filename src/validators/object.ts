@@ -138,6 +138,6 @@ export function _object<S extends Schema>(schema: S): S & {
 export const object = makeValidatorFactory(new AnyObjectValidator(), _object)
 
 /** Validate `Object`s containing only the specified elements. */
-export function objectOf<V extends Validation>(validation: V): Validator<Record<string, InferValidation<V> | undefined>> {
+export function objectOf<V extends Validation>(validation: V): Validator<Record<string, InferValidation<V>>> {
   return new ObjectValidator({ ...allowAdditionalProperties(validation) })
 }

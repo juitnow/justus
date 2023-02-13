@@ -202,7 +202,7 @@ export interface AdditionalProperties<V extends Validator | false> {
 /** Infer the type validated by a `Schema` */
 export type InferSchema<S extends Schema> =
   S extends AdditionalProperties<Validator<infer V>> ?
-    { [ key in string ] : V | undefined } & InferSchema2<S> :
+    { [ key in string ] : V } & InferSchema2<S> :
     InferSchema2<S>
 
 /** Infer the property types described by a `Schema` */

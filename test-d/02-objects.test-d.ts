@@ -158,10 +158,10 @@ expectAssignable<{
 // "objectOf" shortcutr
 
 const o7 = validate(objectOf(number), null)
-expectType<Record<string, number | undefined>>(o7)
+expectType<Record<string, number>>(o7)
 
 const o8 = validate(objectOf([ 1, 2, 3 ] as const), null)
-expectType<Record<string, [ 1, 2, 3 ] | undefined>>(o8)
+expectType<Record<string, [ 1, 2, 3 ]>>(o8)
 
 const o9 = validate(objectOf({ test: boolean }), null)
-expectType<Record<string, { test: boolean } | undefined>>(o9)
+expectType<Record<string, { test: boolean }>>(o9)

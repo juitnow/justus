@@ -259,7 +259,7 @@ describe('DTS Generation', () => {
         ...allowAdditionalProperties,
       }),
     }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { s: string; } & { [key in string]: any | undefined; };')
+        .to.equal('export type test = { s: string; } & { [key in string]: any; };')
 
     expect(generateTypes({
       test: object({
@@ -267,7 +267,7 @@ describe('DTS Generation', () => {
         ...allowAdditionalProperties(),
       }),
     }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { s: string; } & { [key in string]: any | undefined; };')
+        .to.equal('export type test = { s: string; } & { [key in string]: any; };')
 
     expect(generateTypes({
       test: object({
@@ -275,14 +275,14 @@ describe('DTS Generation', () => {
         ...allowAdditionalProperties(number),
       }),
     }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { s: string; } & { [key in string]: number | undefined; };')
+        .to.equal('export type test = { s: string; } & { [key in string]: number; };')
 
     expect(generateTypes({
       test: object({
         ...allowAdditionalProperties(number),
       }),
     }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { [key in string]: number | undefined; };')
+        .to.equal('export type test = { [key in string]: number; };')
   })
 
   it('should reference exported validators', () => {

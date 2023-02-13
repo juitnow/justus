@@ -298,14 +298,13 @@ registerTypeGenerator(ObjectValidator, (validator, references) => {
 
   if (validator.additionalProperties) {
     const propertyType = generateTypeNode(validator.additionalProperties, references)
-    const optionalPropertyType = ts.factory.createUnionTypeNode([ propertyType, undefinedType ])
 
     const extra = ts.factory.createMappedTypeNode(
         undefined, // readonly
         ts.factory.createTypeParameterDeclaration([], 'key', stringType),
         undefined, // name type
         undefined, // question token
-        optionalPropertyType, // (type | undefined)
+        propertyType, // type
         undefined) // members
 
     if (properties.length == 0) return extra
