@@ -1,6 +1,6 @@
 {
   "name": "justus",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "A JavaScript validation library, with types!",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -31,8 +31,8 @@
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
     "chai": "^4.3.7",
-    "esbuild": "^0.17.7",
-    "eslint": "^8.33.0",
+    "esbuild": "^0.17.8",
+    "eslint": "^8.34.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.20",
