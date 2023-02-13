@@ -1,6 +1,5 @@
-import { any } from './validators/any'
 import { ConstantValidator, nullValidator } from './validators/constant'
-import { Schema, schemaValidator, Validation, Validator } from './types'
+import { isValidator, Schema, schemaValidator, Validation, Validator } from './types'
 import { TupleValidator } from './validators/tuple'
 import { ObjectValidator } from './validators/object'
 
@@ -14,12 +13,14 @@ import { ObjectValidator } from './validators/object'
  * When `validation` is `undefined` it will return a `Validator<any>`,
  */
 export function getValidator(validation?: Validation): Validator {
-  // Undefined maps to `any`, null is a constant
-  if (validation === undefined) return any
+  // Undefined is never a validator...
+  if (validation === undefined) throw new TypeError('Invalid undefined validation')
+
+  // Null is a constant
   if (validation === null) return nullValidator
 
-  // Validator instances are simply returned
-  if (validation instanceof Validator) return validation
+  // Validator instance (either object or function)
+  if ((<any> validation)[isValidator] === true) return validation as Validator
 
   // Other types
   switch (typeof validation) {
@@ -28,10 +29,6 @@ export function getValidator(validation?: Validation): Validator {
     case 'string':
     case 'number':
       return new ConstantValidator(validation)
-
-    // validator generator
-    case 'function':
-      return validation()
 
     // other objects...
     case 'object':
