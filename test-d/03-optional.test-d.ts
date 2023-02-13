@@ -1,4 +1,4 @@
-import { expectAssignable, expectType, printType } from 'tsd'
+import { expectAssignable, expectError, expectType, printType } from 'tsd'
 import {
   any,
   array,
@@ -7,7 +7,9 @@ import {
   constant,
   number,
   object,
+  oneOf,
   optional,
+  OptionalValidator,
   string,
   validate,
 } from '../src'
@@ -156,3 +158,41 @@ expectAssignable<{
 
 const o7 = validate(arrayOf(optional(string)), null)
 expectType<(string | undefined)[]>(o7)
+
+// -------------------------------------------------------------------------- //
+// defaults
+
+const d1 = new OptionalValidator(string)
+const r1 = validate(d1, null)
+expectType<string | undefined>(r1)
+
+const d2 = new OptionalValidator(string, 'foobar')
+const r2 = validate(d2, null)
+expectType<string>(r2)
+
+const d3 = new OptionalValidator(oneOf('foo', 'bar'), 'foo')
+const r3 = validate(d3, null)
+expectType<'foo' | 'bar'>(r3)
+
+expectError(new OptionalValidator(string, 1234))
+
+const d4 = optional(string)
+const r4 = validate(d4, null)
+expectType<string | undefined>(r4)
+
+const d5 = optional(string, 'foobar')
+const r5 = validate(d5, null)
+expectType<string>(r5)
+
+const d6 = optional(oneOf('foo', 'bar'), 'foo')
+const r6 = validate(d6, null)
+expectType<'foo' | 'bar'>(r6)
+
+expectError(optional(string, 1234))
+
+const v1 = object({
+  hasDefault: optional(string, 'foobar'),
+  noDefault: optional(number),
+})
+const x1 = validate(v1, null)
+expectType<{ hasDefault: string, noDefault: number | undefined }>(x1)
