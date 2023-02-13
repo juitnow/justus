@@ -11,8 +11,6 @@ export class OptionalValidator<T = any> extends AbstractValidator<T | undefined>
   constructor(validator: Validator<T>) {
     super()
     this.validator = validator
-    this.readonly = validator.readonly
-    this.optional = true
   }
 
   validate(value: unknown, options: ValidationOptions): T | undefined {
