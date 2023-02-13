@@ -208,6 +208,22 @@ describe('DTS Generation', () => {
     })).to.equal('export type test = string | number | boolean;')
   })
 
+  it('should generate the DTS for optionals', () => {
+    expect(generateTypes({
+      hasDefault: optional(string, 'foobar'),
+      noDefault: optional(number),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('export type hasDefault = string; export type noDefault = number | undefined;')
+
+    expect(generateTypes({
+      test: {
+        hasDefault: optional(oneOf('foo', 'bar'), 'foo'),
+        noDefault: optional(oneOf('foo', 'bar')),
+      },
+    }).replace(/\s+/gm, ' '))
+        .to.equal('export type test = { hasDefault: "foo" | "bar"; noDefault?: "foo" | "bar" | undefined; };')
+  })
+
   it('should generate the DTS for objects', () => {
     expect(generateTypes({
       test: object,

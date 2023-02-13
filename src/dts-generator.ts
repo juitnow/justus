@@ -1,4 +1,4 @@
-import ts from 'typescript'
+import ts, { isUnionTypeNode } from 'typescript'
 import {
   AllOfValidator,
   any,
@@ -121,11 +121,19 @@ function generateTypeNode(
   assertSchema(!! generator, `Type generator for "${validator.constructor.name}" not found`)
   const type = generator(validator, references)
 
-  // here any "optional" generator will be treated as "type | undefined"
-  return validator.optional ?
-      type === neverType ? undefinedType : // "never | undefined" is always "undefined"
-      ts.factory.createUnionTypeNode([ type, undefinedType ]) : // "type | undefined"
-      type // simply "type"
+  // If the validator is not optional, then we return the type straight
+  if (! validator.optional) return type
+
+  // If the type would result in "never | undefined" simply return "undefined"
+  if (type === neverType) return undefinedType
+
+  // If the type is already a union type, we simply add our "undefined"
+  if (isUnionTypeNode(type)) {
+    return ts.factory.createUnionTypeNode([ ...type.types, undefinedType ])
+  }
+
+  // Create a new type "type | undefined"
+  return ts.factory.createUnionTypeNode([ type, undefinedType ])
 }
 
 /* ========================================================================== */
