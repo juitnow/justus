@@ -37,7 +37,35 @@ export interface ValidationOptions {
  * A `Validator` is an object capable of validating a given _value_ and
  * (possibly) converting it the required type `T`.
  */
-export abstract class Validator<T = any> implements Iterable<TupleRestParameter<T>> {
+export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
+  /** Validate a _value_ and optionally convert it to the required `Type` */
+  validate(value: unknown, options: ValidationOptions): T
+
+  /** Allow any `Validator` to be used as a rest parameter in `Tuple`s */
+  [Symbol.iterator](): Generator<TupleRestParameter<T>>;
+}
+
+/**
+ * Create a validator "factory", that is a function that when invoked will
+ * create a new `Validator` according to the parameters specified. This function
+ * will also implement the `Validator` interface itself, using the `Validator`
+ * supplied as the first parameter.
+ */
+export function makeValidatorFactory<
+  V extends Validator,
+  F extends () => Validator,
+>(validator: V, factory: F): F & V {
+  return Object.assign(factory, {
+    validate: validator.validate.bind(validator),
+    [Symbol.iterator]: validator[Symbol.iterator].bind(validator),
+  }) as F & V
+}
+
+/**
+ * A `Validator` is an object capable of validating a given _value_ and
+ * (possibly) converting it the required type `T`.
+ */
+export abstract class AbstractValidator<T = any> implements Iterable<TupleRestParameter<T>> {
   /** Validate a _value_ and optionally convert it to the required `Type` */
   abstract validate(value: unknown, options: ValidationOptions): T
 
@@ -58,7 +86,7 @@ export abstract class Validator<T = any> implements Iterable<TupleRestParameter<
  * * Either `null`, a `boolean`, a `number` or a `string` for constants
  */
 export type Validation =
-  (() => Validator) | Validator | // Validator instances or their creators
+  Validator | // Validator instances
   Tuple | Schema | // Tuples or schemas (arrays, objects)
   null | boolean | number | string // Primitives, mapped as constants
 
@@ -69,33 +97,6 @@ export type InferValidation<V> =
   // Let `InferValidationType<T>` be liberal in the type it accepts and check
   // here whether it extends `Validation`
   V extends Validation ?
-
-    // `Validation` can be a function returning a `Validator`, here we need to
-    // extract the return value of its _zero-arguments_ overload
-    V extends {
-      (...args: infer A0): Validator<infer R0>;
-      (...args: infer A1): Validator<infer R1>;
-      (...args: infer A2): Validator<infer R2>;
-      (...args: infer A3): Validator<infer R3>;
-      (...args: infer A4): Validator<infer R4>;
-      (...args: infer A5): Validator<infer R5>;
-      (...args: infer A6): Validator<infer R6>;
-      (...args: infer A7): Validator<infer R7>;
-      (...args: infer A8): Validator<infer R8>;
-      (...args: infer A9): Validator<infer R9>;
-    } ?
-      A0 extends [] ? R0 :
-      A1 extends [] ? R1 :
-      A2 extends [] ? R2 :
-      A3 extends [] ? R3 :
-      A4 extends [] ? R4 :
-      A5 extends [] ? R5 :
-      A6 extends [] ? R6 :
-      A7 extends [] ? R7 :
-      A8 extends [] ? R8 :
-      A9 extends [] ? R9 :
-      never :
-
     // Validators return their validation type
     V extends Validator<infer T> ? T :
 
