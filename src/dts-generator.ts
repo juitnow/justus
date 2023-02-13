@@ -16,6 +16,7 @@ import {
   date,
   DateValidator,
   getValidator,
+  NeverValidator,
   number,
   NumberValidator,
   object,
@@ -156,6 +157,7 @@ registerTypeGenerator(AnyNumberValidator, () => numberType)
 registerTypeGenerator(AnyObjectValidator, () => recordType)
 registerTypeGenerator(AnyStringValidator, () => stringType)
 registerTypeGenerator(BooleanValidator, () => booleanType)
+registerTypeGenerator(NeverValidator, () => neverType)
 registerTypeGenerator(DateValidator, () => ts.factory.createTypeReferenceNode('Date'))
 registerTypeGenerator(URLValidator, () => ts.factory.createTypeReferenceNode('URL'))
 
@@ -273,9 +275,9 @@ registerTypeGenerator(ObjectValidator, (validator, references) => {
   const properties: ts.PropertySignature[] = []
 
   for (const [ key, valueValidator ] of validator.validators.entries()) {
-    const type = valueValidator ? generateTypeNode(valueValidator, references) : neverType
-    const optional = valueValidator ? valueValidator.optional : true // no validator, never are optionals
-    const readonly = valueValidator ? valueValidator.readonly : false // no validator, never are not readonly
+    const type = generateTypeNode(valueValidator, references)
+    const optional = valueValidator.optional
+    const readonly = valueValidator.readonly
 
     const signature = ts.factory.createPropertySignature(
           readonly ? readonlyKeyword : undefined,
