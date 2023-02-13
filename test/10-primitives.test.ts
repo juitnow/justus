@@ -226,6 +226,20 @@ describe('Primitive validators', () => {
       expect(validate(number({ allowNaN: true }), NaN)).to.be.NaN
     })
 
+    it('should validate a number parsing a string', () => {
+      const validator = number({ fromString: true })
+      expect(validate(validator, '123456'), '123456').to.equal(123456)
+      expect(validate(validator, '-12.34'), '-12.34').to.equal(-12.34)
+      expect(validate(validator, '0xCAFE'), '0xCAFE').to.equal(0xCAFE)
+      expect(validate(validator, '0o4321'), '0o4321').to.equal(0o4321)
+      expect(validate(validator, '0b1011'), '0b1011').to.equal(0b1011)
+      expect(() => validate(validator, 'hello'))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { path: [], message: 'Number can not be parsed from string' },
+          ])
+    })
+
     it('should validate a number using the NumberValidator class', () => {
       const validator = new NumberValidator()
       expect(validate(validator, 12345)).to.equal(12345)

@@ -167,6 +167,7 @@ import { number } from 'justus'
 
 const n1 = number // validates any number
 const n2 = number({ minimum: 123 }) // validate numbers 123 and greater
+const n3 = number({ fromString: true }) // parse strings like "12.34" or "0x0CAFE"
 ```
 
 #### Options
@@ -177,6 +178,7 @@ const n2 = number({ minimum: 123 }) // validate numbers 123 and greater
 * `exclusiveMaximum?: number`: The _exclusive_ maximum value for a valid `number`
 * `exclusiveMinimum?: number`: The _exclusive_ minimum value for a valid `number`
 * `allowNaN?: boolean`: Whether to allow `NaN` or not (default: `false`)
+* `fromString?: boolean`: Whether to parse numbers from strings or not (default: `false`)
 
 #### Branded numbers
 

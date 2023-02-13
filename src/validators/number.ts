@@ -30,6 +30,8 @@ export interface NumberConstraints {
   exclusiveMaximum?: number,
   /** The _exclusive_ minimum value for a valid `number`: `value > exclusiveMaximum` */
   exclusiveMinimum?: number,
+  /** Allow numbers to be parsed from strings (e.g. `123.456` or `0x0CAFE`, default: `false`) */
+  fromString?: boolean,
   /** Whether to allow `NaN` or not (default: `false`) */
   allowNaN?: boolean,
 }
@@ -56,6 +58,7 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
   readonly allowNaN: boolean
   readonly exclusiveMaximum?: number
   readonly exclusiveMinimum?: number
+  readonly fromString: boolean
   readonly maximum: number
   readonly minimum: number
   readonly multipleOf?: number
@@ -68,6 +71,7 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
       allowNaN = false,
       exclusiveMaximum,
       exclusiveMinimum,
+      fromString = false,
       maximum = Number.POSITIVE_INFINITY,
       minimum = Number.NEGATIVE_INFINITY,
       multipleOf,
@@ -118,12 +122,20 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
     this.allowNaN = allowNaN
     this.exclusiveMaximum = exclusiveMaximum
     this.exclusiveMinimum = exclusiveMinimum
+    this.fromString = fromString
     this.maximum = maximum
     this.minimum = minimum
     this.multipleOf = multipleOf
   }
 
   validate(value: unknown): N {
+    // Allow parsing from strings
+    if ((typeof value == 'string') && (this.fromString)) {
+      const parsed = +`${value}`
+      assertValidation(! isNaN(parsed), 'Number can not be parsed from string')
+      value = parsed
+    }
+
     assertValidation(typeof value == 'number', 'Value is not a "number"')
 
     if (isNaN(value)) {
