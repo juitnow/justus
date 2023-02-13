@@ -1,22 +1,30 @@
 import ts from 'typescript'
 import {
   AllOfValidator,
+  any,
   AnyArrayValidator,
   AnyNumberValidator,
   AnyObjectValidator,
   AnyStringValidator,
   AnyValidator,
+  array,
   ArrayValidator,
   assertSchema,
+  boolean,
   BooleanValidator,
   ConstantValidator,
+  date,
   DateValidator,
   getValidator,
+  number,
   NumberValidator,
+  object,
   ObjectValidator,
   OneOfValidator,
+  string,
   StringValidator,
   TupleValidator,
+  url,
   URLValidator,
   Validation,
   Validator,
@@ -42,14 +50,15 @@ type ValidatorConstructor<V extends Validator = Validator> = { // <T = any> = {
  * ========================================================================== */
 
 /** Registry of all `Validator` constructors and related `TypeGenerator`s. */
-const generators = new Map<Function, TypeGenerator<any>>()
+const generators = new Map<Function | Validator, TypeGenerator<any>>()
 
 /** Register a `TypeGenerator` function for a `Validator`. */
 export function registerTypeGenerator<V extends Validator>(
-    validator: ValidatorConstructor<V>,
+    validator: V | ValidatorConstructor<V>,
     generator: TypeGenerator<V>,
 ): void {
-  assertSchema(validator.prototype instanceof Validator, 'Not a `Validator` class')
+  // TODO
+  // assertSchema(validator.prototype instanceof AbstractValidator, 'Not a `Validator` class')
   generators.set(validator, generator)
 }
 
@@ -107,7 +116,7 @@ function generateTypeNode(
   const reference = references.get(validator)
   if (reference) return ts.factory.createTypeReferenceNode(reference)
 
-  const generator = generators.get(validator.constructor)
+  const generator = generators.get(validator) || generators.get(validator.constructor)
   assertSchema(!! generator, `Type generator for "${validator.constructor.name}" not found`)
   return generator(validator, references)
 }
@@ -149,6 +158,15 @@ registerTypeGenerator(AnyStringValidator, () => stringType)
 registerTypeGenerator(BooleanValidator, () => booleanType)
 registerTypeGenerator(DateValidator, () => ts.factory.createTypeReferenceNode('Date'))
 registerTypeGenerator(URLValidator, () => ts.factory.createTypeReferenceNode('URL'))
+
+registerTypeGenerator(any, () => anyType)
+registerTypeGenerator(array, () => anyArrayType)
+registerTypeGenerator(number, () => numberType)
+registerTypeGenerator(object, () => recordType)
+registerTypeGenerator(string, () => stringType)
+registerTypeGenerator(boolean, () => booleanType)
+registerTypeGenerator(date, () => ts.factory.createTypeReferenceNode('Date'))
+registerTypeGenerator(url, () => ts.factory.createTypeReferenceNode('URL'))
 
 /* ========================================================================== */
 
