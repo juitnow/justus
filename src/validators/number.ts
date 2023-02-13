@@ -1,6 +1,5 @@
-import { Branding, Validator } from '../types'
+import { Branding, Validator, AbstractValidator, makeValidatorFactory } from '../types'
 import { assertSchema, assertValidation } from '../errors'
-import { makeTupleRestIterable } from './tuple'
 import { ValidationError } from '..'
 
 /* ========================================================================== */
@@ -42,7 +41,7 @@ export interface BrandedNumberConstraints<B extends string> extends NumberConstr
 }
 
 /** A `Validator` validating any `number`. */
-export class AnyNumberValidator extends Validator<number> {
+export class AnyNumberValidator extends AbstractValidator<number> {
   validate(value: unknown): number {
     assertValidation(typeof value == 'number', 'Value is not a "number"')
     assertValidation(! isNaN(value), 'Number is "NaN"')
@@ -51,7 +50,7 @@ export class AnyNumberValidator extends Validator<number> {
 }
 
 /** A `Validator` validating `number`s with constaints. */
-export class NumberValidator<N extends number = number> extends Validator<N> {
+export class NumberValidator<N extends number = number> extends AbstractValidator<N> {
   #isMultipleOf?: ((value: number) => boolean)
 
   readonly allowNaN: boolean
@@ -160,4 +159,4 @@ export function _number(constraints?: NumberConstraints): Validator<number> {
 }
 
 /** Validate `number`s. */
-export const number = makeTupleRestIterable(_number)
+export const number = makeValidatorFactory(anyNumberValidator, _number)
