@@ -57,8 +57,6 @@ export function registerTypeGenerator<V extends Validator>(
     validator: V | ValidatorConstructor<V>,
     generator: TypeGenerator<V>,
 ): void {
-  // TODO
-  // assertSchema(validator.prototype instanceof AbstractValidator, 'Not a `Validator` class')
   generators.set(validator, generator)
 }
 
