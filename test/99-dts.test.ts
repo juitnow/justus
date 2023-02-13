@@ -230,7 +230,7 @@ describe('DTS Generation', () => {
         x: never,
       }),
     }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { readonly s: string; n?: number; readonly ro?: "RO"; readonly or?: "OR"; x?: never; };')
+        .to.equal('export type test = { readonly s: string; n?: number | undefined; readonly ro?: "RO" | undefined; readonly or?: "OR" | undefined; x?: never; };')
 
     expect(generateTypes({
       test: object({
