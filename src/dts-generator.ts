@@ -119,7 +119,13 @@ function generateTypeNode(
 
   const generator = generators.get(validator) || generators.get(validator.constructor)
   assertSchema(!! generator, `Type generator for "${validator.constructor.name}" not found`)
-  return generator(validator, references)
+  const type = generator(validator, references)
+
+  // here any "optional" generator will be treated as "type | undefined"
+  return validator.optional ?
+      type === neverType ? undefinedType : // "never | undefined" is always "undefined"
+      ts.factory.createUnionTypeNode([ type, undefinedType ]) : // "type | undefined"
+      type // simply "type"
 }
 
 /* ========================================================================== */
@@ -143,7 +149,6 @@ const recordType = ts.factory.createMappedTypeNode(
 
 // "Optional" modifier (the "?" token )
 const optionalKeyword = ts.factory.createToken(ts.SyntaxKind.QuestionToken)
-
 
 /* ========================================================================== */
 
@@ -200,8 +205,9 @@ registerTypeGenerator(NumberValidator, (validator: NumberValidator) => {
 })
 
 registerTypeGenerator(OptionalValidator, (validator: OptionalValidator, references) => {
-  const type = generateTypeNode(validator.validator, references)
-  return ts.factory.createUnionTypeNode([ type, undefinedType ])
+  // return the wrappeed type. The '... | undefined' part of the optional will
+  // be added in 'generateTypeNode' above, as _any_ validator can be optional
+  return generateTypeNode(validator.validator, references)
 })
 
 registerTypeGenerator(StringValidator, (validator: StringValidator) => {

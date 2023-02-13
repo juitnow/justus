@@ -60,7 +60,7 @@ describe('DTS Generation', () => {
 
     expect(generateTypes({
       test: never,
-    })).to.equal('export type test = never;')
+    })).to.equal('export type test = undefined;')
 
     expect(generateTypes({
       test: url,
@@ -99,7 +99,7 @@ describe('DTS Generation', () => {
 
     expect(generateTypes({
       test: new NeverValidator(),
-    })).to.equal('export type test = never;')
+    })).to.equal('export type test = undefined;')
 
     expect(generateTypes({
       test: new URLValidator(),
@@ -235,7 +235,7 @@ describe('DTS Generation', () => {
         x: never,
       }),
     }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { n?: number | undefined; x?: never; };')
+        .to.equal('export type test = { n?: number | undefined; x?: undefined; };')
 
     expect(generateTypes({
       test: object({
