@@ -597,10 +597,10 @@ function `objectOf` can come handy:
 import { objectOf, number } from 'justus'
 
 const o1 = objectOf(number)
-// here "o1" will have the shape `Record<string, number | undefined>`
+// here "o1" will have the shape "Record<string, number | undefined>""
 
 const o2 = objectOf({ test: number })
-// here "o2" will have the shape `Record<string, { test: number } | undefined>`
+// here "o2" will have the shape "Record<string, { test: number } | undefined>"
 ```
 
 
