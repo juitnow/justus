@@ -610,7 +610,7 @@ Optional Validator
 Optional properties properties can also be declared in objects, arrays, ...:
 
 ```typescript
-import { object, arrayOf, optional, string } from 'justus'
+import { object, arrayOf, optional, string, number, validate } from 'justus'
 
 const o1 = object({
   foo: string, // any string, but must be a string
@@ -623,6 +623,24 @@ const r1 = validate(o1, something)
 const o2 = arrayOf(optional(string)) // array members will be "string | undefined"
 const r2 = validate(o2, something)
 // here "r2" will have a shape like "(string | undefined)[]"
+```
+
+The optional validator can _also_ be used to inject _default values_ in case
+the source object doesn't have one. To do so, we can simply use the _second_
+parameter of our `optional(...)` function:
+
+```typescript
+import { object, arrayOf, optional, string, validate } from 'justus'
+
+const o1 = object({
+  foo: optional(number, 123), // any number, default is 123
+})
+
+const r1 = validate(o1, {})
+// here "r1" will be "{ foo: 123 }" (the default value)
+
+const r2 = validate(o1, { foo: 321 })
+// here "r2" will be "{ foo: 321 }" (overrides the default value)
 ```
 
 
