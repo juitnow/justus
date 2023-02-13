@@ -61,27 +61,43 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
 
     for (const [ key, validator ] of this.validators.entries()) {
       const optional = !! validator.optional
-
-      // no value? might be optional, but definitely not validated
-      if (record[key] === undefined) {
-        if (! optional) builder.record('Required property missing', key)
-        continue
-      }
+      const original = record[key]
 
       // strip any optional "null" value if told to do so
-      if (stripOptionalNulls && optional && (record[key] === null)) {
+      if (stripOptionalNulls && optional && (original === null)) {
         continue
       }
 
-      // all the rest gets validated normally
+      // if we have no value, then we have few possibilities:
+      // - the (optional) validator provides a valid value
+      // - the validator is optional, so we can simply ignore
+      // - the validator is not optional, so the property is missing
+      if (original === undefined) {
+        try {
+          // try to validate, the validator _might_ be giving us a value
+          const validated = validator.validate(original, options)
+          // put the validated value in the clone, unless optional and undefined
+          if (! (optional && (validated == undefined))) clone[key] = validated
+        } catch (error) {
+          if (optional) continue // original was undefined, so we can skip!
+          builder.record('Required property missing', key)
+          // builder.record(error, key) // double error!
+        }
+
+        continue
+      }
+
+      // here value was _not_ undefined, so we have to validate it normally
       try {
-        const value = validator.validate(record[key], options)
-        if (! (optional && (value == undefined))) clone[key] = value
+        const validated = validator.validate(original, options)
+        // put the validated value in the clone, unless optional and undefined
+        if (! (optional && (validated == undefined))) clone[key] = validated
       } catch (error) {
         builder.record(error, key)
       }
     }
 
+    // process additional keys, as all keys NOT defined in the schema
     const additionalKeys = Object.keys(record).filter((k) => !this.validators.has(k))
     const additional = this.additionalProperties
 
