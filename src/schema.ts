@@ -28,7 +28,7 @@ export function _allowAdditionalProperties(options?: Validation | boolean): Addi
   if (options === false) return { [additionalValidator]: false }
   if (options === true) return { [additionalValidator]: any }
 
-  return { [additionalValidator]: getValidator(options) }
+  return { [additionalValidator]: options ? getValidator(options) : any }
 }
 
 /**
