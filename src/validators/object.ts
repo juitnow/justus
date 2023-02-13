@@ -6,7 +6,6 @@ import {
   Validator,
   AbstractValidator,
   additionalValidator,
-  modifierValidator,
   never,
   restValidator,
   schemaValidator,
@@ -14,17 +13,10 @@ import {
 } from '../types'
 import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { getValidator } from '../utilities'
-import { isModifier } from '../schema'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
  * ========================================================================== */
-
-export type ObjectProperty = {
-  validator: Validator,
-  readonly?: true,
-  optional?: true,
-}
 
 /** A `Validator` validating any `object`. */
 export class AnyObjectValidator extends AbstractValidator<Record<string, any>> {
@@ -39,7 +31,7 @@ export class AnyObjectValidator extends AbstractValidator<Record<string, any>> {
 export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSchema<S>> {
   readonly schema: Readonly<S>
 
-  properties = new Map<string, ObjectProperty | undefined>()
+  validators = new Map<string, Validator | undefined>()
   additionalProperties?: Validator
 
   constructor(schema: S) {
@@ -52,15 +44,9 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
       const definition = properties[key]
 
       if (definition === never) {
-        this.properties.set(key, undefined)
-      } else if (isModifier(definition)) {
-        this.properties.set(key, {
-          validator: definition[modifierValidator],
-          readonly: definition.readonly,
-          optional: definition.optional,
-        })
+        this.validators.set(key, undefined)
       } else {
-        this.properties.set(key, { validator: getValidator(definition) })
+        this.validators.set(key, getValidator(definition))
       }
     }
 
@@ -77,9 +63,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
 
-    for (const [ key, property ] of this.properties.entries()) {
-      const { validator, optional } = property || {}
-
+    for (const [ key, validator ] of this.validators.entries()) {
       // no validator? this is "never" (forbidden)
       if (! validator) {
         if (record[key] === undefined) continue
@@ -90,12 +74,12 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
 
       // no value? might be optional, but definitely not validated
       if (record[key] === undefined) {
-        if (! optional) builder.record('Required property missing', key)
+        if (! validator.optional) builder.record('Required property missing', key)
         continue
       }
 
       // strip any optional "null" value if told to do so
-      if (stripOptionalNulls && optional && (record[key] === null)) {
+      if (stripOptionalNulls && validator.optional && (record[key] === null)) {
         continue
       }
 
@@ -107,7 +91,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
       }
     }
 
-    const additionalKeys = Object.keys(record).filter((k) => !this.properties.has(k))
+    const additionalKeys = Object.keys(record).filter((k) => !this.validators.has(k))
     const additional = this.additionalProperties
 
     if (additional) {
