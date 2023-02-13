@@ -22,5 +22,5 @@ reporter:
   - text
 report-dir: ./coverage
 produce-source-map: true
-preserve-comments: false
+preserve-comments: true
 cache: false
