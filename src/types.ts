@@ -58,7 +58,7 @@ export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
  */
 export function makeValidatorFactory<
   V extends Validator,
-  F extends () => Validator,
+  F extends (...args: any[]) => Validator,
 >(validator: V, factory: F): F & V {
   return Object.assign(factory, {
     validate: validator.validate.bind(validator),

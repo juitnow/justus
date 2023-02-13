@@ -86,22 +86,15 @@ export class ArrayValidator<T> extends AbstractValidator<T[]> {
   }
 }
 
-const anyArrayValidator = new AnyArrayValidator()
-
 /* -------------------------------------------------------------------------- */
 
-export function _array(): Validator<any[]>
-export function _array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>>
-
-export function _array(options?: ArrayConstraints<Validation>): Validator<any[]> {
-  if (! options) return anyArrayValidator
-
-  const items = options.items ? getValidator(options.items) : any
-  return new ArrayValidator({ ...options, items })
+export function _array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>> {
+  const items = constraints.items ? getValidator(constraints.items) : any
+  return new ArrayValidator({ ...constraints, items })
 }
 
 /** Validate `Array`s. */
-export const array = makeValidatorFactory(anyArrayValidator, _array)
+export const array = makeValidatorFactory(new AnyArrayValidator(), _array)
 
 /** Validate `Array`s containing only the specified elements. */
 export function arrayOf<V extends Validation>(validation: V): ArrayValidator<InferValidation<V>> {

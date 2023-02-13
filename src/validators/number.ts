@@ -147,16 +147,13 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
   }
 }
 
-const anyNumberValidator = new AnyNumberValidator()
 
-export function _number(): Validator<number>
-export function _number(constraints?: NumberConstraints): NumberValidator<number>
-export function _number<N extends number>(constraints?: NumberConstraints): NumberValidator<N>
+export function _number(constraints: NumberConstraints): NumberValidator<number>
+export function _number<N extends number>(constraints: NumberConstraints): NumberValidator<N>
 export function _number<B extends string>(constraints: BrandedNumberConstraints<B>): NumberValidator<number & Branding<B>>
-
-export function _number(constraints?: NumberConstraints): Validator<number> {
-  return constraints ? new NumberValidator(constraints) : anyNumberValidator
+export function _number(constraints: NumberConstraints): Validator<number> {
+  return new NumberValidator(constraints)
 }
 
 /** Validate `number`s. */
-export const number = makeValidatorFactory(anyNumberValidator, _number)
+export const number = makeValidatorFactory(new AnyNumberValidator(), _number)
