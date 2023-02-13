@@ -245,6 +245,21 @@ const validator = object({
 })
 ```
 
+To validate the string `true` or `false` as booleans, simply create the
+validator with the `fromString` option (defaults to `false`):
+
+```typescript
+import { boolean, object } from 'justus'
+
+const validator = object({
+  foo: boolean({ fromString: 'true' })
+})
+
+// Here myValue can be a boolean or the string "true" or "false" (case insensitive)
+const bool = validate(validator, myValue)
+```
+
+
 
 Constant Validator
 ------------------

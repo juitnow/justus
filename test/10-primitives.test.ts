@@ -15,6 +15,19 @@ describe('Primitive validators', () => {
       expect(validate(boolean, false)).to.be.false
     })
 
+    it('should validate a boolean from a string', () => {
+      expect(validate(boolean({ fromString: true }), 'true')).to.be.true
+      expect(validate(boolean({ fromString: true }), 'TRUE')).to.be.true
+      expect(validate(boolean({ fromString: true }), 'false')).to.be.false
+      expect(validate(boolean({ fromString: true }), 'FALSE')).to.be.false
+
+      expect(() => validate(boolean({ fromString: true }), 'hello'))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { path: [], message: 'Boolean can not be parsed from string' },
+          ])
+    })
+
     it('should fail validating non booleans', () => {
       expect(() => validate(boolean, 'foobar'))
           .to.throw(ValidationError, 'Found 1 validation error')
