@@ -5,6 +5,7 @@ import {
   Validation,
   ValidationOptions,
   Validator,
+  AbstractValidator,
 } from '../types'
 
 export type UnionArguments = readonly [ Validation, ...Validation[] ]
@@ -21,7 +22,7 @@ export type InferOneOfValidationType<A extends UnionArguments> =
   never
 
 /** A `Validator` validating a value as _one of_ the specified arguments. */
-export class OneOfValidator<A extends UnionArguments> extends Validator<InferOneOfValidationType<A>> {
+export class OneOfValidator<A extends UnionArguments> extends AbstractValidator<InferOneOfValidationType<A>> {
   readonly validators: readonly Validator[]
 
   constructor(args: A) {
@@ -59,7 +60,7 @@ export type InferAllOfValidationType<A extends UnionArguments> =
   never
 
 /** A `Validator` validating a value as _all of_ the specified arguments. */
-export class AllOfValidator<A extends UnionArguments> extends Validator<InferAllOfValidationType<A>> {
+export class AllOfValidator<A extends UnionArguments> extends AbstractValidator<InferAllOfValidationType<A>> {
   readonly validators: readonly Validator[]
 
   constructor(args: A) {
