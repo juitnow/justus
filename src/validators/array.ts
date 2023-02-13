@@ -1,8 +1,7 @@
 import { assertSchema, assertValidation, ValidationErrorBuilder } from '../errors'
-import { InferValidation, Validation, ValidationOptions, Validator } from '../types'
+import { InferValidation, Validation, ValidationOptions, AbstractValidator, Validator, makeValidatorFactory } from '../types'
 import { getValidator } from '../utilities'
 import { any } from './any'
-import { makeTupleRestIterable } from './tuple'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -21,7 +20,7 @@ export interface ArrayConstraints<V extends Validation> {
 }
 
 /** Basic validator for `Array` instances. */
-export class AnyArrayValidator<T = any> extends Validator<T[]> {
+export class AnyArrayValidator<T = any> extends AbstractValidator<T[]> {
   validate(value: unknown, options: ValidationOptions): T[] {
     void options
     assertValidation(Array.isArray(value), 'Value is not an "array"')
@@ -30,7 +29,7 @@ export class AnyArrayValidator<T = any> extends Validator<T[]> {
 }
 
 /** A validator for `Array` instances with constraints. */
-export class ArrayValidator<T> extends Validator<T[]> {
+export class ArrayValidator<T> extends AbstractValidator<T[]> {
   readonly maxItems: number
   readonly minItems: number
   readonly uniqueItems: boolean
@@ -97,12 +96,12 @@ export function _array<V extends Validation>(constraints: ArrayConstraints<V>): 
 export function _array(options?: ArrayConstraints<Validation>): Validator<any[]> {
   if (! options) return anyArrayValidator
 
-  const items = getValidator(options.items)
+  const items = options.items ? getValidator(options.items) : any
   return new ArrayValidator({ ...options, items })
 }
 
 /** Validate `Array`s. */
-export const array = makeTupleRestIterable(_array)
+export const array = makeValidatorFactory(anyArrayValidator, _array)
 
 /** Validate `Array`s containing only the specified elements. */
 export function arrayOf<V extends Validation>(validation: V): ArrayValidator<InferValidation<V>> {
