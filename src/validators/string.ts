@@ -1,6 +1,5 @@
-import { Branding, Validator } from '../types'
+import { Branding, Validator, AbstractValidator, makeValidatorFactory } from '../types'
 import { assertValidation, assertSchema } from '../errors'
-import { makeTupleRestIterable } from './tuple'
 
 /** Constraints to validate a `string` with. */
 export interface StringConstraints {
@@ -19,7 +18,7 @@ export interface BrandedStringConstraints<B extends string> extends StringConstr
 }
 
 /** A `Validator` validating any `string`. */
-export class AnyStringValidator extends Validator<string> {
+export class AnyStringValidator extends AbstractValidator<string> {
   validate(value: unknown): string {
     assertValidation(typeof value == 'string', 'Value is not a "string"')
     return value
@@ -27,7 +26,7 @@ export class AnyStringValidator extends Validator<string> {
 }
 
 /** A `Validator` validating `string`s with constraints. */
-export class StringValidator<S extends string = string> extends Validator<S> {
+export class StringValidator<S extends string = string> extends AbstractValidator<S> {
   readonly maxLength: number
   readonly minLength: number
   readonly pattern?: RegExp
@@ -81,4 +80,4 @@ export function _string(constraints?: StringConstraints): Validator<string> {
 }
 
 /** Validate `string`s. */
-export const string = makeTupleRestIterable(_string)
+export const string = makeValidatorFactory(anyStringValidator, _string)
