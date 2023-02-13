@@ -15,6 +15,7 @@ export { _array, array, arrayOf, AnyArrayValidator, ArrayConstraints, ArrayValid
 export { boolean, BooleanValidator } from './validators/boolean'
 export { constant, ConstantValidator } from './validators/constant'
 export { _date, date, DateConstraints, DateValidator } from './validators/date'
+export { never, NeverValidator } from './validators/never'
 export { _number, number, AnyNumberValidator, BrandedNumberConstraints, NumberConstraints, NumberValidator } from './validators/number'
 export { _object, object, AnyObjectValidator, ObjectValidator } from './validators/object'
 export { _string, string, AnyStringValidator, BrandedStringConstraints, StringConstraints, StringValidator } from './validators/string'
