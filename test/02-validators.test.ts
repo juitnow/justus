@@ -1,23 +1,15 @@
-import { any, ConstantValidator, getValidator, ObjectValidator, Schema, TupleValidator, Validator } from '../src/index'
+import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, Schema, TupleValidator } from '../src/index'
 import { expect } from 'chai'
 
 describe('Validators', () => {
   const schemaValidator = Symbol.for('justus.schemaValidator')
   const restValidator = Symbol.for('justus.restValidator')
 
-  const fakeValidator = new class extends Validator {
+  const fakeValidator = new class extends AbstractValidator {
     validate(): never {
       throw new Error('Method not implemented.')
     }
   }
-
-  function fakeCreator(): Validator {
-    return fakeValidator
-  }
-
-  it('undefined', () => {
-    expect(getValidator()).to.equal(any)
-  })
 
   it('null', () => {
     expect(getValidator(null))
@@ -42,10 +34,6 @@ describe('Validators', () => {
     expect(getValidator('Hello, world!'))
         .to.be.instanceOf(ConstantValidator)
         .with.property('constant').to.equal('Hello, world!')
-  })
-
-  it('creator functions', () => {
-    expect(getValidator(fakeCreator)).to.equal(fakeValidator)
   })
 
   it('objects', () => {
