@@ -21,7 +21,6 @@ import {
   object,
   oneOf,
   optional,
-  readonly,
   string,
   url,
   URLValidator,
@@ -223,14 +222,11 @@ describe('DTS Generation', () => {
 
     expect(generateTypes({
       test: object({
-        s: readonly(string),
         n: optional(number),
-        ro: readonly(optional('RO')),
-        or: optional(readonly('OR')),
         x: never,
       }),
     }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { readonly s: string; n?: number | undefined; readonly ro?: "RO" | undefined; readonly or?: "OR" | undefined; x?: never; };')
+        .to.equal('export type test = { n?: number | undefined; x?: never; };')
 
     expect(generateTypes({
       test: object({
