@@ -2,6 +2,7 @@ import { expectAssignable, expectType, printType } from 'tsd'
 import {
   any,
   array,
+  arrayOf,
   boolean,
   constant,
   number,
@@ -149,3 +150,9 @@ expectAssignable<{
   on?: BrandedNumber | undefined,
   os?: BrandedString | undefined,
 }>(o6)
+
+// -------------------------------------------------------------------------- //
+// arrays
+
+const o7 = validate(arrayOf(optional(string)), null)
+expectType<(string | undefined)[]>(o7)

@@ -1,4 +1,4 @@
-import { number, object, optional, string, strip, validate, ValidationError } from '../src/index'
+import { arrayOf, number, object, optional, string, strip, validate, ValidationError } from '../src/index'
 import { expect } from 'chai'
 
 describe('Object modifiers', () => {
@@ -10,6 +10,20 @@ describe('Object modifiers', () => {
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').eql([
           { path: [], message: 'Value does not match constant "foobar"' },
+        ])
+  })
+
+  it('should validate an array with optional elements', () => {
+    const validation = arrayOf(optional('foobar'))
+    expect(validate(validation, [ undefined ])).to.eql([ undefined ])
+    expect(validate(validation, [ 'foobar' ])).to.eql([ 'foobar' ])
+    expect(validate(validation, [ undefined, 'foobar' ])).to.eql([ undefined, 'foobar' ])
+
+    expect(() => validate(validation, [ 'wrong', 12 ]))
+        .to.throw(ValidationError, 'Found 2 validation errors')
+        .with.property('errors').eql([
+          { path: [ 0 ], message: 'Value does not match constant "foobar"' },
+          { path: [ 1 ], message: 'Value does not match constant "foobar"' },
         ])
   })
 
