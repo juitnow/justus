@@ -1,4 +1,4 @@
-import { Tuple, InferTuple, Validator, TupleRestParameter, InferValidation, restValidator } from '../types'
+import { Tuple, InferTuple, Validator, AbstractValidator, restValidator } from '../types'
 import { ValidationOptions } from '../types'
 import { assertValidation, ValidationError } from '../errors'
 import { getValidator } from '../utilities'
@@ -7,7 +7,7 @@ import { nullValidator } from './constant'
 export interface TupleMember { single: boolean, validator: Validator }
 
 /** A `Validator` for _tuples_. */
-export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
+export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTuple<T>> {
   readonly members: readonly TupleMember[]
   readonly tuple: T
 
@@ -77,14 +77,4 @@ export class TupleValidator<T extends Tuple> extends Validator<InferTuple<T>> {
 /** Validate _tuples_. */
 export function tuple<T extends Tuple>(tuple: T): Validator<InferTuple<T>> {
   return new TupleValidator(tuple)
-}
-
-export function makeTupleRestIterable<
-  F extends () => Validator,
->(create: F): F & Iterable<TupleRestParameter<InferValidation<F>>> {
-  const validator = create()
-  ;(<any>create)[Symbol.iterator] = function* (): Generator<TupleRestParameter<InferValidation<F>>> {
-    yield { [restValidator]: validator }
-  }
-  return create as any
 }
