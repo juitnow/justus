@@ -1,4 +1,4 @@
-import { arrayOf, number, object, optional, string, strip, validate, ValidationError } from '../src/index'
+import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from '../src/index'
 import { expect } from 'chai'
 
 describe('Object modifiers', () => {
@@ -44,6 +44,56 @@ describe('Object modifiers', () => {
         .with.property('errors').eql([
           { path: [ 'bar' ], message: 'Number is less than 50' },
           { path: [ 'baz' ], message: 'Unknown property' },
+        ])
+  })
+
+  it('should validate an object with optional properties and defaults', () => {
+    const schema = object({
+      foo: optional(oneOf('hello', 'world'), 'hello'),
+      bar: optional(number({ minimum: 5 }), 10),
+      baz: optional(string, 'world'),
+    })
+
+    expect(validate(schema, {}))
+        .to.eql({ foo: 'hello', bar: 10, baz: 'world' })
+
+    expect(validate(schema, { foo: 'world', bar: 15, baz: 'hello' }))
+        .to.eql({ foo: 'world', bar: 15, baz: 'hello' })
+
+    expect(() => validate(schema, { foo: 'nope', bar: 0, baz: 0 }))
+        .to.throw(ValidationError, 'Found 4 validation errors')
+        .with.property('errors').eql([
+          { path: [ 'foo' ], message: 'Value does not match constant "hello"' },
+          { path: [ 'foo' ], message: 'Value does not match constant "world"' },
+          { path: [ 'bar' ], message: 'Number is less than 5' },
+          { path: [ 'baz' ], message: 'Value is not a "string"' },
+        ])
+  })
+
+  it('should validate an object when a validator is forced as "optional"', () => {
+    // here we "force" a non-optional validator to be optional: it will have
+    // no default and throw, but since it is _optional_, if the value is
+    // undefined the error will be ignored!
+    const validator = new StringValidator()
+    validator.optional = true
+
+    expect(validate({ test: validator }, { })).to.eql({})
+    expect(() => validate({ test: validator }, { test: 123 }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').eql([
+          { path: [ 'test' ], message: 'Value is not a "string"' },
+        ])
+  })
+
+  it('should fail when a default value does not match the validation', () => {
+    expect(() => object({
+      foo: optional(oneOf('hello', 'world'), 'nope' as any),
+    })).to.throw(TypeError, 'Default value does not match validator')
+        .and.have.property('cause')
+        .instanceOf(ValidationError)
+        .with.property('errors').eql([
+          { path: [], message: 'Value does not match constant "hello"' },
+          { path: [], message: 'Value does not match constant "world"' },
         ])
   })
 
