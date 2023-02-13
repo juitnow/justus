@@ -588,6 +588,22 @@ const o3 = object({
 } as const)
 ```
 
+#### Simple records
+
+When attempting to validate a simple `Record<string, ...anything...>` the
+function `objectOf` can come handy:
+
+```typescript
+import { objectOf, number } from 'justus'
+
+const o1 = objectOf(number)
+// here "o1" will have the shape `Record<string, number | undefined>`
+
+const o2 = objectOf({ test: number })
+// here "o2" will have the shape `Record<string, { test: number } | undefined>`
+```
+
+
 Optional Validator
 ------------------
 

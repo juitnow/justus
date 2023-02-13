@@ -10,6 +10,7 @@ import {
   validate,
   arrayOf,
 } from '../src'
+import { objectOf } from '../src/validators/object'
 
 printType('__file_marker__')
 
@@ -152,3 +153,15 @@ expectAssignable<{
   n: BrandedNumber,
   s: BrandedString,
 }>(o6)
+
+// -------------------------------------------------------------------------- //
+// "objectOf" shortcutr
+
+const o7 = validate(objectOf(number), null)
+expectType<Record<string, number | undefined>>(o7)
+
+const o8 = validate(objectOf([ 1, 2, 3 ] as const), null)
+expectType<Record<string, [ 1, 2, 3 ] | undefined>>(o8)
+
+const o9 = validate(objectOf({ test: boolean }), null)
+expectType<Record<string, { test: boolean } | undefined>>(o9)

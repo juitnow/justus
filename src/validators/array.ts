@@ -97,6 +97,6 @@ export function _array<V extends Validation>(constraints: ArrayConstraints<V>): 
 export const array = makeValidatorFactory(new AnyArrayValidator(), _array)
 
 /** Validate `Array`s containing only the specified elements. */
-export function arrayOf<V extends Validation>(validation: V): ArrayValidator<InferValidation<V>> {
+export function arrayOf<V extends Validation>(validation: V): Validator<InferValidation<V>[]> {
   return new ArrayValidator({ items: getValidator(validation) })
 }

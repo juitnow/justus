@@ -9,9 +9,12 @@ import {
   restValidator,
   schemaValidator,
   makeValidatorFactory,
+  Validation,
+  InferValidation,
 } from '../types'
 import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { getValidator } from '../utilities'
+import { allowAdditionalProperties } from '../schema'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -117,3 +120,8 @@ export function _object<S extends Schema>(schema: S): S & {
 
 /** Validate `object`s. */
 export const object = makeValidatorFactory(new AnyObjectValidator(), _object)
+
+/** Validate `Object`s containing only the specified elements. */
+export function objectOf<V extends Validation>(validation: V): Validator<Record<string, InferValidation<V> | undefined>> {
+  return new ObjectValidator({ ...allowAdditionalProperties(validation) })
+}

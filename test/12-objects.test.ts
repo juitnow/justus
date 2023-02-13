@@ -1,4 +1,4 @@
-import { ValidationError, object, validate, string, number, array, allowAdditionalProperties, any, never, strip } from '../src/index'
+import { ValidationError, object, objectOf, validate, string, number, array, allowAdditionalProperties, any, never, strip, boolean } from '../src/index'
 import { expect } from 'chai'
 
 describe('Object validator', () => {
@@ -174,6 +174,29 @@ describe('Object validator', () => {
         .with.property('errors').to.eql([
           { path: [ 'baz' ], message: 'Forbidden property' },
           { path: [ 'bar' ], message: 'Value is not a "string"' },
+        ])
+  })
+
+  it('should validate an object of specific values', () => {
+    const validator1 = objectOf(string)
+    expect(validate(validator1, { foo: 'FOO', bar: 'BAR' }))
+        .to.eql({ foo: 'FOO', bar: 'BAR' })
+
+    expect(() => validate(validator1, { foo: 'FOO', bar: true }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'bar' ], message: 'Value is not a "string"' },
+        ])
+
+    const validator2 = objectOf({ test: boolean })
+    expect(validate(validator2, { foo: { test: true }, bar: { test: false } }))
+        .to.eql({ foo: { test: true }, bar: { test: false } })
+
+    expect(() => validate(validator2, { foo: { test: 'hello' }, bar: { test: 123 } }))
+        .to.throw(ValidationError, 'Found 2 validation errors')
+        .with.property('errors').to.eql([
+          { path: [ 'foo', 'test' ], message: 'Value is not a "boolean"' },
+          { path: [ 'bar', 'test' ], message: 'Value is not a "boolean"' },
         ])
   })
 
