@@ -1,6 +1,5 @@
 import { assertSchema, assertValidation, ValidationError } from '../errors'
-import { Validator } from '../types'
-import { makeTupleRestIterable } from './tuple'
+import { AbstractValidator, makeValidatorFactory } from '../types'
 
 /** Lifted from AngularJS: matches a valid RFC 3339 string. */
 const ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))?)?$/
@@ -16,7 +15,7 @@ export interface DateConstraints {
 }
 
 /** A `Validator` validating dates and converting them to `Date` instances. */
-export class DateValidator extends Validator<Date> {
+export class DateValidator extends AbstractValidator<Date> {
   readonly format?: 'iso' | 'timestamp'
   readonly from?: Date
   readonly until?: Date
@@ -75,4 +74,4 @@ export function _date(constraints?: DateConstraints): DateValidator {
 }
 
 /** Validate dates and convert them to `Date` instances. */
-export const date = makeTupleRestIterable(_date)
+export const date = makeValidatorFactory(anyDateValidator, _date)
