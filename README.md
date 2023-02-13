@@ -93,7 +93,7 @@ String validators are created using the `string` function:
 ```typescript
 import { string } from 'justus'
 
-const s1 = string() // validates any string
+const s1 = string // validates any string
 const s2 = string({ minLength: 1 }) // validate non empty strings
 ```
 
@@ -165,7 +165,7 @@ Number validators are created using the `number` function:
 ```typescript
 import { number } from 'justus'
 
-const n1 = number() // validates any number
+const n1 = number // validates any number
 const n2 = number({ minimum: 123 }) // validate numbers 123 and greater
 ```
 
@@ -310,7 +310,7 @@ Array validators are created using the `array` or `arrayOf` functions:
 ```typescript
 import { array, arrayOf, number, string } from 'justus'
 
-const a1 = array() // validates any array
+const a1 = array // validates any array
 const a2 = array({ maxItems: 10, items: string }) // array of strings
 const a3 = arrayOf(number) // array of numbers
 ```
@@ -354,7 +354,7 @@ Date validators are created using the `date` function:
 ```typescript
 import { date } from 'justus'
 
-const d1 = date() // validates any date
+const d1 = date // validates any date
 const d2 = date({ format: 'iso' }) // validate ISO dates
 ```
 
@@ -435,7 +435,7 @@ As seen in the examples above, object validators are created using the
 ```typescript
 import { object, string, number, boolean } from 'justus'
 
-const o1 = object() // any object (excluding null - darn JavaScript)
+const o1 = object // any object (excluding null - darn JavaScript)
 const o2 = object({
   foo: string, // any string
   bar: number, // any number
