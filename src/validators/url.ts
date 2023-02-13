@@ -129,11 +129,8 @@ export class URLValidator extends AbstractValidator<URL> {
 
 const anyURLValidator = new URLValidator()
 
-export function _url(): URLValidator
-export function _url(constraints: URLConstraints): URLValidator
-
-export function _url(constraints?: URLConstraints): URLValidator {
-  return constraints ? new URLValidator(constraints) : anyURLValidator
+export function _url(constraints: URLConstraints): URLValidator {
+  return new URLValidator(constraints)
 }
 
 /** Validate URLs and convert them to `URL` instances. */
