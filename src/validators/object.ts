@@ -6,7 +6,6 @@ import {
   Validator,
   AbstractValidator,
   additionalValidator,
-  never,
   restValidator,
   schemaValidator,
   makeValidatorFactory,
@@ -31,7 +30,7 @@ export class AnyObjectValidator extends AbstractValidator<Record<string, any>> {
 export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSchema<S>> {
   readonly schema: Readonly<S>
 
-  validators = new Map<string, Validator | undefined>()
+  validators = new Map<string, Validator>()
   additionalProperties?: Validator
 
   constructor(schema: S) {
@@ -41,13 +40,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     if (additional) this.additionalProperties = getValidator(additional)
 
     for (const key of Object.keys(properties)) {
-      const definition = properties[key]
-
-      if (definition === never) {
-        this.validators.set(key, undefined)
-      } else {
-        this.validators.set(key, getValidator(definition))
-      }
+      this.validators.set(key, getValidator(properties[key]))
     }
 
     this.schema = schema
@@ -57,35 +50,30 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
 
-    const { stripAdditionalProperties, stripForbiddenProperties, stripOptionalNulls } = options
+    const { stripAdditionalProperties, stripOptionalNulls } = options
 
     const record: { [ k in string | number | symbol ]?: unknown } = value
     const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
 
     for (const [ key, validator ] of this.validators.entries()) {
-      // no validator? this is "never" (forbidden)
-      if (! validator) {
-        if (record[key] === undefined) continue
-        if (stripForbiddenProperties) continue
-        builder.record('Forbidden property', key)
-        continue
-      }
+      const optional = !! validator.optional
 
       // no value? might be optional, but definitely not validated
       if (record[key] === undefined) {
-        if (! validator.optional) builder.record('Required property missing', key)
+        if (! optional) builder.record('Required property missing', key)
         continue
       }
 
       // strip any optional "null" value if told to do so
-      if (stripOptionalNulls && validator.optional && (record[key] === null)) {
+      if (stripOptionalNulls && optional && (record[key] === null)) {
         continue
       }
 
       // all the rest gets validated normally
       try {
-        clone[key] = validator.validate(record[key], options)
+        const value = validator.validate(record[key], options)
+        if (! (optional && (value == undefined))) clone[key] = value
       } catch (error) {
         builder.record(error, key)
       }
