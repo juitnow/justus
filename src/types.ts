@@ -246,7 +246,6 @@ export type InferSchema2<S extends Schema> =
     S[key] extends CombinedModifier<infer V> ? InferValidation<V> | undefined :
     S[key] extends OptionalModifier<infer V> ? InferValidation<V> | undefined :
     S[key] extends ReadonlyModifier<infer V> ? InferValidation<V> :
-    S[key] extends typeof never ? never :
     InferValidation<S[key]>
   } | {
     readonly [ key in keyof S as key extends string ? key : never ]:
