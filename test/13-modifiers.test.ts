@@ -1,4 +1,4 @@
-import { number, object, optional, readonly, string, strip, validate, ValidationError } from '../src/index'
+import { number, object, optional, string, strip, validate, ValidationError } from '../src/index'
 import { expect } from 'chai'
 
 describe('Object modifiers', () => {
@@ -17,20 +17,19 @@ describe('Object modifiers', () => {
     const schema1 = object({
       foo: string,
       bar: optional(number({ minimum: 50 })),
-      baz: readonly(number({ maximum: 50 })),
     })
 
-    expect(validate(schema1, { foo: 'hello', bar: 50, baz: 50 }))
-        .to.eql({ foo: 'hello', bar: 50, baz: 50 })
+    expect(validate(schema1, { foo: 'hello', bar: 50 }))
+        .to.eql({ foo: 'hello', bar: 50 })
 
-    expect(validate(schema1, { foo: 'hello', baz: 50 }))
-        .to.eql({ foo: 'hello', baz: 50 })
+    expect(validate(schema1, { foo: 'hello' }))
+        .to.eql({ foo: 'hello' })
 
     expect(() => validate(schema1, { foo: 'hello', bar: 40, baz: 60 }))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').eql([
           { path: [ 'bar' ], message: 'Number is less than 50' },
-          { path: [ 'baz' ], message: 'Number is greater than 50' },
+          { path: [ 'baz' ], message: 'Unknown property' },
         ])
   })
 
@@ -38,23 +37,21 @@ describe('Object modifiers', () => {
     const schema1 = object({
       foo: string,
       bar: optional(number({ minimum: 50 })),
-      baz: readonly(number({ maximum: 50 })),
     })
 
-    expect(strip(schema1, { foo: 'hello', bar: 50, baz: 50, extra: 'foo' }))
-        .to.eql({ foo: 'hello', bar: 50, baz: 50 })
+    expect(strip(schema1, { foo: 'hello', bar: 50, extra: 'foo' }))
+        .to.eql({ foo: 'hello', bar: 50 })
 
-    expect(strip(schema1, { foo: 'hello', bar: null, baz: 50, extra: 'foo' }))
-        .to.eql({ foo: 'hello', baz: 50 })
+    expect(strip(schema1, { foo: 'hello', bar: null, extra: 'foo' }))
+        .to.eql({ foo: 'hello' })
 
-    expect(strip(schema1, { foo: 'hello', baz: 50, extra: 'foo' }))
-        .to.eql({ foo: 'hello', baz: 50 })
+    expect(strip(schema1, { foo: 'hello', extra: 'foo' }))
+        .to.eql({ foo: 'hello' })
 
     expect(() => strip(schema1, { foo: 'hello', bar: 40, baz: 60, extra: 'foo' }))
-        .to.throw(ValidationError, 'Found 2 validation errors')
+        .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').eql([
           { path: [ 'bar' ], message: 'Number is less than 50' },
-          { path: [ 'baz' ], message: 'Number is greater than 50' },
         ])
   })
 })
