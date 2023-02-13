@@ -14,9 +14,6 @@ export const schemaValidator = Symbol.for('justus.schemaValidator')
 /** A symbol indicating the `Validator` for a `Schema`'s additional properties. */
 export const additionalValidator = Symbol.for('justus.additionalValidator')
 
-/** A symbol indicating that a `Schema` property is _forbidden_. */
-export const never = Symbol.for('justus.never')
-
 /* ========================================================================== *
  * BASIC VALIDATION TYPES                                                     *
  * ========================================================================== */
@@ -189,7 +186,7 @@ export type InferTuple<T> =
  * how they should be validated.
  */
 export interface Schema {
-  [ key: string ] : Validation | typeof never
+  [ key: string ] : Validation
   [ additionalValidator ]?: Validator | false
 }
 
