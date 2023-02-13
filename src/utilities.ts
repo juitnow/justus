@@ -12,10 +12,7 @@ import { ObjectValidator } from './validators/object'
  *
  * When `validation` is `undefined` it will return a `Validator<any>`,
  */
-export function getValidator(validation?: Validation): Validator {
-  // Undefined is never a validator...
-  if (validation === undefined) throw new TypeError('Invalid undefined validation')
-
+export function getValidator(validation: Validation): Validator {
   // Null is a constant
   if (validation === null) return nullValidator
 
