@@ -16,6 +16,7 @@ import {
   date,
   DateValidator,
   getValidator,
+  never,
   NeverValidator,
   number,
   NumberValidator,
@@ -164,6 +165,7 @@ registerTypeGenerator(number, () => numberType)
 registerTypeGenerator(object, () => recordType)
 registerTypeGenerator(string, () => stringType)
 registerTypeGenerator(boolean, () => booleanType)
+registerTypeGenerator(never, () => neverType)
 registerTypeGenerator(date, () => ts.factory.createTypeReferenceNode('Date'))
 registerTypeGenerator(url, () => ts.factory.createTypeReferenceNode('URL'))
 

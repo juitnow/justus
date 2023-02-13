@@ -17,6 +17,7 @@ import {
   date,
   DateValidator,
   never,
+  NeverValidator,
   number,
   object,
   oneOf,
@@ -58,6 +59,10 @@ describe('DTS Generation', () => {
     })).to.equal('export type test = Date;')
 
     expect(generateTypes({
+      test: never,
+    })).to.equal('export type test = never;')
+
+    expect(generateTypes({
       test: url,
     })).to.equal('export type test = URL;')
   })
@@ -91,6 +96,10 @@ describe('DTS Generation', () => {
     expect(generateTypes({
       test: new DateValidator(),
     })).to.equal('export type test = Date;')
+
+    expect(generateTypes({
+      test: new NeverValidator(),
+    })).to.equal('export type test = never;')
 
     expect(generateTypes({
       test: new URLValidator(),
