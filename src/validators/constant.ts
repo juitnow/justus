@@ -1,8 +1,8 @@
-import { Validator } from '../types'
+import { AbstractValidator, Validator } from '../types'
 import { assertValidation } from '../errors'
 
 /** A `Validator` for _constants_. */
-export class ConstantValidator<T extends string | number | boolean | null> extends Validator<T> {
+export class ConstantValidator<T extends string | number | boolean | null> extends AbstractValidator<T> {
   readonly constant: T
 
   constructor(constant: T) {
