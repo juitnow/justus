@@ -1,7 +1,6 @@
 import { ConstantValidator } from './constant'
 import { ValidationError, ValidationErrorBuilder } from '../errors'
-import { Schema, Validator } from '../types'
-import { makeTupleRestIterable } from './tuple'
+import { Schema, Validator, AbstractValidator, makeValidatorFactory } from '../types'
 import { ObjectValidator, ValidationOptions } from '..'
 
 const KEYS: Exclude<keyof URLConstraints, 'searchParams'>[] = [
@@ -58,7 +57,7 @@ export interface URLConstraints {
 }
 
 /** A `Validator` validating URLs and converting them to `URL` instances. */
-export class URLValidator extends Validator<URL> {
+export class URLValidator extends AbstractValidator<URL> {
   readonly href?: Validator<string>
   readonly origin?: Validator<string>
   readonly protocol?: Validator<string>
@@ -138,4 +137,4 @@ export function _url(constraints?: URLConstraints): URLValidator {
 }
 
 /** Validate URLs and convert them to `URL` instances. */
-export const url = makeTupleRestIterable(_url)
+export const url = makeValidatorFactory(anyURLValidator, _url)
