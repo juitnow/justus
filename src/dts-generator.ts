@@ -23,7 +23,6 @@ import {
   ObjectValidator,
   OneOfValidator,
   OptionalValidator,
-  ReadonlyValidator,
   string,
   StringValidator,
   TupleValidator,
@@ -141,9 +140,7 @@ const recordType = ts.factory.createMappedTypeNode(
     anyType, // type of the mapped key
     undefined) // members
 
-// Modifiers and tokens
-
-const readonlyKeyword = [ ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword) ]
+// "Optional" modifier (the "?" token )
 const optionalKeyword = ts.factory.createToken(ts.SyntaxKind.QuestionToken)
 
 
@@ -203,10 +200,6 @@ registerTypeGenerator(NumberValidator, (validator: NumberValidator) => {
 registerTypeGenerator(OptionalValidator, (validator: OptionalValidator, references) => {
   const type = generateTypeNode(validator.validator, references)
   return ts.factory.createUnionTypeNode([ type, undefinedType ])
-})
-
-registerTypeGenerator(ReadonlyValidator, (validator: ReadonlyValidator, references) => {
-  return generateTypeNode(validator.validator, references)
 })
 
 registerTypeGenerator(StringValidator, (validator: StringValidator) => {
@@ -277,13 +270,12 @@ registerTypeGenerator(ObjectValidator, (validator, references) => {
   for (const [ key, valueValidator ] of validator.validators.entries()) {
     const type = generateTypeNode(valueValidator, references)
     const optional = valueValidator.optional
-    const readonly = valueValidator.readonly
 
     const signature = ts.factory.createPropertySignature(
-          readonly ? readonlyKeyword : undefined,
-          key,
-          optional ? optionalKeyword : undefined,
-          type)
+        undefined,
+        key,
+        optional ? optionalKeyword : undefined,
+        type)
 
     properties.push(signature)
   }
