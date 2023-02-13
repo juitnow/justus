@@ -17,8 +17,8 @@ expectType<number>(validate(number, null))
 expectType<string>(validate(string, null))
 
 // constructed validators
-expectType<number>(validate(number(), null))
-expectType<string>(validate(string(), null))
+expectType<number>(validate(number({}), null))
+expectType<string>(validate(string({}), null))
 
 // constants
 expectType<null>(validate(constant(null), null))
@@ -38,8 +38,8 @@ expectType<'xyz'>(validate('xyz', null))
 type BrandedNumber = number & { __branded_number: never }
 type BrandedString = string & { __branded_string: never }
 
-expectType<BrandedNumber>(validate(number<BrandedNumber>(), null))
-expectType<BrandedString>(validate(string<BrandedString>(), null))
+expectType<BrandedNumber>(validate(number<BrandedNumber>({}), null))
+expectType<BrandedString>(validate(string<BrandedString>({}), null))
 
 // implicit branding
 expectType<never>(validate(number({ brand: 'test' }), null).__brand_test)

@@ -164,11 +164,6 @@ describe('DTS Generation', () => {
         .to.equal('export type test = { [key in string]: any; };')
 
     expect(generateTypes({
-      test: object(),
-    }).replace(/\s+/gm, ' '))
-        .to.equal('export type test = { [key in string]: any; };')
-
-    expect(generateTypes({
       test: object({}),
     }).replace(/\s+/gm, ' '))
         .to.equal('export type test = {};')

@@ -6,9 +6,6 @@ describe('Array validator', () => {
     expect(validate(array, [ 1, true, 'foo' ])).to.eql([ 1, true, 'foo' ])
     expect(validate(array, [])).to.eql([])
 
-    expect(validate(array(), [ 1, true, 'foo' ])).to.eql([ 1, true, 'foo' ])
-    expect(validate(array(), [])).to.eql([])
-
     expect(() => validate(array, 123))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([
@@ -42,7 +39,7 @@ describe('Array validator', () => {
   })
 
   it('should validate an array with unique items', () => {
-    expect(validate(array(), [ 1, 2, 1 ])).to.eql([ 1, 2, 1 ])
+    expect(validate(array, [ 1, 2, 1 ])).to.eql([ 1, 2, 1 ])
     expect(validate(array({ uniqueItems: false }), [ 1, 2, 1 ])).to.eql([ 1, 2, 1 ])
 
     expect(() => validate(array({ uniqueItems: true }), [ 1, 2, 1, 2 ]))
@@ -63,9 +60,9 @@ describe('Array validator', () => {
           { path: [ 3 ], message: 'Value is not a "string"' },
         ])
 
-    expect(validate(arrayOf(string()), [ 'a', 'b', 'c' ])).to.eql([ 'a', 'b', 'c' ])
+    expect(validate(arrayOf(string), [ 'a', 'b', 'c' ])).to.eql([ 'a', 'b', 'c' ])
 
-    expect(() => validate(arrayOf(string()), [ 'a', true, 'b', 123 ]))
+    expect(() => validate(arrayOf(string), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
           { path: [ 1 ], message: 'Value is not a "string"' },

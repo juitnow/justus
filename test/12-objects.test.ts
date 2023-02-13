@@ -6,9 +6,6 @@ describe('Object validator', () => {
     expect(validate(object, {})).to.eql({})
     expect(validate(object, { a: 1, b: 'foo' })).to.eql({ a: 1, b: 'foo' })
 
-    expect(validate(object(), {})).to.eql({})
-    expect(validate(object(), { a: 1, b: 'foo' })).to.eql({ a: 1, b: 'foo' })
-
     expect(() => validate(object, 123))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([

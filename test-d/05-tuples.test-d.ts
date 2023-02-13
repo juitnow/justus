@@ -16,16 +16,13 @@ expectType<(number|string)[]>(validate(tuple([ 1, string ]), null))
 expectType<[ 1, number ]>(validate(tuple([ 1, number ] as const), null))
 
 // with rest arguments
-expectType<(number|string)[]>(validate(tuple([ 1, ...string() ]), null))
-expectType<[ 1, ...number[] ]>(validate(tuple([ 1, ...number() ] as const), null))
+expectType<(number|string)[]>(validate(tuple([ 1, ...string ]), null))
+expectType<[ 1, ...number[] ]>(validate(tuple([ 1, ...number ] as const), null))
 
 expectType<(number|string)[]>(validate(tuple([ 1, ...string ]), null))
 expectType<[ 1, ...number[] ]>(validate(tuple([ 1, ...number ] as const), null))
 
 // only rest arguments
-expectType<string[]>(validate(tuple([ ...string() ]), null))
-expectType<number[]>(validate(tuple([ ...number() ] as const), null))
-
 expectType<string[]>(validate(tuple([ ...string ]), null))
 expectType<number[]>(validate(tuple([ ...number ] as const), null))
 

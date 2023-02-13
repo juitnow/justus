@@ -23,10 +23,6 @@ expectType<boolean[]>(validate(arrayOf(boolean), null))
 expectType<number[]>(validate(arrayOf(number), null))
 expectType<string[]>(validate(arrayOf(string), null))
 
-// constructed validators
-expectType<number[]>(validate(arrayOf(number()), null))
-expectType<string[]>(validate(arrayOf(string()), null))
-
 // constants
 expectType<null[]>(validate(arrayOf(constant(null)), null))
 expectType<true[]>(validate(arrayOf(constant(true)), null))
@@ -42,8 +38,8 @@ expectType<12345[]>(validate(arrayOf(12345), null))
 expectType<'xyz'[]>(validate(arrayOf('xyz'), null))
 
 // "branded" primitives
-expectType<BrandedNumber[]>(validate(arrayOf(number<BrandedNumber>()), null))
-expectType<BrandedString[]>(validate(arrayOf(string<BrandedString>()), null))
+expectType<BrandedNumber[]>(validate(arrayOf(number<BrandedNumber>({})), null))
+expectType<BrandedString[]>(validate(arrayOf(string<BrandedString>({})), null))
 
 // -------------------------------------------------------------------------- //
 
@@ -53,10 +49,6 @@ expectType<any[]>(validate(array({ items: any }), null))
 expectType<boolean[]>(validate(array({ items: boolean }), null))
 expectType<number[]>(validate(array({ items: number }), null))
 expectType<string[]>(validate(array({ items: string }), null))
-
-// constructed validators
-expectType<number[]>(validate(array({ items: number() }), null))
-expectType<string[]>(validate(array({ items: string() }), null))
 
 // constants
 expectType<null[]>(validate(array({ items: constant(null) }), null))
@@ -73,5 +65,5 @@ expectType<12345[]>(validate(array({ items: 12345 }), null))
 expectType<'xyz'[]>(validate(array({ items: 'xyz' }), null))
 
 // "branded" primitives
-expectType<BrandedNumber[]>(validate(array({ items: number<BrandedNumber>() }), null))
-expectType<BrandedString[]>(validate(array({ items: string<BrandedString>() }), null))
+expectType<BrandedNumber[]>(validate(array({ items: number<BrandedNumber>({}) }), null))
+expectType<BrandedString[]>(validate(array({ items: string<BrandedString>({}) }), null))

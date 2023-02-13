@@ -37,7 +37,7 @@ expectError(validate(object({
 
 expectType<null | undefined>(validate(object({ ...allowAdditionalProperties(null) }), null).extra)
 expectType<Record<string, any> | undefined>(validate(object({ ...allowAdditionalProperties(object) }), null).extra)
-expectType<number | undefined>(validate(object({ ...allowAdditionalProperties(number()) }), null).extra)
+expectType<number | undefined>(validate(object({ ...allowAdditionalProperties(number) }), null).extra)
 expectType<'hello' | undefined>(validate(object({ ...allowAdditionalProperties('hello') }), null).extra)
 
 // -------------------------------------------------------------------------- //

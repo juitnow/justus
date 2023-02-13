@@ -48,8 +48,8 @@ expectAssignable<{
 // -------------------------------------------------------------------------- //
 // constructed validators
 const o2 = validate(object({
-  n: number(),
-  s: string(),
+  n: number({}),
+  s: string({}),
   a: arrayOf(boolean),
   o: object({ x: boolean }),
 }), null)
@@ -141,8 +141,8 @@ expectAssignable<{
 // "branded" primitives
 
 const o6 = validate(object({
-  n: number<BrandedNumber>(),
-  s: string<BrandedString>(),
+  n: number<BrandedNumber>({}),
+  s: string<BrandedString>({}),
 }), null)
 
 expectType<BrandedNumber>(o6.n)

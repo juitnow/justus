@@ -13,7 +13,7 @@ describe('Object modifiers', () => {
       readonly: true,
     })
 
-    const validator = string()
+    const validator = string
 
     const modified = readonly(validator)
     expect(modified).to.eql({
@@ -33,7 +33,7 @@ describe('Object modifiers', () => {
       optional: true,
     })
 
-    const validator = string()
+    const validator = string
 
     const modified = optional(validator)
     expect(modified).to.eql({
@@ -43,7 +43,7 @@ describe('Object modifiers', () => {
   })
 
   it('should combine modifiers', () => {
-    const validator = string()
+    const validator = string
 
     const r = readonly(validator)
     expect(r).to.eql({

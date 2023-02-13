@@ -109,39 +109,33 @@ expectAssignable<{
 // constructed validators
 
 const o3 = validate(object({
-  rn: readonly(number()),
-  rs: readonly(string()),
-  ra: readonly(array()),
-  ro: readonly(object()),
+  rn: readonly(number({})),
+  rs: readonly(string({})),
+  ra: readonly(array({})),
 
-  on: optional(number()),
-  os: optional(string()),
-  oa: optional(array()),
-  oo: optional(object()),
+  on: optional(number({})),
+  os: optional(string({})),
+  oa: optional(array({})),
 }), null)
 
 expectType<number>(o3.rn)
 expectType<string>(o3.rs)
 expectType<any[]>(o3.ra)
-expectType<Record<string, any>>(o3.ro)
 
 expectType<number | undefined>(o3.on)
 expectType<string | undefined>(o3.os)
 expectType<any[] | undefined>(o3.oa)
-expectType<Record<string, any> | undefined>(o3.oo)
 
 expectAssignable<{
   readonly rn: number,
   readonly rs: string,
   readonly ra: any[],
-  readonly ro: Record<string, any>,
 
   ox?: any | undefined,
   ob?: boolean | undefined,
   on?: number | undefined,
   os?: string | undefined,
   oa?: any[] | undefined,
-  oo?: Record<string, any> | undefined,
 }>(o3)
 
 // -------------------------------------------------------------------------- //
@@ -234,10 +228,10 @@ expectAssignable<{
 // "branded" primitives
 
 const o6 = validate(object({
-  rn: readonly(number<BrandedNumber>()),
-  rs: readonly(string<BrandedString>()),
-  on: optional(number<BrandedNumber>()),
-  os: optional(string<BrandedString>()),
+  rn: readonly(number<BrandedNumber>({})),
+  rs: readonly(string<BrandedString>({})),
+  on: optional(number<BrandedNumber>({})),
+  os: optional(string<BrandedString>({})),
 }), null)
 
 expectType<BrandedNumber>(o6.rn)
