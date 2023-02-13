@@ -4,16 +4,17 @@ import {
   TupleRestParameter,
   ValidationOptions,
   Validator,
+  AbstractValidator,
   additionalValidator,
   modifierValidator,
   never,
   restValidator,
   schemaValidator,
+  makeValidatorFactory,
 } from '../types'
 import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { getValidator } from '../utilities'
 import { isModifier } from '../schema'
-import { makeTupleRestIterable } from './tuple'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -26,7 +27,7 @@ export type ObjectProperty = {
 }
 
 /** A `Validator` validating any `object`. */
-export class AnyObjectValidator extends Validator<Record<string, any>> {
+export class AnyObjectValidator extends AbstractValidator<Record<string, any>> {
   validate(value: unknown): Record<string, any> {
     assertValidation(typeof value == 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
@@ -35,7 +36,7 @@ export class AnyObjectValidator extends Validator<Record<string, any>> {
 }
 
 /** A `Validator` validating `object`s according to a `Schema`. */
-export class ObjectValidator<S extends Schema> extends Validator<InferSchema<S>> {
+export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSchema<S>> {
   readonly schema: Readonly<S>
 
   properties = new Map<string, ObjectProperty | undefined>()
@@ -149,4 +150,4 @@ export function _object(schema?: Schema): Validator<Record<string, any>> | Schem
 }
 
 /** Validate `object`s. */
-export const object = makeTupleRestIterable(_object)
+export const object = makeValidatorFactory(anyObjectValidator, _object)
