@@ -4,11 +4,18 @@ import {
   allOf,
   allowAdditionalProperties,
   any,
+  AnyArrayValidator,
+  AnyNumberValidator,
+  AnyObjectValidator,
+  AnyStringValidator,
+  AnyValidator,
   array,
   arrayOf,
   boolean,
+  BooleanValidator,
   constant,
   date,
+  DateValidator,
   never,
   number,
   object,
@@ -17,6 +24,7 @@ import {
   readonly,
   string,
   url,
+  URLValidator,
 } from '../src/index'
 
 describe('DTS Generation', () => {
@@ -52,6 +60,41 @@ describe('DTS Generation', () => {
 
     expect(generateTypes({
       test: url,
+    })).to.equal('export type test = URL;')
+  })
+
+  it('should generate the DTS for some basic validators', () => {
+    expect(generateTypes({
+      test: new AnyValidator(),
+    })).to.equal('export type test = any;')
+
+    expect(generateTypes({
+      test: new AnyArrayValidator(),
+    })).to.equal('export type test = any[];')
+
+    expect(generateTypes({
+      test: new AnyNumberValidator(),
+    })).to.equal('export type test = number;')
+
+    expect(generateTypes({
+      test: new AnyObjectValidator(),
+    }).replace(/\s+/gm, ' '))
+        .to.equal('export type test = { [key in string]: any; };')
+
+    expect(generateTypes({
+      test: new AnyStringValidator(),
+    })).to.equal('export type test = string;')
+
+    expect(generateTypes({
+      test: new BooleanValidator(),
+    })).to.equal('export type test = boolean;')
+
+    expect(generateTypes({
+      test: new DateValidator(),
+    })).to.equal('export type test = Date;')
+
+    expect(generateTypes({
+      test: new URLValidator(),
     })).to.equal('export type test = URL;')
   })
 
