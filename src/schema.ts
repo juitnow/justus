@@ -3,15 +3,12 @@ import { getValidator } from './utilities'
 
 import {
   AdditionalProperties,
-  CombinedModifier,
   InferValidation,
-  Modifier,
-  OptionalModifier,
-  ReadonlyModifier,
   Validation,
   Validator,
   additionalValidator,
-  modifierValidator,
+  AbstractValidator,
+  ValidationOptions,
 } from './types'
 
 /* ========================================================================== *
@@ -49,64 +46,56 @@ allowAdditionalProperties[additionalValidator] = any
  * SCHEMA KEYS MODIFIERS                                                      *
  * ========================================================================== */
 
-export type CombineModifiers<M1 extends Modifier, M2 extends Modifier> =
-  M1 extends ReadonlyModifier ?
-    M2 extends ReadonlyModifier<infer V> ? ReadonlyModifier<V> :
-    M2 extends OptionalModifier<infer V> ? CombinedModifier<V> :
-    never :
-  M1 extends OptionalModifier ?
-    M2 extends ReadonlyModifier<infer V> ? CombinedModifier<V> :
-    M2 extends OptionalModifier<infer V> ? OptionalModifier<V> :
-    never :
-  never
+export class ReadonlyValidator<T = any> extends AbstractValidator<T> {
+  validator: Validator<T>
+  readonly: true = true
 
-/* -------------------------------------------------------------------------- */
+  constructor(validator: Validator<T>) {
+    super()
+    this.validator = validator
+    this.optional = validator.optional
+    this.readonly = true
+  }
 
-/** Type guard for `Modifier` instances */
-export function isModifier(what: any): what is Modifier<any> {
-  return (what && (typeof what === 'object') && (modifierValidator in what))
+  validate(value: unknown, options: ValidationOptions): T {
+    return this.validator.validate(value, options)
+  }
 }
-
-/* -------------------------------------------------------------------------- */
 
 /**
  * Ensure that the property is marked as _read only_ in the `Schema`.
  *
  * @param validation - A `Validation` to be marked as _read only_.
  */
-export function readonly(): ReadonlyModifier<any>
-export function readonly<V extends Validation>(validation: V): ReadonlyModifier<Validator<InferValidation<V>>>
-export function readonly<M extends Modifier>(modifier: M): CombineModifiers<ReadonlyModifier, M>
-
-export function readonly(options?: Modifier | Validation): Modifier {
-  const { [modifierValidator]: validation = any, optional = false } =
-    isModifier(options) ? options : { [modifierValidator]: options }
-
+export function readonly<V extends Validation>(validation: V): ReadonlyValidator<InferValidation<V>> {
   const validator = getValidator(validation)
-
-  return optional ?
-    { [modifierValidator]: validator, optional, readonly: true } :
-    { [modifierValidator]: validator, readonly: true }
+  return new ReadonlyValidator(validator)
 }
 
-/* -------------------------------------------------------------------------- */
+
+export class OptionalValidator<T = any> extends AbstractValidator<T | undefined> {
+  validator: Validator<T>
+  optional: true = true
+
+  constructor(validator: Validator<T>) {
+    super()
+    this.validator = validator
+    this.readonly = validator.readonly
+    this.optional = true
+  }
+
+  validate(value: unknown, options: ValidationOptions): T | undefined {
+    if (value === undefined) return value
+    return this.validator.validate(value, options)
+  }
+}
 
 /**
  * Ensure that the property is marked as _optional_ in the `Schema`.
  *
  * @param validation - A `Validation` to be marked as _optional_.
  */
-export function optional(): OptionalModifier<any>
-export function optional<V extends Validation>(validation: V): OptionalModifier<Validator<InferValidation<V>>>
-export function optional<M extends Modifier>(modifier: M): CombineModifiers<OptionalModifier, M>
-
-export function optional(options?: Modifier<any> | Validation): Modifier<any> {
-  const { [modifierValidator]: validation = any, readonly = false } =
-    isModifier(options) ? options : { [modifierValidator]: options }
-
+export function optional<V extends Validation>(validation: V): OptionalValidator<InferValidation<V>> {
   const validator = getValidator(validation)
-
-  return readonly ?
-    { [modifierValidator]: validator, readonly, optional: true } :
-    { [modifierValidator]: validator, optional: true }
+  return new OptionalValidator(validator)
 }
