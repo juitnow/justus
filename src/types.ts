@@ -37,7 +37,6 @@ export interface ValidationOptions {
 export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
   [isValidator]: true
 
-  readonly?: boolean
   optional?: boolean
 
   /** Validate a _value_ and optionally convert it to the required `Type` */
@@ -58,7 +57,6 @@ export function makeValidatorFactory<
   F extends (...args: any[]) => Validator,
 >(validator: V, factory: F): F & V {
   return Object.assign(factory, {
-    readonly: validator.readonly,
     optional: validator.optional,
     validate: validator.validate.bind(validator),
     [Symbol.iterator]: validator[Symbol.iterator].bind(validator),
@@ -73,7 +71,6 @@ export function makeValidatorFactory<
 export abstract class AbstractValidator<T = any> implements Iterable<TupleRestParameter<T>> {
   [isValidator]: true = true
 
-  readonly?: boolean = undefined
   optional?: boolean = undefined
 
   /** Validate a _value_ and optionally convert it to the required `Type` */
@@ -212,10 +209,6 @@ export type InferSchema<S extends Schema> =
 export type InferSchema2<S extends Schema> =
   { [ key in keyof S as key extends string ? key : never ]:
     InferValidation<S[key]>
-  } | {
-    readonly [ key in keyof S as key extends string ? key : never ]:
-    S[key] extends Validator & { readonly: true } ? InferValidation<S[key]> :
-    never
   }
 
 

@@ -7,8 +7,6 @@ import {
   Validation,
   Validator,
   additionalValidator,
-  AbstractValidator,
-  ValidationOptions,
 } from './types'
 
 /* ========================================================================== *
@@ -41,33 +39,3 @@ export const allowAdditionalProperties = _allowAdditionalProperties as
   typeof _allowAdditionalProperties & AdditionalProperties<Validator<any>>
 
 allowAdditionalProperties[additionalValidator] = any
-
-/* ========================================================================== *
- * SCHEMA KEYS MODIFIERS                                                      *
- * ========================================================================== */
-
-export class ReadonlyValidator<T = any> extends AbstractValidator<T> {
-  validator: Validator<T>
-  readonly: true = true
-
-  constructor(validator: Validator<T>) {
-    super()
-    this.validator = validator
-    this.optional = validator.optional
-    this.readonly = true
-  }
-
-  validate(value: unknown, options: ValidationOptions): T {
-    return this.validator.validate(value, options)
-  }
-}
-
-/**
- * Ensure that the property is marked as _read only_ in the `Schema`.
- *
- * @param validation - A `Validation` to be marked as _read only_.
- */
-export function readonly<V extends Validation>(validation: V): ReadonlyValidator<InferValidation<V>> {
-  const validator = getValidator(validation)
-  return new ReadonlyValidator(validator)
-}
