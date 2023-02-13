@@ -25,6 +25,7 @@ typing can be inferred.
   * [Dates](#date-validator)
   * [Tuples](#tuple-validator)
   * [Objects](#object-validator) (yes, this is the important one!!!)
+  * [Optionals](#optional-validator)
   * [Any of, all of](#union-validators)
 * [Validation Options](#validation-options)
 * [A (slightly more) complex example](#a-complex-example)
@@ -548,7 +549,7 @@ const o2 = object({
 
 When allowing extra properties, or extending objects, we might want to validate
 the _non-existance_ of a specific property. We can do this setting a property
-to `never`:
+to `never`.
 
 ```typescript
 import { allowAdditionalProperties, never, number, object, string } from 'justus'
@@ -570,19 +571,25 @@ const o3 = object({
 } as const)
 ```
 
-#### Optional and read-only properties
+Optional Validator
+------------------
 
-Optional and read-only properties can also be declared in objects:
+Optional properties properties can also be declared in objects, arrays, ...:
 
 ```typescript
-import { object, readonly, optional, string, number, boolean } from 'justus'
+import { object, arrayOf, optional, string } from 'justus'
 
 const o1 = object({
   foo: string, // any string, but must be a string
   bar: optional(number), // optional property as "number | undefined"
-  baz: readonly(boolean), // read-only property as "readonly boolean"
-  xxx: readonly(optional(string)) // ... guess what it'll be?
 })
+
+const r1 = validate(o1, something)
+// here "r1" will have a shape like "{ foo: string, bar?: number | undefined }"
+
+const o2 = arrayOf(optional(string)) // array members will be "string | undefined"
+const r2 = validate(o2, something)
+// here "r2" will have a shape like "(string | undefined)[]"
 ```
 
 
