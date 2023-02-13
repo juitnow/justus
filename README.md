@@ -152,7 +152,7 @@ The shorthand syntax for string validators is simply `string`. For example:
 import { object, string } from 'justus'
 
 const validator = object({
-  foo: string // yep, no parenthesis, just "string"
+  foo: string, // yep, no parenthesis, just "string"
 })
 ```
 
@@ -227,7 +227,7 @@ The shorthand syntax for number validators is simply `number`. For example:
 import { number, object } from 'justus'
 
 const validator = object({
-  foo: number // yep, no parenthesis, just "number"
+  foo: number, // yep, no parenthesis, just "number"
 })
 ```
 
@@ -241,7 +241,7 @@ The boolean validator is represented by the `boolean` constant:
 import { boolean, object } from 'justus'
 
 const validator = object({
-  foo: boolean // it's a constant, no options!
+  foo: boolean, // it's a constant, no options!
 })
 ```
 
@@ -249,10 +249,10 @@ To validate the string `true` or `false` as booleans, simply create the
 validator with the `fromString` option (defaults to `false`):
 
 ```typescript
-import { boolean, object } from 'justus'
+import { boolean, object, validate } from 'justus'
 
 const validator = object({
-  foo: boolean({ fromString: 'true' })
+  foo: boolean({ fromString: true }),
 })
 
 // Here myValue can be a boolean or the string "true" or "false" (case insensitive)
@@ -347,7 +347,7 @@ The shorthand syntax for string validators is simply `array`. For example:
 import { array, object } from 'justus'
 
 const validator = object({
-  foo: array // validate any array, of any length, containing anything
+  foo: array, // validate any array, of any length, containing anything
 })
 ```
 
@@ -394,7 +394,7 @@ The shorthand syntax for number validators is simply `date`. For example:
 import { date, object } from 'justus'
 
 const validator = object({
-  foo: date // anything that can be converted to `Date` will be!
+  foo: date, // anything that can be converted to `Date` will be!
 })
 ```
 
@@ -450,7 +450,7 @@ As seen in the examples above, object validators are created using the
 `object` function:
 
 ```typescript
-import { object, string, number, boolean } from 'justus'
+import { object, string, number } from 'justus'
 
 const o1 = object // any object (excluding null - darn JavaScript)
 const o2 = object({
@@ -630,7 +630,7 @@ the source object doesn't have one. To do so, we can simply use the _second_
 parameter of our `optional(...)` function:
 
 ```typescript
-import { object, arrayOf, optional, string, validate } from 'justus'
+import { object, optional, number, validate } from 'justus'
 
 const o1 = object({
   foo: optional(number, 123), // any number, default is 123
@@ -702,6 +702,8 @@ The `strip(...)` function is a convenience wrapper around `validate(...)`
 implying `stripAdditionalProperties` and `stripOptionalNulls`. Therefore:
 
 ```typescript
+import { validate, strip } from 'justus'
+
 const result1 = strip(schema, object)
 
 // is equivalent to
@@ -800,7 +802,7 @@ const product = object({
   uuid,
   price,
   name: string({ minLength: 1 }),
- })
+})
 ```
 
 We can generate the DTS for `UUID` and `Product` (we specifically not export
