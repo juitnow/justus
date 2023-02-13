@@ -21,6 +21,8 @@ import {
   object,
   ObjectValidator,
   OneOfValidator,
+  OptionalValidator,
+  ReadonlyValidator,
   string,
   StringValidator,
   TupleValidator,
@@ -196,6 +198,15 @@ registerTypeGenerator(NumberValidator, (validator: NumberValidator) => {
   return ts.factory.createIntersectionTypeNode([ numberType, literal ])
 })
 
+registerTypeGenerator(OptionalValidator, (validator: OptionalValidator, references) => {
+  const type = generateTypeNode(validator.validator, references)
+  return ts.factory.createUnionTypeNode([ type, undefinedType ])
+})
+
+registerTypeGenerator(ReadonlyValidator, (validator: ReadonlyValidator, references) => {
+  return generateTypeNode(validator.validator, references)
+})
+
 registerTypeGenerator(StringValidator, (validator: StringValidator) => {
   if (! validator.brand) return stringType
 
@@ -261,9 +272,10 @@ registerTypeGenerator(OneOfValidator, (validator, references) => {
 registerTypeGenerator(ObjectValidator, (validator, references) => {
   const properties: ts.PropertySignature[] = []
 
-  for (const [ key, property ] of validator.properties.entries()) {
-    const { validator, readonly, optional } = property || { optional: true }
-    const type = validator ? generateTypeNode(validator, references) : neverType
+  for (const [ key, valueValidator ] of validator.validators.entries()) {
+    const type = valueValidator ? generateTypeNode(valueValidator, references) : neverType
+    const optional = valueValidator ? valueValidator.optional : true // no validator, never are optionals
+    const readonly = valueValidator ? valueValidator.readonly : false // no validator, never are not readonly
 
     const signature = ts.factory.createPropertySignature(
           readonly ? readonlyKeyword : undefined,
