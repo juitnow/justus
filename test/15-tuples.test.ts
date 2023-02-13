@@ -1,4 +1,4 @@
-import { boolean, number, object, string, tuple, validate, ValidationError } from '../src/index'
+import { boolean, number, object, string, tuple, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
 
 describe('Tuple validator', () => {

@@ -1,4 +1,4 @@
-import { date, validate, ValidationError } from '../src/index'
+import { date, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
 
 describe('Date validator', () => {

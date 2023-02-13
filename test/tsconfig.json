@@ -3,6 +3,9 @@
   "compilerOptions": {
     "types": [ "mocha", "node" ],
     "rootDir": "..",
+    "paths": {
+      "justus": [ "../src/index.ts" ]
+    }
   },
   "include": [ "." ],
 }

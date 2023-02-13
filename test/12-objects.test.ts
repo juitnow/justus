@@ -1,4 +1,4 @@
-import { ValidationError, object, objectOf, validate, string, number, array, allowAdditionalProperties, any, never, strip, boolean } from '../src/index'
+import { ValidationError, object, objectOf, validate, string, number, array, allowAdditionalProperties, any, never, strip, boolean } from 'justus'
 import { expect } from 'chai'
 
 describe('Object validator', () => {

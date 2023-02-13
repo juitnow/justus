@@ -1,4 +1,4 @@
-import { constant, optional, string, url, validate, ValidationError } from '../src/index'
+import { constant, optional, string, url, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
 
 describe('URL validator', () => {

@@ -1,4 +1,4 @@
-import { allOf, number, oneOf, string, validate, ValidationError } from '../src/index'
+import { allOf, number, oneOf, string, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
 
 describe('Union validators', () => {

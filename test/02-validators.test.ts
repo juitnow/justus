@@ -1,4 +1,4 @@
-import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, Schema, TupleValidator } from '../src/index'
+import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, Schema, TupleValidator } from 'justus'
 import { expect } from 'chai'
 
 describe('Validators', () => {

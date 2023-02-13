@@ -1,4 +1,4 @@
-import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from '../src/index'
+import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
 
 describe('Object modifiers', () => {

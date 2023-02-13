@@ -1,4 +1,4 @@
-import { arrayOf, date, object, tuple, validate } from '../src/index'
+import { arrayOf, date, object, tuple, validate } from 'justus'
 import { expect } from 'chai'
 
 describe('Type conversion', () => {
