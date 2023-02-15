@@ -1,33 +1,37 @@
-import { ValidationErrorBuilder } from '../errors'
-import { getValidator } from '../utilities'
+import { assertSchema, ValidationErrorBuilder } from '../errors'
 import {
-  InferValidation,
+  AbstractValidator, InferValidation,
   Validation,
   ValidationOptions,
   Validator,
-  AbstractValidator,
 } from '../types'
-
-export type UnionArguments = readonly [ Validation, ...Validation[] ]
+import { getValidator } from '../utilities'
 
 /* -------------------------------------------------------------------------- */
 
-export type InferOneOfValidationType<A extends UnionArguments> =
+export type OneOfArguments = readonly Validation[]
+
+export type InferOneOfValidationType<A extends OneOfArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
-      Rest extends UnionArguments ?
+      Rest extends OneOfArguments ?
         InferValidation<First> | InferOneOfValidationType<Rest> :
       InferValidation<First> :
+    never :
+  A extends readonly (infer Type)[] ?
+    Type extends Validation ?
+      InferValidation<Type> :
     never :
   never
 
 /** A `Validator` validating a value as _one of_ the specified arguments. */
-export class OneOfValidator<A extends UnionArguments> extends AbstractValidator<InferOneOfValidationType<A>> {
+export class OneOfValidator<A extends OneOfArguments> extends AbstractValidator<InferOneOfValidationType<A>> {
   readonly validators: readonly Validator[]
 
   constructor(args: A) {
     super()
     this.validators = args.map((validation) => getValidator(validation))
+    assertSchema(this.validators.length > 0, 'At least one validation required in "oneOf"')
   }
 
   validate(value: unknown, options: ValidationOptions): InferOneOfValidationType<A> {
@@ -44,28 +48,31 @@ export class OneOfValidator<A extends UnionArguments> extends AbstractValidator<
 }
 
 /** Validate a value as _one of_ the specified arguments */
-export function oneOf<A extends UnionArguments>(...args: A): OneOfValidator<A> {
+export function oneOf<A extends OneOfArguments>(...args: A): OneOfValidator<A> {
   return new OneOfValidator(args)
 }
 
 /* -------------------------------------------------------------------------- */
 
-export type InferAllOfValidationType<A extends UnionArguments> =
+export type AllOfArguments = readonly [ Validation, ...Validation[] ]
+
+export type InferAllOfValidationType<A extends AllOfArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
-      Rest extends UnionArguments ?
-        InferValidation<First> & InferOneOfValidationType<Rest> :
+      Rest extends AllOfArguments ?
+        InferValidation<First> & InferAllOfValidationType<Rest> :
       InferValidation<First> :
     never :
   never
 
 /** A `Validator` validating a value as _all of_ the specified arguments. */
-export class AllOfValidator<A extends UnionArguments> extends AbstractValidator<InferAllOfValidationType<A>> {
+export class AllOfValidator<A extends AllOfArguments> extends AbstractValidator<InferAllOfValidationType<A>> {
   readonly validators: readonly Validator[]
 
   constructor(args: A) {
     super()
     this.validators = args.map((validation) => getValidator(validation))
+    assertSchema(this.validators.length > 0, 'At least one validation required in "allOf"')
   }
 
   validate(value: unknown, options: ValidationOptions): InferAllOfValidationType<A> {
@@ -77,6 +84,6 @@ export class AllOfValidator<A extends UnionArguments> extends AbstractValidator<
 }
 
 /** Validate a value as _all of_ the specified arguments */
-export function allOf<A extends UnionArguments>(...args: A): AllOfValidator<A> {
+export function allOf<A extends AllOfArguments>(...args: A): AllOfValidator<A> {
   return new AllOfValidator(args)
 }

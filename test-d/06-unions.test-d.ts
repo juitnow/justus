@@ -62,3 +62,15 @@ expectAssignable<{ o1: string, o2: number}>(allOfR2)
 
 expectType<string>(allOfR2.o1)
 expectType<number>(allOfR2.o2)
+
+/* -------------------------------------------------------------------------- */
+
+const arrayOneOf1: ('foo' | 'bar')[] = []
+const validatorOneOf1 = oneOf(...arrayOneOf1)
+const resultOneOf1 = validate(validatorOneOf1, 'x')
+expectType<'foo' | 'bar'>(resultOneOf1)
+
+const arrayOneOf2: string[] = []
+const validatorOneOf2 = oneOf(...arrayOneOf2)
+const resultOneOf2 = validate(validatorOneOf2, 'x')
+expectType<string>(resultOneOf2)
