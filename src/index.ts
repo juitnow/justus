@@ -9,7 +9,7 @@ export * from './types'
 export * from './utilities'
 
 // Validators
-export { allOf, oneOf, AllOfValidator, InferAllOfValidationType, InferOneOfValidationType, OneOfValidator, UnionArguments } from './validators/union'
+export { allOf, oneOf, AllOfArguments, AllOfValidator, InferAllOfValidationType, InferOneOfValidationType, OneOfArguments, OneOfValidator } from './validators/union'
 export { any, AnyValidator } from './validators/any'
 export { _array, array, arrayOf, AnyArrayValidator, ArrayConstraints, ArrayValidator } from './validators/array'
 export { _boolean, boolean, BooleanConstraints, BooleanValidator } from './validators/boolean'

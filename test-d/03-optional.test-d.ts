@@ -1,4 +1,4 @@
-import { expectAssignable, expectError, expectType, printType } from 'tsd'
+import { expectAssignable, expectType, printType } from 'tsd'
 import {
   any,
   array,
@@ -174,7 +174,7 @@ const d3 = new OptionalValidator(oneOf('foo', 'bar'), 'foo')
 const r3 = validate(d3, null)
 expectType<'foo' | 'bar'>(r3)
 
-expectError(new OptionalValidator(string, 1234))
+expectType<string>(validate(new OptionalValidator(string, 1234), undefined))
 
 const d4 = optional(string)
 const r4 = validate(d4, null)
@@ -188,7 +188,7 @@ const d6 = optional(oneOf('foo', 'bar'), 'foo')
 const r6 = validate(d6, null)
 expectType<'foo' | 'bar'>(r6)
 
-expectError(optional(string, 1234))
+expectType<string>(validate(optional(string, 1234), undefined))
 
 const v1 = object({
   hasDefault: optional(string, 'foobar'),

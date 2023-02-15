@@ -6,10 +6,10 @@ import { getValidator } from '../utilities'
  */
 export class OptionalValidator<
   T = any, // the type of the "validation", that is the optional type to validate
-  D extends (T | undefined) = undefined, // the default value (or undefined)
+  D = undefined, // the default value (or undefined)
 > extends AbstractValidator<D extends undefined ? T | undefined : T> {
   validator: Validator<T>
-  defaultValue: D
+  defaultValue: T | undefined
   optional: D extends undefined ? true : false
 
   constructor(validator: Validator<T>)
@@ -19,11 +19,13 @@ export class OptionalValidator<
     super()
     this.validator = validator
     this.optional = (defaultValue === undefined) as any
-    this.defaultValue = defaultValue as D
-    if (this.optional) return
+    if (this.optional) {
+      this.defaultValue = undefined
+      return
+    }
 
     try {
-      validator.validate(defaultValue, {
+      this.defaultValue = validator.validate(defaultValue, {
         stripAdditionalProperties: false,
         stripForbiddenProperties: false,
         stripOptionalNulls: false,
@@ -49,13 +51,11 @@ export function optional<
 >(validation: V): OptionalValidator<InferValidation<V>, undefined>
 
 export function optional<
-  V extends Validation,
-  D extends InferValidation<V>,
+  V extends Validation, D,
 >(validation: V, defaultValue: D): OptionalValidator<InferValidation<V>, D>
 
 export function optional<
-  V extends Validation,
-  D extends InferValidation<V>,
+  V extends Validation, D,
 >(validation: V, defaultValue?: D): OptionalValidator<InferValidation<V>> {
   const validator = getValidator(validation)
   return new OptionalValidator(validator, defaultValue)
