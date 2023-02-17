@@ -13,18 +13,34 @@ export class C<V1 extends Validation, V2 extends Validation> {
   }
 
   test(value: unknown): void {
+    const v1 = validate(this.validation1, value)
+    expectType<InferValidation<V1>>(v1)
+    this.retest(v1)
+
+    const v2 = validate(this.validation2, value)
+    expectType<InferValidation<V2>>(v2)
+    expectError(this.retest(v2))
+
     const a1 = validate(arrayOf(this.validation1), [])
     expectType<InferValidation<V1>[]>(a1)
     this.retest(...a1)
 
     const a2 = validate(arrayOf(this.validation2), [])
+    expectType<InferValidation<V2>[]>(a2)
     expectError(this.retest(...a2))
 
     const o1 = validate(object({ test: this.validation1 }), value)
     expectAssignable<{ test: InferValidation<V1> }>(o1)
+    expectType<InferValidation<V1>>(o1)
+    expectError(o1.nope)
+
     this.retest(o1.test)
 
     const o2 = validate(object({ test: this.validation2 }), value)
+    expectAssignable<{ test: InferValidation<V2> }>(o2)
+    expectType<InferValidation<V2>>(o2)
+    expectError(o1.nope)
+
     expectError(this.retest(o2.test))
   }
 
