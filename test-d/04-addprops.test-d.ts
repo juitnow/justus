@@ -1,9 +1,9 @@
-import { expectError, expectType, printType } from 'tsd'
+import { expectAssignable, expectError, expectType, printType } from 'tsd'
 import {
   allowAdditionalProperties,
   boolean,
-  number,
   never,
+  number,
   object,
   string,
   validate,
@@ -88,6 +88,7 @@ const o4 = validate(s4, null)
 expectType<number>(o4.a)
 expectType<never>(o4.b)
 expectType<string>(o4.c)
+expectAssignable<{ a: number, b?: undefined, c: string }>(o4)
 expectError(o4.extra) // no additional properties
 
 // never with "additionalProperties"
@@ -104,4 +105,5 @@ const o5 = validate(s5, null)
 expectType<number>(o5.a)
 expectType<never>(o5.b) // forcedly removed from the resulting object
 expectType<string>(o5.c)
+expectAssignable<{ a: number, b?: undefined, c: string } & { [ k in string ]: boolean }>(o5)
 expectType<boolean>(o5.extra) // defined in additionalProperties
