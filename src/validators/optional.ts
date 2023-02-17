@@ -10,7 +10,6 @@ export class OptionalValidator<
 > extends AbstractValidator<D extends undefined ? T | undefined : T> {
   validator: Validator<T>
   defaultValue: T | undefined
-  optional: D extends undefined ? true : false
 
   constructor(validator: Validator<T>)
   constructor(validator: Validator<T>, defaultValue: D)
