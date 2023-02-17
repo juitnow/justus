@@ -219,10 +219,9 @@ export type InferSchema2<S extends Schema> = {
         undefined extends InferValidation<S[key]> ?
           never :
           key :
-      never ]:
+      never ] -? :
   InferValidation<S[key]>
 }
-
 
 /* ========================================================================== *
  * TYPE BRANDING                                                              *
