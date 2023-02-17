@@ -1,10 +1,11 @@
-import { expectAssignable, expectType, printType } from 'tsd'
+import { expectAssignable, expectNotAssignable, expectType, printType } from 'tsd'
 import {
   any,
   array,
   arrayOf,
   boolean,
   constant,
+  InferValidation,
   number,
   object,
   oneOf,
@@ -158,6 +159,35 @@ expectAssignable<{
 
 const o7 = validate(arrayOf(optional(string)), null)
 expectType<(string | undefined)[]>(o7)
+
+// -------------------------------------------------------------------------- //
+// assignment of constant as "InferValidation<...>": regression bug found by
+// Eugene: when a property is optional, it's key needs to be optional (?) too!
+
+const v8 = object({
+  fixed: string,
+  optional1: optional(number),
+  optional2: optional(number, 123),
+})
+
+type T8 = InferValidation<typeof v8>
+
+const o8 = validate(v8, null)
+o8.fixed
+o8.optional1
+o8.optional2
+
+expectAssignable<T8>({ fixed: 'foo', optional2: 123456789 })
+expectAssignable<T8>({ fixed: 'foo', optional1: 123456789, optional2: 123456789 })
+expectAssignable<T8>({ fixed: 'foo', optional1: undefined, optional2: 123456789 })
+
+// missing optional2
+expectNotAssignable<T8>({ fixed: 'foo', optional1: 123456789 })
+expectNotAssignable<T8>({ fixed: 'foo', optional1: undefined })
+
+// optional2 is "undefined"
+expectNotAssignable<T8>({ fixed: 'foo', optional1: 123456789, optional2: undefined })
+expectNotAssignable<T8>({ fixed: 'foo', optional1: undefined, optional2: undefined })
 
 // -------------------------------------------------------------------------- //
 // defaults
