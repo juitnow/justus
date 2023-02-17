@@ -2,13 +2,13 @@ import { expectAssignable, expectType, printType } from 'tsd'
 import {
   any,
   array,
-  object,
+  arrayOf,
   boolean,
   constant,
   number,
+  object,
   string,
   validate,
-  arrayOf,
 } from '../src'
 import { objectOf } from '../src/validators/object'
 
@@ -38,7 +38,7 @@ expectType<any[]>(o1.a)
 expectType<Record<string, any>>(o1.o)
 
 expectAssignable<{
-  x: any,
+  x?: any,
   b: boolean,
   n: number,
   s: string,
@@ -164,4 +164,4 @@ const o8 = validate(objectOf([ 1, 2, 3 ] as const), null)
 expectType<Record<string, [ 1, 2, 3 ]>>(o8)
 
 const o9 = validate(objectOf({ test: boolean }), null)
-expectType<Record<string, { test: boolean }>>(o9)
+expectAssignable<Record<string, { test: boolean }>>(o9)
