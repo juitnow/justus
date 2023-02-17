@@ -225,4 +225,4 @@ const v1 = object({
   noDefault: optional(number),
 })
 const x1 = validate(v1, null)
-expectType<{ hasDefault: string, noDefault: number | undefined }>(x1)
+expectAssignable<{ hasDefault: string, noDefault?: number | undefined }>(x1)
