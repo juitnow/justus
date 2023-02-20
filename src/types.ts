@@ -101,23 +101,21 @@ export type Validation =
  * Infer the type returned by a `Validation` when validating.
  */
 export type InferValidation<V> =
-  // Let `InferValidationType<T>` be liberal in the type it accepts and check
-  // here whether it extends `Validation`
-  V extends Validation ?
-    // Validators return their validation type
-    V extends Validator<infer T> ? T :
+  // Validators return their validation type
+  V extends Validator<infer T> ? T :
 
-    // Tuples and schemas are inferred using their own types
-    V extends Tuple ? InferTuple<V> :
-    V extends Schema ? InferSchema<V> :
+  // Primitives are returned as constants
+  V extends undefined ? V :
+  V extends boolean ? V :
+  V extends number ? V :
+  V extends string ? V :
+  V extends null ? V :
 
-    // Primitives are returned as constants
-    V extends boolean ? V :
-    V extends number ? V :
-    V extends string ? V :
-    V extends null ? V :
-    never :
-  never
+  // Tuples are inferred using their own types
+  V extends Tuple ? InferTuple<V> :
+
+  // Anyhing else can only be a schema
+  InferSchema<V>
 
 
 /* ========================================================================== *
@@ -200,13 +198,13 @@ export interface AdditionalProperties<V extends Validator | false> {
  * ========================================================================== */
 
 /** Infer the type validated by a `Schema` */
-export type InferSchema<S extends Schema> =
+export type InferSchema<S> =
   S extends AdditionalProperties<Validator<infer V>> ?
     { [ key in string ] : V } & InferSchema2<S> :
     InferSchema2<S>
 
 /** Infer the property types described by a `Schema` */
-export type InferSchema2<S extends Schema> = {
+export type InferSchema2<S> = {
   // this first part of the type infers all keys from the schema into their
   // type, but makes *each* key optional... we'll restrict in the next part...
   [ key in keyof S as key extends string ? key : never ] ? : InferValidation<S[key]>
