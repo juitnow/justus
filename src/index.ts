@@ -7,6 +7,7 @@ export * from './errors'
 export * from './schema'
 export * from './types'
 export * from './utilities'
+// Validators
 export { any, AnyValidator } from './validators/any'
 export { AnyArrayValidator, array, ArrayConstraints, arrayOf, ArrayValidator, _array } from './validators/array'
 export { boolean, BooleanConstraints, BooleanValidator, _boolean } from './validators/boolean'
@@ -18,7 +19,6 @@ export { AnyObjectValidator, object, objectOf, ObjectValidator, _object } from '
 export { optional, OptionalValidator } from './validators/optional'
 export { AnyStringValidator, BrandedStringConstraints, string, StringConstraints, StringValidator, _string } from './validators/string'
 export { tuple, TupleMember, TupleValidator } from './validators/tuple'
-// Validators
 export { allOf, AllOfArguments, AllOfValidator, InferAllOfValidationType, InferOneOfValidationType, oneOf, OneOfArguments, OneOfValidator } from './validators/union'
 export { url, URLConstraints, URLValidator, _url } from './validators/url'
 
@@ -27,8 +27,8 @@ export { url, URLConstraints, URLValidator, _url } from './validators/url'
  * VALIDATE FUNCTION (our main entry point)                                   *
  * ========================================================================== */
 
-import { getValidator } from './utilities'
 import { defaultValidationOptions } from './types'
+import { getValidator } from './utilities'
 
 import type { InferValidation, Validation, ValidationOptions } from './types'
 
