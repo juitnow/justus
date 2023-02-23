@@ -64,7 +64,7 @@ export class DateValidator extends AbstractValidator<Date> {
   }
 }
 
-export function _date(constraints: DateConstraints): DateValidator {
+function _date(constraints: DateConstraints): DateValidator {
   return new DateValidator(constraints)
 }
 

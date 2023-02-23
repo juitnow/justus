@@ -161,10 +161,10 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
 }
 
 
-export function _number(constraints: NumberConstraints): NumberValidator<number>
-export function _number<N extends number>(constraints: NumberConstraints): NumberValidator<N>
-export function _number<B extends string>(constraints: BrandedNumberConstraints<B>): NumberValidator<number & Branding<B>>
-export function _number(constraints: NumberConstraints): Validator<number> {
+function _number(constraints: NumberConstraints): NumberValidator<number>
+function _number<N extends number>(constraints: NumberConstraints): NumberValidator<N>
+function _number<B extends string>(constraints: BrandedNumberConstraints<B>): NumberValidator<number & Branding<B>>
+function _number(constraints: NumberConstraints): Validator<number> {
   return new NumberValidator(constraints)
 }
 

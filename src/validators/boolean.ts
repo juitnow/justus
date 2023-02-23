@@ -37,7 +37,7 @@ export class BooleanValidator extends AbstractValidator<boolean> {
   }
 }
 
-export function _boolean(constraints: BooleanConstraints): BooleanValidator {
+function _boolean(constraints: BooleanConstraints): BooleanValidator {
   return new BooleanValidator(constraints)
 }
 
