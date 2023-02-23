@@ -1,25 +1,29 @@
 {
   "name": "justus",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "A JavaScript validation library, with types!",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
-    "./dts-generator": {
-      "import": "./dist/dts-generator.mjs",
-      "require": "./dist/dts-generator.js"
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      }
     }
   },
-  "types": "./index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "./build.sh",
-    "dev": "nodemon -e ts -x ./build.sh -w src -w test -w test-d",
-    "lint": "eslint src test test-d",
-    "prepare": "patch -N -p0 -i .nyc.patch || true"
+    "build": "plug",
+    "coverage": "plug coverage'",
+    "dev": "plug coverage -w src -w test'",
+    "lint": "plug lint'",
+    "test": "plug test'",
+    "transpile": "plug transpile'"
   },
   "author": "Juit Developers <developers@juit.com>",
   "license": "MIT",
@@ -38,7 +42,8 @@
     "nodemon": "^2.0.20",
     "nyc": "^15.1.0",
     "tsd": "^0.25.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "@plugjs/build": "^0.2.1"
   },
   "directories": {
     "test": "test"
@@ -55,5 +60,13 @@
   "bugs": {
     "url": "https://github.com/juitnow/justus/issues"
   },
-  "homepage": "https://github.com/juitnow/justus#readme"
+  "homepage": "https://github.com/juitnow/justus#readme",
+  "dependencies": {
+    "@plugjs/build": "^0.2.1"
+  },
+  "files": [
+    "*.md",
+    "dist/",
+    "src/"
+  ]
 }

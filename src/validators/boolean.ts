@@ -1,5 +1,5 @@
-import { AbstractValidator, makeValidatorFactory } from '../types'
 import { assertValidation } from '../errors'
+import { AbstractValidator, makeValidatorFactory } from '../types'
 
 /** Constraints to validate a `boolean` with. */
 export interface BooleanConstraints {

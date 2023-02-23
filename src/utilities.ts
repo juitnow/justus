@@ -1,7 +1,11 @@
+import { isValidator, schemaValidator } from './types'
 import { ConstantValidator, nullValidator } from './validators/constant'
-import { isValidator, Schema, schemaValidator, Validation, Validator } from './types'
-import { TupleValidator } from './validators/tuple'
+// eslint-disable-next-line import/no-cycle
 import { ObjectValidator } from './validators/object'
+// eslint-disable-next-line import/no-cycle
+import { TupleValidator } from './validators/tuple'
+
+import type { Schema, Validation, Validator } from './types'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *

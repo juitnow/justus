@@ -1,11 +1,13 @@
 import { assertSchema, ValidationErrorBuilder } from '../errors'
-import {
-  AbstractValidator, InferValidation,
+import { AbstractValidator } from '../types'
+import { getValidator } from '../utilities'
+
+import type {
+  InferValidation,
   Validation,
   ValidationOptions,
   Validator,
 } from '../types'
-import { getValidator } from '../utilities'
 
 /* -------------------------------------------------------------------------- */
 

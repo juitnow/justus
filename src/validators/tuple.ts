@@ -1,8 +1,10 @@
-import { Tuple, InferTuple, Validator, AbstractValidator, restValidator } from '../types'
-import { ValidationOptions } from '../types'
 import { assertValidation, ValidationError } from '../errors'
+import { AbstractValidator, restValidator } from '../types'
+// eslint-disable-next-line import/no-cycle
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
+
+import type { InferTuple, Tuple, ValidationOptions, Validator } from '../types'
 
 export interface TupleMember { single: boolean, validator: Validator }
 

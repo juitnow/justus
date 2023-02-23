@@ -1,4 +1,5 @@
 import ts, { isUnionTypeNode } from 'typescript'
+
 import {
   AllOfValidator,
   any,
@@ -29,6 +30,9 @@ import {
   TupleValidator,
   url,
   URLValidator,
+} from './index'
+
+import type {
   Validation,
   Validator,
 } from './index'

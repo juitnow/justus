@@ -1,7 +1,9 @@
 import { assertSchema, assertValidation, ValidationErrorBuilder } from '../errors'
-import { InferValidation, Validation, ValidationOptions, AbstractValidator, Validator, makeValidatorFactory } from '../types'
+import { AbstractValidator, makeValidatorFactory } from '../types'
 import { getValidator } from '../utilities'
 import { any } from './any'
+
+import type { InferValidation, Validation, ValidationOptions, Validator } from '../types'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *

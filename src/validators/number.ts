@@ -1,6 +1,7 @@
-import { Branding, Validator, AbstractValidator, makeValidatorFactory } from '../types'
-import { assertSchema, assertValidation } from '../errors'
-import { ValidationError } from '..'
+import { assertSchema, assertValidation, ValidationError } from '../errors'
+import { AbstractValidator, makeValidatorFactory } from '../types'
+
+import type { Branding, Validator } from '../types'
 
 /* ========================================================================== */
 

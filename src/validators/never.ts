@@ -1,5 +1,7 @@
 import { ValidationError } from '../errors'
-import { ValidationOptions, AbstractValidator } from '../types'
+import { AbstractValidator } from '../types'
+
+import type { ValidationOptions } from '../types'
 
 /** A `Validator` validating _nothing_. */
 export class NeverValidator extends AbstractValidator<never> {

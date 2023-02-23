@@ -1,12 +1,12 @@
-import { any } from './validators/any'
+import { additionalValidator } from './types'
+// eslint-disable-next-line import/no-cycle
 import { getValidator } from './utilities'
+import { any } from './validators/any'
 
-import {
-  AdditionalProperties,
-  InferValidation,
+import type {
+  AdditionalProperties, InferValidation,
   Validation,
   Validator,
-  additionalValidator,
 } from './types'
 
 /* ========================================================================== *
@@ -38,4 +38,6 @@ export function _allowAdditionalProperties(options?: Validation | boolean): Addi
 export const allowAdditionalProperties = _allowAdditionalProperties as
   typeof _allowAdditionalProperties & AdditionalProperties<Validator<any>>
 
+// Remember to inject our `any` validator as the default for when
+// `allowAdditionalProperties` is _not_ used as a function
 allowAdditionalProperties[additionalValidator] = any

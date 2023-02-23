@@ -7,28 +7,29 @@ export * from './errors'
 export * from './schema'
 export * from './types'
 export * from './utilities'
-
-// Validators
-export { allOf, oneOf, AllOfArguments, AllOfValidator, InferAllOfValidationType, InferOneOfValidationType, OneOfArguments, OneOfValidator } from './validators/union'
 export { any, AnyValidator } from './validators/any'
-export { _array, array, arrayOf, AnyArrayValidator, ArrayConstraints, ArrayValidator } from './validators/array'
-export { _boolean, boolean, BooleanConstraints, BooleanValidator } from './validators/boolean'
+export { AnyArrayValidator, array, ArrayConstraints, arrayOf, ArrayValidator, _array } from './validators/array'
+export { boolean, BooleanConstraints, BooleanValidator, _boolean } from './validators/boolean'
 export { constant, ConstantValidator } from './validators/constant'
-export { _date, date, DateConstraints, DateValidator } from './validators/date'
+export { date, DateConstraints, DateValidator, _date } from './validators/date'
 export { never, NeverValidator } from './validators/never'
-export { _number, number, AnyNumberValidator, BrandedNumberConstraints, NumberConstraints, NumberValidator } from './validators/number'
-export { _object, object, objectOf, AnyObjectValidator, ObjectValidator } from './validators/object'
+export { AnyNumberValidator, BrandedNumberConstraints, number, NumberConstraints, NumberValidator, _number } from './validators/number'
+export { AnyObjectValidator, object, objectOf, ObjectValidator, _object } from './validators/object'
 export { optional, OptionalValidator } from './validators/optional'
-export { _string, string, AnyStringValidator, BrandedStringConstraints, StringConstraints, StringValidator } from './validators/string'
+export { AnyStringValidator, BrandedStringConstraints, string, StringConstraints, StringValidator, _string } from './validators/string'
 export { tuple, TupleMember, TupleValidator } from './validators/tuple'
-export { _url, url, URLConstraints, URLValidator } from './validators/url'
+// Validators
+export { allOf, AllOfArguments, AllOfValidator, InferAllOfValidationType, InferOneOfValidationType, oneOf, OneOfArguments, OneOfValidator } from './validators/union'
+export { url, URLConstraints, URLValidator, _url } from './validators/url'
+
 
 /* ========================================================================== *
  * VALIDATE FUNCTION (our main entry point)                                   *
  * ========================================================================== */
 
-import type { InferValidation, Validation, ValidationOptions } from './types'
 import { getValidator } from './utilities'
+
+import type { InferValidation, Validation, ValidationOptions } from './types'
 
 /** Options for `validate` */
 export type ValidateOptions = {

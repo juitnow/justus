@@ -1,5 +1,7 @@
-import { Branding, Validator, AbstractValidator, makeValidatorFactory } from '../types'
-import { assertValidation, assertSchema } from '../errors'
+import { assertSchema, assertValidation } from '../errors'
+import { AbstractValidator, makeValidatorFactory } from '../types'
+
+import type { Branding, Validator } from '../types'
 
 /** Constraints to validate a `string` with. */
 export interface StringConstraints {

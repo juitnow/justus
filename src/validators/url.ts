@@ -1,7 +1,10 @@
-import { ConstantValidator } from './constant'
 import { ValidationError, ValidationErrorBuilder } from '../errors'
-import { Schema, Validator, AbstractValidator, makeValidatorFactory } from '../types'
-import { ObjectValidator, ValidationOptions } from '..'
+import { AbstractValidator, makeValidatorFactory } from '../types'
+import { ConstantValidator } from './constant'
+import { ObjectValidator } from './object'
+
+import type { ValidationOptions } from '..'
+import type { Schema, Validator } from '../types'
 
 const KEYS: Exclude<keyof URLConstraints, 'searchParams'>[] = [
   'href',

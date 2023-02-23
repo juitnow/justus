@@ -1,20 +1,19 @@
+import { assertValidation, ValidationErrorBuilder } from '../errors'
+// eslint-disable-next-line import/no-cycle
+import { allowAdditionalProperties } from '../schema'
 import {
-  InferSchema,
-  Schema,
-  TupleRestParameter,
-  ValidationOptions,
-  Validator,
   AbstractValidator,
   additionalValidator,
+  makeValidatorFactory,
   restValidator,
   schemaValidator,
-  makeValidatorFactory,
-  Validation,
-  InferValidation,
 } from '../types'
-import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { getValidator } from '../utilities'
-import { allowAdditionalProperties } from '../schema'
+
+import type {
+  InferSchema, InferValidation, Schema, TupleRestParameter, Validation, ValidationOptions,
+  Validator,
+} from '../types'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *

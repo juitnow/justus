@@ -1,5 +1,7 @@
-import { AbstractValidator, InferValidation, Validation, ValidationOptions, Validator } from '../types'
+import { AbstractValidator } from '../types'
 import { getValidator } from '../utilities'
+
+import type { InferValidation, Validation, ValidationOptions, Validator } from '../types'
 
 /**
  * A `Validator` for _optional_ properties (that is `type | undefined`).
