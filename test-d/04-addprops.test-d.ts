@@ -1,4 +1,5 @@
 import { expectAssignable, expectError, expectType, printType } from 'tsd'
+
 import {
   allowAdditionalProperties,
   boolean,

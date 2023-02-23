@@ -1,4 +1,5 @@
 import { expectAssignable, expectType, printType } from 'tsd'
+
 import { boolean, number, object, string, tuple, validate } from '../src'
 
 printType('__file_marker__')

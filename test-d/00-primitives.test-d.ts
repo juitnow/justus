@@ -1,4 +1,5 @@
 import { expectType, printType } from 'tsd'
+
 import {
   any,
   boolean,

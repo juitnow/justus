@@ -1,16 +1,17 @@
 import { expectAssignable, expectError, expectType, printType } from 'tsd'
+
 import {
-  number,
-  string,
-  oneOf,
   allOf,
-  validate,
   boolean,
-  Validator,
+  number,
   object,
-  InferValidation,
+  oneOf,
   optional,
+  string,
+  validate,
 } from '../src'
+
+import type { InferValidation, Validator } from '../src'
 
 printType('__file_marker__')
 

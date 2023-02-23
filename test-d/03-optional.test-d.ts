@@ -1,11 +1,11 @@
 import { expectAssignable, expectNotAssignable, expectType, printType } from 'tsd'
+
 import {
   any,
   array,
   arrayOf,
   boolean,
   constant,
-  InferValidation,
   number,
   object,
   oneOf,
@@ -14,6 +14,8 @@ import {
   string,
   validate,
 } from '../src'
+
+import type { InferValidation } from '../src'
 
 printType('__file_marker__')
 
