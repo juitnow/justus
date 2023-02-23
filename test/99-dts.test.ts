@@ -1,5 +1,6 @@
-import { generateTypes } from '../src/dts-generator'
 import { expect } from 'chai'
+
+import { generateTypes } from '../src/dts-generator'
 import {
   allOf,
   allowAdditionalProperties,

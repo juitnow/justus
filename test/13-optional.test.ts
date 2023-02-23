@@ -1,5 +1,6 @@
-import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
+
+import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from '../src'
 
 describe('Object modifiers', () => {
   it('should validate a simple optional validation', () => {
@@ -77,7 +78,7 @@ describe('Object modifiers', () => {
     const validator = new StringValidator()
     validator.optional = true
 
-    expect(validate({ test: validator }, { })).to.eql({})
+    expect(validate({ test: validator }, {})).to.eql({})
     expect(() => validate({ test: validator }, { test: 123 }))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').eql([

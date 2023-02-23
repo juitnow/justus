@@ -1,5 +1,6 @@
-import { ValidationError, validate, array, arrayOf, string, ArrayValidator } from 'justus'
 import { expect } from 'chai'
+
+import { array, arrayOf, ArrayValidator, string, validate, ValidationError } from '../src'
 
 describe('Array validator', () => {
   it('should validate an array', () => {

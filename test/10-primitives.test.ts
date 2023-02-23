@@ -1,5 +1,6 @@
-import { ValidationError, any, boolean, validate, number, constant, string, NumberValidator, StringValidator } from 'justus'
 import { expect } from 'chai'
+
+import { any, boolean, constant, number, NumberValidator, string, StringValidator, validate, ValidationError } from '../src'
 
 describe('Primitive validators', () => {
   describe('any', () => {

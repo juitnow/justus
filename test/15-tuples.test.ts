@@ -1,5 +1,6 @@
-import { boolean, number, object, string, tuple, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
+
+import { boolean, number, object, string, tuple, validate, ValidationError } from '../src'
 
 describe('Tuple validator', () => {
   it('should not validate non-arrays', () => {

@@ -1,5 +1,6 @@
-import { date, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
+
+import { date, validate, ValidationError } from '../src'
 
 describe('Date validator', () => {
   it('should validate a simple date', () => {

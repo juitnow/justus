@@ -1,5 +1,8 @@
-import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, Schema, TupleValidator } from 'justus'
 import { expect } from 'chai'
+
+import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, TupleValidator } from '../src'
+
+import type { Schema } from '../src'
 
 describe('Validators', () => {
   const schemaValidator = Symbol.for('justus.schemaValidator')

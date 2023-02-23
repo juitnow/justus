@@ -1,5 +1,6 @@
-import { constant, optional, string, url, validate, ValidationError } from 'justus'
 import { expect } from 'chai'
+
+import { constant, optional, string, url, validate, ValidationError } from '../src'
 
 describe('URL validator', () => {
   it('should validate a simple URL', () => {

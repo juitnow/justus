@@ -1,5 +1,6 @@
-import { ValidationError, assertSchema, assertValidation, ValidationErrorBuilder } from 'justus'
 import { expect } from 'chai'
+
+import { assertSchema, assertValidation, ValidationError, ValidationErrorBuilder } from '../src'
 
 describe('Errors', () => {
   describe('ValidationError', () => {
