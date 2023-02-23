@@ -22,12 +22,21 @@ export const additionalValidator = Symbol.for('justus.additionalValidator')
  * Options to be using while validating.
  */
 export interface ValidationOptions {
-  /** Strip additional, undeclared properties from objects */
-  readonly stripAdditionalProperties: boolean,
-  /** Strip `null`s from an object when associated with an optional key */
-  readonly stripOptionalNulls: boolean,
-  /** Ignore and strip forbidden (`never`) properties from objects */
-  readonly stripForbiddenProperties: boolean,
+  /** Strip additional, undeclared properties from objects (default: `false`) */
+  stripAdditionalProperties?: boolean,
+  /** Strip `null`s from an object when associated with an optional key (default: `false`) */
+  stripOptionalNulls?: boolean,
+  /** Ignore and strip forbidden (`never`) properties from objects (default: `false`) */
+  stripForbiddenProperties?: boolean,
+}
+
+/**
+ * Default validation options.
+ */
+export const defaultValidationOptions: Readonly<Required<ValidationOptions>> = {
+  stripAdditionalProperties: false,
+  stripForbiddenProperties: false,
+  stripOptionalNulls: false,
 }
 
 /**
@@ -40,7 +49,7 @@ export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
   optional?: boolean
 
   /** Validate a _value_ and optionally convert it to the required `Type` */
-  validate(value: unknown, options: ValidationOptions): T
+  validate(value: unknown, options?: ValidationOptions | undefined): T
 
   /** Allow any `Validator` to be used as a rest parameter in `Tuple`s */
   [Symbol.iterator](): Generator<TupleRestParameter<T>>;
@@ -68,13 +77,14 @@ export function makeValidatorFactory<
  * A `Validator` is an object capable of validating a given _value_ and
  * (possibly) converting it the required type `T`.
  */
-export abstract class AbstractValidator<T = any> implements Iterable<TupleRestParameter<T>> {
+export abstract class AbstractValidator<T = any>
+implements Validator<T>, Iterable<TupleRestParameter<T>> {
   [isValidator]: true = true
 
   optional?: boolean = undefined
 
   /** Validate a _value_ and optionally convert it to the required `Type` */
-  abstract validate(value: unknown, options: ValidationOptions): T
+  abstract validate(value: unknown, options?: ValidationOptions | undefined): T
 
   /** Allow any `Validator` to be used as a rest parameter in `Tuple`s */
   * [Symbol.iterator](): Generator<TupleRestParameter<T>> {
