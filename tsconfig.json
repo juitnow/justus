@@ -1,19 +1,21 @@
 {
   "compilerOptions": {
-    "lib": [ "esnext" ],
+    "lib": [ "es2022" ],
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "node16",
     "types": [ "node" ],
-    "target": "esnext",
-    "noImplicitAny": true,
-    "outDir": "./build/types",
-    "rootDir": "src",
+    "esModuleInterop": true,
+
+    "noEmit": true,
+
     "strict": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "declaration": true,
-    "declarationMap": false,
-    "emitDeclarationOnly": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
   },
-  "include": [ "src" ],
+  "include": [
+    "./src",
+    "./build.ts",
+  ],
 }
