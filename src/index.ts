@@ -28,13 +28,9 @@ export { url, URLConstraints, URLValidator, _url } from './validators/url'
  * ========================================================================== */
 
 import { getValidator } from './utilities'
+import { defaultValidationOptions } from './types'
 
 import type { InferValidation, Validation, ValidationOptions } from './types'
-
-/** Options for `validate` */
-export type ValidateOptions = {
-  -readonly [ key in keyof ValidationOptions ]?: ValidationOptions[key] | undefined
-}
 
 /**
  * Validate a _value_ using the specified `Validation`.
@@ -45,15 +41,9 @@ export type ValidateOptions = {
 export function validate<V extends Validation>(
     validation: V,
     value: any,
-    options: ValidateOptions = {},
+    options?: ValidationOptions,
 ): InferValidation<V> {
-  const opts: ValidationOptions = {
-    stripAdditionalProperties: false,
-    stripForbiddenProperties: false,
-    stripOptionalNulls: false,
-    ...options,
-  }
-
+  const opts: ValidationOptions = { ...defaultValidationOptions, ...options }
   return getValidator(validation).validate(value, opts)
 }
 
@@ -74,7 +64,7 @@ export function validate<V extends Validation>(
 export function strip<V extends Validation>(
     validation: V,
     value: any,
-    options: ValidateOptions = {},
+    options?: ValidationOptions,
 ): InferValidation<V> {
   const opts: ValidationOptions = {
     stripAdditionalProperties: true,
