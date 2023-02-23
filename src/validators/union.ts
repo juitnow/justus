@@ -36,7 +36,7 @@ export class OneOfValidator<A extends OneOfArguments> extends AbstractValidator<
     assertSchema(this.validators.length > 0, 'At least one validation required in "oneOf"')
   }
 
-  validate(value: unknown, options: ValidationOptions): InferOneOfValidationType<A> {
+  validate(value: unknown, options?: ValidationOptions): InferOneOfValidationType<A> {
     const builder = new ValidationErrorBuilder()
     for (const validator of this.validators) {
       try {
@@ -77,7 +77,7 @@ export class AllOfValidator<A extends AllOfArguments> extends AbstractValidator<
     assertSchema(this.validators.length > 0, 'At least one validation required in "allOf"')
   }
 
-  validate(value: unknown, options: ValidationOptions): InferAllOfValidationType<A> {
+  validate(value: unknown, options?: ValidationOptions): InferAllOfValidationType<A> {
     for (const validator of this.validators) {
       value = validator.validate(value, options)
     }

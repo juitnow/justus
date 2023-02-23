@@ -1,4 +1,4 @@
-import { AbstractValidator } from '../types'
+import { AbstractValidator, defaultValidationOptions } from '../types'
 import { getValidator } from '../utilities'
 
 import type { InferValidation, Validation, ValidationOptions, Validator } from '../types'
@@ -26,17 +26,13 @@ export class OptionalValidator<
     }
 
     try {
-      this.defaultValue = validator.validate(defaultValue, {
-        stripAdditionalProperties: false,
-        stripForbiddenProperties: false,
-        stripOptionalNulls: false,
-      })
+      this.defaultValue = validator.validate(defaultValue, defaultValidationOptions)
     } catch (cause) {
       throw new TypeError('Default value does not match validator', { cause })
     }
   }
 
-  validate(value: unknown, options: ValidationOptions): D extends undefined ? T | undefined : T {
+  validate(value: unknown, options?: ValidationOptions): D extends undefined ? T | undefined : T {
     if (value === undefined) return this.defaultValue as any // do not validate defaults!
     return this.validator.validate(value, options)
   }

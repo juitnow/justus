@@ -4,6 +4,7 @@ import { allowAdditionalProperties } from '../schema'
 import {
   AbstractValidator,
   additionalValidator,
+  defaultValidationOptions,
   makeValidatorFactory,
   restValidator,
   schemaValidator,
@@ -48,7 +49,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     this.schema = schema
   }
 
-  validate(value: unknown, options: ValidationOptions): InferSchema<S> {
+  validate(value: unknown, options: ValidationOptions = defaultValidationOptions): InferSchema<S> {
     assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
 

@@ -31,7 +31,7 @@ export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTupl
     this.tuple = tuple
   }
 
-  validate(value: unknown, options: ValidationOptions): InferTuple<T> {
+  validate(value: unknown, options?: ValidationOptions): InferTuple<T> {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
 
     // Empty tuples

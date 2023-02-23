@@ -1,5 +1,5 @@
 import { ValidationError } from '../errors'
-import { AbstractValidator } from '../types'
+import { AbstractValidator, defaultValidationOptions } from '../types'
 
 import type { ValidationOptions } from '../types'
 
@@ -7,7 +7,7 @@ import type { ValidationOptions } from '../types'
 export class NeverValidator extends AbstractValidator<never> {
   optional: true = true
 
-  validate(value: unknown, options: ValidationOptions): never {
+  validate(value: unknown, options: ValidationOptions = defaultValidationOptions): never {
     const { stripForbiddenProperties } = options
 
     // @ts-expect-error

@@ -23,8 +23,7 @@ export interface ArrayConstraints<V extends Validation> {
 
 /** Basic validator for `Array` instances. */
 export class AnyArrayValidator<T = any> extends AbstractValidator<T[]> {
-  validate(value: unknown, options: ValidationOptions): T[] {
-    void options
+  validate(value: unknown): T[] {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
     return [ ...value ]
   }
@@ -57,7 +56,7 @@ export class ArrayValidator<T> extends AbstractValidator<T[]> {
     this.uniqueItems = uniqueItems
   }
 
-  validate(value: unknown, options: ValidationOptions): T[] {
+  validate(value: unknown, options?: ValidationOptions): T[] {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
 
     assertValidation(value.length >= this.minItems,
