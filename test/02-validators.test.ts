@@ -5,9 +5,6 @@ import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidato
 import type { Schema } from '../src'
 
 describe('Validators', () => {
-  const schemaValidator = Symbol.for('justus.validator')
-  const restValidator = Symbol.for('justus.validator')
-
   const fakeValidator = new class extends AbstractValidator {
     validate(): never {
       throw new Error('Method not implemented.')
@@ -45,7 +42,7 @@ describe('Validators', () => {
         .to.be.instanceOf(ObjectValidator)
         .with.property('schema').to.eql({ foo: 'bar' })
 
-    expect(getValidator({ [schemaValidator]: objectValidator } as Schema))
+    expect(getValidator({ [Symbol.justusValidator]: objectValidator } as Schema))
         .to.equal(objectValidator)
   })
 
@@ -64,7 +61,7 @@ describe('Validators', () => {
     const array = [ ...fakeValidator ]
     expect(array).to.have.length(1)
     expect(array[0]).to.eql({
-      [restValidator]: fakeValidator,
+      [Symbol.justusRestValidator]: fakeValidator,
     })
   })
 })
