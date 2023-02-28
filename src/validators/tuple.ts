@@ -1,5 +1,5 @@
 import { assertValidation, ValidationError } from '../errors'
-import { AbstractValidator, restValidator } from '../types'
+import { AbstractValidator } from '../types'
 // eslint-disable-next-line import/no-cycle
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
@@ -20,8 +20,8 @@ export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTupl
     for (const item of tuple) {
       if (item === null) { // god knows why typeof null === "object"
         members.push({ single: true, validator: nullValidator })
-      } else if ((typeof item === 'object') && (restValidator in item)) {
-        members.push({ single: false, validator: (<any>item)[restValidator] })
+      } else if ((typeof item === 'object') && (Symbol.justusRestValidator in item)) {
+        members.push({ single: false, validator: (<any>item)[Symbol.justusRestValidator] })
       } else {
         members.push({ single: true, validator: getValidator(item) })
       }

@@ -5,8 +5,8 @@ import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidato
 import type { Schema } from '../src'
 
 describe('Validators', () => {
-  const schemaValidator = Symbol.for('justus.schemaValidator')
-  const restValidator = Symbol.for('justus.restValidator')
+  const schemaValidator = Symbol.for('justus.validator')
+  const restValidator = Symbol.for('justus.validator')
 
   const fakeValidator = new class extends AbstractValidator {
     validate(): never {

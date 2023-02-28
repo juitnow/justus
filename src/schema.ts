@@ -1,4 +1,4 @@
-import { additionalValidator } from './types'
+// import { additionalValidator } from './types'
 // eslint-disable-next-line import/no-cycle
 import { getValidator } from './utilities'
 import { any } from './validators/any'
@@ -20,10 +20,10 @@ export function _allowAdditionalProperties(allow: false): AdditionalProperties<f
 export function _allowAdditionalProperties<V extends Validation>(validation: V): AdditionalProperties<Validator<InferValidation<V>>>
 
 export function _allowAdditionalProperties(options?: Validation | boolean): AdditionalProperties<Validator | false> {
-  if (options === false) return { [additionalValidator]: false }
-  if (options === true) return { [additionalValidator]: any }
+  if (options === false) return { [Symbol.justusAdditionalValidator]: false }
+  if (options === true) return { [Symbol.justusAdditionalValidator]: any }
 
-  return { [additionalValidator]: options ? getValidator(options) : any }
+  return { [Symbol.justusAdditionalValidator]: options ? getValidator(options) : any }
 }
 
 /**
@@ -40,4 +40,4 @@ export const allowAdditionalProperties = _allowAdditionalProperties as
 
 // Remember to inject our `any` validator as the default for when
 // `allowAdditionalProperties` is _not_ used as a function
-allowAdditionalProperties[additionalValidator] = any
+allowAdditionalProperties[Symbol.justusAdditionalValidator] = any

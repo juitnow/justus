@@ -3,11 +3,8 @@ import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { allowAdditionalProperties } from '../schema'
 import {
   AbstractValidator,
-  additionalValidator,
   defaultValidationOptions,
   makeValidatorFactory,
-  restValidator,
-  schemaValidator,
 } from '../types'
 import { getValidator } from '../utilities'
 
@@ -38,9 +35,9 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
 
   constructor(schema: S) {
     super()
-    const { [additionalValidator]: additional, ...properties } = schema
+    const { [Symbol.justusAdditionalValidator]: additional, ...properties } = schema
 
-    if (additional) this.additionalProperties = getValidator(additional)
+    if (additional) this.additionalProperties = additional
 
     for (const key of Object.keys(properties)) {
       this.validators.set(key, getValidator(properties[key]))
@@ -125,11 +122,11 @@ function _object<S extends Schema>(schema: S): S & {
 } {
   const validator = new ObjectValidator(schema)
   function* iterator(): Generator<TupleRestParameter> {
-    yield { [restValidator]: validator }
+    yield { [Symbol.justusRestValidator]: validator }
   }
 
   return Object.defineProperties(schema, {
-    [schemaValidator]: { value: validator, enumerable: false },
+    [Symbol.justusSchemaValidator]: { value: validator, enumerable: false },
     [Symbol.iterator]: { value: iterator, enumerable: false },
   }) as any
 }

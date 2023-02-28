@@ -1,4 +1,3 @@
-import { isValidator, schemaValidator } from './types'
 import { ConstantValidator, nullValidator } from './validators/constant'
 // eslint-disable-next-line import/no-cycle
 import { ObjectValidator } from './validators/object'
@@ -21,7 +20,7 @@ export function getValidator(validation: Validation): Validator {
   if (validation === null) return nullValidator
 
   // Validator instance (either object or function)
-  if ((<any> validation)[isValidator] === true) return validation as Validator
+  if ((<any> validation)[Symbol.justusIsValidator]) return (<any> validation)[Symbol.justusIsValidator] as Validator
 
   // Other types
   switch (typeof validation) {
@@ -34,7 +33,7 @@ export function getValidator(validation: Validation): Validator {
     // other objects...
     case 'object':
       // pre-compiled schema with validator
-      if (schemaValidator in validation) return (<any> validation)[schemaValidator]
+      if (Symbol.justusSchemaValidator in validation) return (<any> validation)[Symbol.justusSchemaValidator]
       // arrays are tuples
       if (Array.isArray(validation)) return new TupleValidator(validation)
       // any other object is a schema
