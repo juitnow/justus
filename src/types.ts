@@ -4,7 +4,7 @@
 
 declare global {
   interface SymbolConstructor {
-    /** A symbol indicating that an instance is (in fact) a `Validator`. */
+    /** A symbol associated with a `Validator` instance. */
     readonly justusValidator: unique symbol
     /** A symbol indicating the `Validator` for a `Tuple`'s rest parameter. */
     readonly justusRestValidator: unique symbol
