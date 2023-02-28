@@ -2,33 +2,24 @@ import ts, { isUnionTypeNode } from 'typescript'
 
 import {
   AllOfValidator,
-  any,
   AnyArrayValidator,
   AnyNumberValidator,
   AnyObjectValidator,
   AnyStringValidator,
   AnyValidator,
-  array,
   ArrayValidator,
   assertSchema,
-  boolean,
   BooleanValidator,
   ConstantValidator,
-  date,
   DateValidator,
   getValidator,
-  never,
   NeverValidator,
-  number,
   NumberValidator,
-  object,
   ObjectValidator,
   OneOfValidator,
   OptionalValidator,
-  string,
   StringValidator,
   TupleValidator,
-  url,
   URLValidator,
 } from './index'
 
@@ -175,16 +166,6 @@ registerTypeGenerator(BooleanValidator, () => booleanType)
 registerTypeGenerator(NeverValidator, () => neverType)
 registerTypeGenerator(DateValidator, () => ts.factory.createTypeReferenceNode('Date'))
 registerTypeGenerator(URLValidator, () => ts.factory.createTypeReferenceNode('URL'))
-
-registerTypeGenerator(any, () => anyType)
-registerTypeGenerator(array, () => anyArrayType)
-registerTypeGenerator(number, () => numberType)
-registerTypeGenerator(object, () => recordType)
-registerTypeGenerator(string, () => stringType)
-registerTypeGenerator(boolean, () => booleanType)
-registerTypeGenerator(never, () => neverType)
-registerTypeGenerator(date, () => ts.factory.createTypeReferenceNode('Date'))
-registerTypeGenerator(url, () => ts.factory.createTypeReferenceNode('URL'))
 
 /* ========================================================================== */
 
