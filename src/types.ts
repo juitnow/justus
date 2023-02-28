@@ -5,11 +5,9 @@
 declare global {
   interface SymbolConstructor {
     /** A symbol indicating that an instance is (in fact) a `Validator`. */
-    readonly justusIsValidator: unique symbol
+    readonly justusValidator: unique symbol
     /** A symbol indicating the `Validator` for a `Tuple`'s rest parameter. */
     readonly justusRestValidator: unique symbol
-    /** A symbol indicating the `Validator` for a `Schema`. */
-    readonly justusSchemaValidator: unique symbol
     /** A symbol indicating the `Validator` for a `Schema`'s additional properties. */
     readonly justusAdditionalValidator: unique symbol
   }
@@ -17,10 +15,9 @@ declare global {
 
 /* Inject our symbols as globals */
 Object.defineProperties(Symbol, {
-  justusIsValidator: { value: Symbol.for('justus.validator') },
-  justusRestValidator: { value: Symbol.for('justus.validator') },
-  justusSchemaValidator: { value: Symbol.for('justus.validator') },
-  justusAdditionalValidator: { value: Symbol.for('justus.validator') },
+  justusValidator: { value: Symbol.for('justus.Validator') },
+  justusRestValidator: { value: Symbol.for('justus.restValidator') },
+  justusAdditionalValidator: { value: Symbol.for('justus.additionalValidator') },
 })
 
 /* ========================================================================== *
@@ -53,7 +50,7 @@ export const defaultValidationOptions: Readonly<Required<ValidationOptions>> = {
  * (possibly) converting it the required type `T`.
  */
 export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
-  [Symbol.justusIsValidator]: this
+  [Symbol.justusValidator]: this
 
   optional?: boolean
 
@@ -78,7 +75,7 @@ export function makeValidatorFactory<
     optional: validator.optional,
     validate: validator.validate.bind(validator),
     [Symbol.iterator]: validator[Symbol.iterator].bind(validator),
-    [Symbol.justusIsValidator]: validator,
+    [Symbol.justusValidator]: validator,
   }) as F & V
 }
 
@@ -88,7 +85,7 @@ export function makeValidatorFactory<
  */
 export abstract class AbstractValidator<T = any>
 implements Validator<T>, Iterable<TupleRestParameter<T>> {
-  [Symbol.justusIsValidator] = this
+  [Symbol.justusValidator] = this
 
   optional?: boolean = undefined
 

@@ -126,7 +126,7 @@ function _object<S extends Schema>(schema: S): S & {
   }
 
   return Object.defineProperties(schema, {
-    [Symbol.justusSchemaValidator]: { value: validator, enumerable: false },
+    [Symbol.justusValidator]: { value: validator, enumerable: false },
     [Symbol.iterator]: { value: iterator, enumerable: false },
   }) as any
 }

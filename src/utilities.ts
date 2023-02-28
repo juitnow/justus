@@ -19,8 +19,10 @@ export function getValidator(validation: Validation): Validator {
   // Null is a constant
   if (validation === null) return nullValidator
 
-  // Validator instance (either object or function)
-  if ((<any> validation)[Symbol.justusIsValidator]) return (<any> validation)[Symbol.justusIsValidator] as Validator
+  // Anything with a validor associated with
+  if ((<any> validation)[Symbol.justusValidator]) {
+    return (<any> validation)[Symbol.justusValidator] as Validator
+  }
 
   // Other types
   switch (typeof validation) {
@@ -32,8 +34,6 @@ export function getValidator(validation: Validation): Validator {
 
     // other objects...
     case 'object':
-      // pre-compiled schema with validator
-      if (Symbol.justusSchemaValidator in validation) return (<any> validation)[Symbol.justusSchemaValidator]
       // arrays are tuples
       if (Array.isArray(validation)) return new TupleValidator(validation)
       // any other object is a schema
