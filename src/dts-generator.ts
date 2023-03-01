@@ -1,4 +1,4 @@
-import ts, { isUnionTypeNode } from 'typescript'
+import ts from 'typescript'
 
 import {
   AllOfValidator,
@@ -123,7 +123,7 @@ function generateTypeNode(
   if (type === neverType) return undefinedType
 
   // If the type is already a union type, we simply add our "undefined"
-  if (isUnionTypeNode(type)) {
+  if (ts.isUnionTypeNode(type)) {
     return ts.factory.createUnionTypeNode([ ...type.types, undefinedType ])
   }
 
