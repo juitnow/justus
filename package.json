@@ -38,8 +38,8 @@
   "author": "Juit Developers <developers@juit.com>",
   "license": "MIT",
   "devDependencies": {
-    "@plugjs/build": "^0.2.2",
-    "@plugjs/tsd": "^0.2.1",
+    "@plugjs/build": "^0.2.4",
+    "@plugjs/tsd": "^0.2.3",
     "@types/chai": "^4.3.4",
     "chai": "^4.3.7",
     "tsd": "^0.25.0",
