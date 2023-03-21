@@ -66,8 +66,12 @@ export class ValidationError extends Error {
 
     super(`${message}\n  ${details}`)
 
-    Error.captureStackTrace(this, constructor)
+    Error.captureStackTrace?.(this, constructor)
     Object.defineProperty(this, 'errors', { value: errors })
+  }
+
+  static {
+    ValidationError.prototype.name = ValidationError.name
   }
 }
 

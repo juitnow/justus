@@ -1,3 +1,5 @@
+/// <reference types="../types/fixes.d.ts" />
+
 import { expectType, printType } from 'tsd'
 
 import {

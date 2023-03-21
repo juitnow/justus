@@ -1,4 +1,4 @@
-import { banner, build, find, hookAfter, merge, tasks } from '@plugjs/build'
+import { banner, build, find, hookAfter, tasks } from '@plugjs/build'
 import '@plugjs/tsd'
 
 const localBuild = build({
