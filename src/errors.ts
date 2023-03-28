@@ -71,7 +71,7 @@ export class ValidationError extends Error {
   }
 
   static {
-    ValidationError.prototype.name = ValidationError.name
+    this.prototype.name = 'ValidationError'
   }
 }
 
