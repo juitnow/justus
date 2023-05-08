@@ -2,9 +2,3 @@
 interface URLSearchParams {
   keys(): IterableIterator<string>
 }
-
-
-interface ErrorConstructor {
-  // @ts-ignore
-  captureStackTrace?: (targetObject: object, constructorOpt?: Function) => void;
-}
