@@ -117,7 +117,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
   }
 }
 
-function _object<S extends Schema>(schema: S): S & {
+export function objectFactory<S extends Schema>(schema: S): S & {
   [Symbol.iterator](): Generator<TupleRestParameter<InferSchema<S>>>
 } {
   const validator = new ObjectValidator(schema)
@@ -132,7 +132,7 @@ function _object<S extends Schema>(schema: S): S & {
 }
 
 /** Validate `object`s. */
-export const object = makeValidatorFactory(new AnyObjectValidator(), _object)
+export const object = makeValidatorFactory(new AnyObjectValidator(), objectFactory)
 
 /** Validate `Object`s containing only the specified elements. */
 export function objectOf<V extends Validation>(validation: V): Validator<Record<string, InferValidation<V>>> {

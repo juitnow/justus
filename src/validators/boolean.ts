@@ -37,9 +37,9 @@ export class BooleanValidator extends AbstractValidator<boolean> {
   }
 }
 
-function _boolean(constraints: BooleanConstraints): BooleanValidator {
+export function booleanFactory(constraints: BooleanConstraints): BooleanValidator {
   return new BooleanValidator(constraints)
 }
 
 /** The `Validator` for `boolean`s. */
-export const boolean = makeValidatorFactory(new BooleanValidator(), _boolean)
+export const boolean = makeValidatorFactory(new BooleanValidator(), booleanFactory)

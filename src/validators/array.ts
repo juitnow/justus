@@ -89,13 +89,13 @@ export class ArrayValidator<T> extends AbstractValidator<T[]> {
 
 /* -------------------------------------------------------------------------- */
 
-function _array<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>> {
+export function arrayFactory<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>> {
   const items = constraints.items ? getValidator(constraints.items) : any
   return new ArrayValidator({ ...constraints, items })
 }
 
 /** Validate `Array`s. */
-export const array = makeValidatorFactory(new AnyArrayValidator(), _array)
+export const array = makeValidatorFactory(new AnyArrayValidator(), arrayFactory)
 
 /** Validate `Array`s containing only the specified elements. */
 export function arrayOf<V extends Validation>(validation: V): Validator<InferValidation<V>[]> {

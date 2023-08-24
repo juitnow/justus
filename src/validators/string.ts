@@ -70,12 +70,12 @@ export class StringValidator<S extends string = string> extends AbstractValidato
   }
 }
 
-function _string(constraints: StringConstraints): StringValidator<string>
-function _string<S extends string>(constraints: StringConstraints): StringValidator<S>
-function _string<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
-function _string(constraints: StringConstraints): Validator<string> {
+export function stringFactory(constraints: StringConstraints): StringValidator<string>
+export function stringFactory<S extends string>(constraints: StringConstraints): StringValidator<S>
+export function stringFactory<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
+export function stringFactory(constraints: StringConstraints): Validator<string> {
   return new StringValidator(constraints)
 }
 
 /** Validate `string`s. */
-export const string = makeValidatorFactory(new AnyStringValidator(), _string)
+export const string = makeValidatorFactory(new AnyStringValidator(), stringFactory)
