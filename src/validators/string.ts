@@ -28,7 +28,7 @@ export class AnyStringValidator extends AbstractValidator<string> {
 }
 
 /** A `Validator` validating `string`s with constraints. */
-export class StringValidator<S extends string = string> extends AbstractValidator<S, string> {
+export class StringValidator<S extends string = string, I = string> extends AbstractValidator<S, I> {
   readonly maxLength: number
   readonly minLength: number
   readonly pattern?: RegExp
