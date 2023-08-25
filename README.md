@@ -15,6 +15,7 @@ used to ensure that an object is _**correct**_ and from which _**proper**_
 typing can be inferred.
 
 * [Quick Start](#quick-start)
+* [Inferring Types](#inferring-types)
 * Validators
   * [Strings](#string-validator)
   * [Numbers](#number-validator)
@@ -27,6 +28,7 @@ typing can be inferred.
   * [Objects](#object-validator) (yes, this is the important one!!!)
   * [Optionals](#optional-validator)
   * [Any of, all of](#union-validators)
+* [Extra Validators](#extra-validators)
 * [Validation Options](#validation-options)
 * [A (slightly more) complex example](#a-complex-example)
 * [Generating DTS files](#generating-dts-files)
@@ -83,6 +85,62 @@ const validated = validate({
 ```
 
 ... you get the drill! See below in each _validator_ for their shorthand syntax.
+
+
+Inferring Types
+---------------
+
+It is sometimes useful to have access to the inferred types produced by the
+validation function. The `InferValidation` type does just that:
+
+```typescript
+const myTypeValidator = object({
+  /* a required string, with minimum length of 1 character */
+  foo: string({ minLength: 1 }),
+  /* an optional number, defaulted to 12345 */
+  bar: optional(number, 12345),
+  /* an optional date, without default */
+  baz: optional(date),
+} as const)
+
+type MyValidatedType = InferValidation<typeof myTypeValidator>
+// here "MyValidatedType" will have the following shape:
+// {
+//   foo: string,             // plain "string"
+//   bar: number,             // optional _with_ a default
+//   baz?: Date | undefined , // optional _without_ a default
+// }
+```
+
+Similarly, it might be useful to have access to a minimal type required as a
+validation input. This obviously differs from the input for several reasons,
+like:
+
+* optionals with default: on input we should represent `optional(type, default)`
+  as `type`, but on input this should be `type | undefined`
+* type conversions: the `date` validator converts numbers or strings always
+  into `Date` objects, but the input type should be `Date | string | number`
+
+The `InferInput` helps in this case:
+
+```typescript
+const myTypeValidator = object({
+  /* a required string, with minimum length of 1 character */
+  foo: string({ minLength: 1 }),
+  /* an optional number, defaulted to 12345 */
+  bar: optional(number, 12345),
+  /* an optional date, without default */
+  baz: optional(date),
+} as const)
+
+type MyInputType = InferInput<typeof myTypeValidator>
+// here "MyInputType" will have the following shape:
+// {
+//   foo: string,                              // plain string
+//   bar?: number | undefined,                 // optional, as it has a default
+//   baz?: Date | string | number | undefined, // optional, also parsed from string, number
+// }
+```
 
 
 String Validator
@@ -678,6 +736,22 @@ const result = validate(oneOf(number, string), something)
 
 result // <-- its type will be "number | string"
 ```
+
+
+Extra Validators
+----------------
+
+A number of _extra_ validators are also included, but not exported by default
+in order to reduce the bundle size when Justus is bundled in client apps.
+
+Those are:
+
+* `ean13`: Validate a standard _EAN-13_ barcode number (as a string)
+  * `import { ean13 } from 'justus/extra/ean13'`
+* `url`: Validate a string URL and converts it into a proper `URL` object
+  * `import { url } from 'justus/extra/url'`
+* `uuid`: Validate a string UUID plain and simple
+  * `import { uuid } from 'justus/extra/uuid'`
 
 
 Validation Options
