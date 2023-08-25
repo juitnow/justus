@@ -53,7 +53,7 @@ export class AnyNumberValidator extends AbstractValidator<number> {
 }
 
 /** A `Validator` validating `number`s with constaints. */
-export class NumberValidator<N extends number = number> extends AbstractValidator<N> {
+export class NumberValidator<N extends number = number> extends AbstractValidator<N, number> {
   #isMultipleOf?: ((value: number) => boolean)
 
   readonly allowNaN: boolean
