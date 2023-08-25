@@ -1,8 +1,7 @@
 import { assertValidation, ValidationError } from '../errors'
+import { registry } from '../registry'
 import { AbstractValidator } from '../types'
-// eslint-disable-next-line import/no-cycle
 import { getValidator } from '../utilities'
-import { nullValidator } from './constant'
 
 import type {
   InferInputTuple,
@@ -27,7 +26,7 @@ export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTupl
     const members: TupleMember[] = []
     for (const item of tuple) {
       if (item === null) { // god knows why typeof null === "object"
-        members.push({ single: true, validator: nullValidator })
+        members.push({ single: true, validator: getValidator(null) })
       } else if ((typeof item === 'object') && (Symbol.justusRestValidator in item)) {
         members.push({ single: false, validator: (<any>item)[Symbol.justusRestValidator] })
       } else {
@@ -92,3 +91,6 @@ export function tuple<T extends
 >(tuple: T): Validator<InferTuple<T>, InferInputTuple<T>> {
   return new TupleValidator(tuple)
 }
+
+// Register our "constant" validator
+registry.set('tuple', TupleValidator)

@@ -1,6 +1,6 @@
 import { assertValidation, ValidationErrorBuilder } from '../errors'
+import { registry } from '../registry'
 import { AbstractValidator, defaultValidationOptions, makeValidatorFactory } from '../types'
-// eslint-disable-next-line import/no-cycle
 import { getValidator } from '../utilities'
 
 import type {
@@ -136,3 +136,6 @@ export const object = makeValidatorFactory(new AnyObjectValidator(), objectFacto
 export function objectOf<V extends Validation>(validation: V): Validator<Record<string, InferValidation<V>>> {
   return new ObjectValidator({ [Symbol.justusAdditionalValidator]: getValidator(validation) })
 }
+
+// Register our "object" validator
+registry.set('object', ObjectValidator)
