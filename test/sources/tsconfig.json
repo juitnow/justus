@@ -19,8 +19,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "verbatimModuleSyntax": true,
+
+    "paths": {
+      "justus": [ "../.." ]
+    }
   },
-  "include": [
-    "*.ts",
-  ],
+  "include": [ "*.ts", ],
+  "exclude": [ ]
 }
