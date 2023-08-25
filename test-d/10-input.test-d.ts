@@ -78,7 +78,10 @@ expectType<string[]>(inputType(arrayOf(string)))
 // one of / all of
 
 expectType<string | number>(inputType(oneOf(number, string)))
-expectAssignable<{ a: number, b: string }>(inputType(allOf({ a: number }, { b: string })))
+expectType<string | number | Date | URL>(inputType(oneOf(date, url)))
+
+expectType<(string | number | Date) & URL>(inputType(allOf(date, url)))
+expectAssignable<{ a: number } & { b: string }>(inputType(allOf({ a: number }, { b: string })))
 
 // optional
 
