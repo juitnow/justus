@@ -22,7 +22,7 @@ export interface ArrayConstraints<V extends Validation> {
 }
 
 /** Basic validator for `Array` instances. */
-export class AnyArrayValidator<T = any> extends AbstractValidator<T[]> {
+export class AnyArrayValidator<T = any> extends AbstractValidator<T[], T[]> {
   validate(value: unknown): T[] {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
     return [ ...value ]
