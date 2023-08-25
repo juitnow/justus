@@ -1,6 +1,7 @@
 import { expectType, printType } from 'tsd'
 
-import { date, tuple, url } from '../src'
+import { date, tuple } from '../src'
+import { url } from '../src/extra/url'
 
 import type { InferInput } from '../src'
 

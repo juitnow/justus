@@ -21,7 +21,6 @@ export { OptionalValidator, optional } from './validators/optional'
 export { AnyStringValidator, StringValidator, string } from './validators/string'
 export { TupleValidator, tuple } from './validators/tuple'
 export { AllOfValidator, OneOfValidator, allOf, oneOf } from './validators/union'
-export { URLValidator, url } from './validators/url'
 
 // Validator Types
 export type { ArrayConstraints, arrayFactory } from './validators/array'
@@ -31,7 +30,6 @@ export type { BrandedNumberConstraints, numberFactory } from './validators/numbe
 export type { objectFactory } from './validators/object'
 export type { BrandedStringConstraints, StringConstraints, stringFactory } from './validators/string'
 export type { TupleMember } from './validators/tuple'
-export type { URLConstraints, urlFactory } from './validators/url'
 
 /* ========================================================================== *
  * VALIDATE FUNCTION (our main entry point)                                   *

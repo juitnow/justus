@@ -8,8 +8,8 @@ import {
   number,
   object,
   string,
-  url,
 } from 'justus'
+import { url } from 'justus/extra/url'
 
 export const testKeywords = object({
   _any: any,

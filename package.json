@@ -35,6 +35,16 @@
         "default": "./dist/extra/ean13.mjs"
       }
     },
+    "./extra/url": {
+      "require": {
+        "types": "./dist/extra/url.d.ts",
+        "default": "./dist/extra/url.cjs"
+      },
+      "import": {
+        "types": "./dist/extra/url.d.ts",
+        "default": "./dist/extra/url.mjs"
+      }
+    },
     "./extra/uuid": {
       "require": {
         "types": "./dist/extra/uuid.d.ts",

@@ -9,8 +9,8 @@ import {
   oneOf,
   optional,
   string,
-  url,
 } from '../src'
+import { url } from '../src/extra/url'
 
 import type { InferInput, Validation } from '../src'
 

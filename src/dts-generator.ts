@@ -1,32 +1,22 @@
 import ts from 'typescript'
 
-import {
-  AllOfValidator,
-  AnyArrayValidator,
-  AnyNumberValidator,
-  AnyObjectValidator,
-  AnyStringValidator,
-  AnyValidator,
-  ArrayValidator,
-  assertSchema,
-  BooleanValidator,
-  ConstantValidator,
-  DateValidator,
-  getValidator,
-  NeverValidator,
-  NumberValidator,
-  ObjectValidator,
-  OneOfValidator,
-  OptionalValidator,
-  StringValidator,
-  TupleValidator,
-  URLValidator,
-} from './index'
+import { assertSchema } from './errors'
+import { URLValidator } from './extra/url'
+import { getValidator } from './utilities'
+import { AnyValidator } from './validators/any'
+import { AnyArrayValidator, ArrayValidator } from './validators/array'
+import { BooleanValidator } from './validators/boolean'
+import { ConstantValidator } from './validators/constant'
+import { DateValidator } from './validators/date'
+import { NeverValidator } from './validators/never'
+import { AnyNumberValidator, NumberValidator } from './validators/number'
+import { AnyObjectValidator, ObjectValidator } from './validators/object'
+import { OptionalValidator } from './validators/optional'
+import { AnyStringValidator, StringValidator } from './validators/string'
+import { TupleValidator } from './validators/tuple'
+import { AllOfValidator, OneOfValidator } from './validators/union'
 
-import type {
-  Validation,
-  Validator,
-} from './index'
+import type { Validation, Validator } from './types'
 
 /* ========================================================================== *
  * LOCAL TYPES                                                                *

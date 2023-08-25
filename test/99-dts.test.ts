@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 
-import { generateTypes } from '../src/dts-generator'
 import {
   allOf,
   allowAdditionalProperties,
@@ -24,9 +23,9 @@ import {
   oneOf,
   optional,
   string,
-  url,
-  URLValidator,
-} from '../src/index'
+} from '../src'
+import { generateTypes } from '../src/dts-generator'
+import { url, URLValidator } from '../src/extra/url'
 
 describe('DTS Generation', () => {
   it('should generate the DTS for some basic types', () => {

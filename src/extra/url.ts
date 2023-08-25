@@ -1,7 +1,7 @@
 import { ValidationError, ValidationErrorBuilder } from '../errors'
 import { AbstractValidator, makeValidatorFactory } from '../types'
-import { ConstantValidator } from './constant'
-import { ObjectValidator } from './object'
+import { ConstantValidator } from '../validators/constant'
+import { ObjectValidator } from '../validators/object'
 
 import type { ValidationOptions } from '..'
 import type { Schema, Validator } from '../types'

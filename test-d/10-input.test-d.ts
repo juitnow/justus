@@ -14,9 +14,9 @@ import {
   oneOf,
   optional,
   string,
-  url,
   validate,
 } from '../src'
+import { url } from '../src/extra/url'
 
 import type { InferInput } from '../src'
 
