@@ -115,9 +115,7 @@ export class URLValidator extends AbstractValidator<URL, URL | string> {
 
     if (this.searchParams) {
       const parameters: Record<string, string> = {}
-      for (const param of url.searchParams.keys()) {
-        parameters[param] = url.searchParams.get(param) as string
-      }
+      url.searchParams.forEach((value, key) => parameters[key] = value)
 
       try {
         this.searchParams.validate(parameters, OPTIONS)
