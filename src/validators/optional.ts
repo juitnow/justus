@@ -9,7 +9,7 @@ import type { InferValidation, Validation, ValidationOptions, Validator } from '
 export class OptionalValidator<
   T = any, // the type of the "validation", that is the optional type to validate
   D = undefined, // the default value (or undefined)
-> extends AbstractValidator<D extends undefined ? T | undefined : T> {
+> extends AbstractValidator<D extends undefined ? T | undefined : T, T | undefined> {
   validator: Validator<T>
   defaultValue: T | undefined
 
@@ -32,8 +32,9 @@ export class OptionalValidator<
     }
   }
 
-  validate(value: unknown, options?: ValidationOptions): D extends undefined ? T | undefined : T {
-    if (value === undefined) return this.defaultValue as any // do not validate defaults!
+  validate(value: unknown, options?: ValidationOptions): D extends undefined ? T | undefined : T
+  validate(value: unknown, options?: ValidationOptions): T | undefined {
+    if (value === undefined) return this.defaultValue // do not validate defaults!
     return this.validator.validate(value, options)
   }
 }
