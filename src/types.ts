@@ -297,6 +297,8 @@ export type InferInputSchema2<S> = {
   // making the key *non optional*
   [ key in keyof S as
       key extends string ?
+        InferInput<S[key]> extends never ?
+          never :
         undefined extends InferInput<S[key]> ?
           never :
           key :
