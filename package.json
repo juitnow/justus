@@ -24,6 +24,26 @@
         "types": "./dist/dts-generator.d.ts",
         "default": "./dist/dts-generator.mjs"
       }
+    },
+    "./extra/ean13": {
+      "require": {
+        "types": "./dist/extra/ean13.d.ts",
+        "default": "./dist/extra/ean13.cjs"
+      },
+      "import": {
+        "types": "./dist/extra/ean13.d.ts",
+        "default": "./dist/extra/ean13.mjs"
+      }
+    },
+    "./extra/uuid": {
+      "require": {
+        "types": "./dist/extra/uuid.d.ts",
+        "default": "./dist/extra/uuid.cjs"
+      },
+      "import": {
+        "types": "./dist/extra/uuid.d.ts",
+        "default": "./dist/extra/uuid.mjs"
+      }
     }
   },
   "types": "./dist/index.d.ts",
