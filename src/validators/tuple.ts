@@ -92,5 +92,5 @@ export function tuple<T extends
   return new TupleValidator(tuple)
 }
 
-// Register our "constant" validator
+// Register our "tuple" validator
 registry.set('tuple', TupleValidator)
