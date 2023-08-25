@@ -15,7 +15,7 @@ export interface DateConstraints {
 }
 
 /** A `Validator` validating dates and converting them to `Date` instances. */
-export class DateValidator extends AbstractValidator<Date> {
+export class DateValidator extends AbstractValidator<Date, Date | string | number> {
   readonly format?: 'iso' | 'timestamp'
   readonly from?: Date
   readonly until?: Date
@@ -36,12 +36,12 @@ export class DateValidator extends AbstractValidator<Date> {
   }
 
   validate(value: unknown): Date {
-    let date: Date
-    try {
-      date = new Date(value as any)
-    } catch (error) {
-      throw new ValidationError('Value could not be converted to a "Date"')
-    }
+    const date =
+        value instanceof Date ? new Date(value.getTime()) :
+        typeof value === 'string' ? new Date(value) :
+        typeof value === 'number' ? new Date(value) :
+        undefined
+    assertValidation(!! date, 'Value could not be converted to a "Date"')
 
     if (isNaN(date.getTime())) throw new ValidationError('Invalid date')
 
