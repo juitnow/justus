@@ -4,12 +4,20 @@ import { AbstractValidator } from '../types'
 import { getValidator } from '../utilities'
 import { nullValidator } from './constant'
 
-import type { InferTuple, Tuple, ValidationOptions, Validator } from '../types'
+import type {
+  InferInputTuple,
+  InferTuple,
+  Tuple,
+  TupleRestParameter,
+  Validation,
+  ValidationOptions,
+  Validator,
+} from '../types'
 
 export interface TupleMember { single: boolean, validator: Validator }
 
 /** A `Validator` for _tuples_. */
-export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTuple<T>> {
+export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTuple<T>, InferInputTuple<T>> {
   readonly members: readonly TupleMember[]
   readonly tuple: T
 
@@ -77,6 +85,10 @@ export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTupl
 }
 
 /** Validate _tuples_. */
-export function tuple<T extends Tuple>(tuple: T): Validator<InferTuple<T>> {
+export function tuple<T extends
+| readonly [ Validation | TupleRestParameter<any, any>, ...Tuple ]
+| readonly [ ...Tuple, Validation | TupleRestParameter<any, any> ]
+| readonly [ ...Tuple ] // ... this is bascially an array...
+>(tuple: T): Validator<InferTuple<T>, InferInputTuple<T>> {
   return new TupleValidator(tuple)
 }
