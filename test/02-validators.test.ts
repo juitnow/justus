@@ -5,7 +5,7 @@ import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidato
 import type { Schema } from '../src'
 
 describe('Validators', () => {
-  const fakeValidator = new class extends AbstractValidator {
+  const fakeValidator = new class extends AbstractValidator<never, never> {
     validate(): never {
       throw new Error('Method not implemented.')
     }
