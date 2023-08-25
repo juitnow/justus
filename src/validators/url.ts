@@ -60,7 +60,7 @@ export interface URLConstraints {
 }
 
 /** A `Validator` validating URLs and converting them to `URL` instances. */
-export class URLValidator extends AbstractValidator<URL> {
+export class URLValidator extends AbstractValidator<URL, URL | string> {
   readonly href?: Validator<string>
   readonly origin?: Validator<string>
   readonly protocol?: Validator<string>
