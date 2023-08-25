@@ -1,10 +1,9 @@
-// import { additionalValidator } from './types'
-// eslint-disable-next-line import/no-cycle
 import { getValidator } from './utilities'
 import { any } from './validators/any'
 
 import type {
-  AdditionalProperties, InferValidation,
+  AdditionalProperties,
+  InferValidation,
   Validation,
   Validator,
 } from './types'
