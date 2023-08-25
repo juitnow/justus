@@ -89,13 +89,3 @@ expectType<string | undefined>(inputType(optional(string, 12345 as const)))
 expectType<number[] | undefined>(inputType(optional(arrayOf(number))))
 expectType<number[] | undefined>(inputType(optional(arrayOf(number), [ 1, 2, 3 ] as const)))
 expectType<number[] | undefined>(inputType(optional(arrayOf(number), 12345 as const)))
-
-// expectType<any[]>(inputType(array({})))
-// expectType<Record<string, any>>(inputType(object({})))
-
-
-// object
-// objectOf
-// tuple
-// allOf
-// oneOf
