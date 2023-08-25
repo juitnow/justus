@@ -60,7 +60,7 @@
   "scripts": {
     "build": "plug",
     "coverage": "plug coverage",
-    "dev": "plug coverage -w src -w test",
+    "dev": "plug coverage -w src -w test -w test-d",
     "lint": "plug lint",
     "test": "plug test",
     "transpile": "plug transpile"
