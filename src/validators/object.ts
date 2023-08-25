@@ -1,15 +1,12 @@
 import { assertValidation, ValidationErrorBuilder } from '../errors'
+import { AbstractValidator, defaultValidationOptions, makeValidatorFactory } from '../types'
 // eslint-disable-next-line import/no-cycle
-import { allowAdditionalProperties } from '../schema'
-import {
-  AbstractValidator,
-  defaultValidationOptions,
-  makeValidatorFactory,
-} from '../types'
 import { getValidator } from '../utilities'
 
 import type {
-  InferSchema, InferValidation, Schema, TupleRestParameter, Validation, ValidationOptions,
+  InferInputSchema,
+  InferSchema, InferValidation, Schema, TupleRestParameter, Validation,
+  ValidationOptions,
   Validator,
 } from '../types'
 
@@ -27,7 +24,7 @@ export class AnyObjectValidator extends AbstractValidator<Record<string, any>> {
 }
 
 /** A `Validator` validating `object`s according to a `Schema`. */
-export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSchema<S>> {
+export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSchema<S>, InferInputSchema<S>> {
   readonly schema: Readonly<S>
 
   validators = new Map<string, Validator>()
@@ -118,10 +115,11 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
 }
 
 export function objectFactory<S extends Schema>(schema: S): S & {
-  [Symbol.iterator](): Generator<TupleRestParameter<InferSchema<S>>>
+  [Symbol.iterator](): Generator<TupleRestParameter<InferSchema<S>, InferInputSchema<S>>>
 } {
   const validator = new ObjectValidator(schema)
-  function* iterator(): Generator<TupleRestParameter> {
+
+  function* iterator(): Generator<TupleRestParameter<any, any>> {
     yield { [Symbol.justusRestValidator]: validator }
   }
 
@@ -136,5 +134,5 @@ export const object = makeValidatorFactory(new AnyObjectValidator(), objectFacto
 
 /** Validate `Object`s containing only the specified elements. */
 export function objectOf<V extends Validation>(validation: V): Validator<Record<string, InferValidation<V>>> {
-  return new ObjectValidator({ ...allowAdditionalProperties(validation) })
+  return new ObjectValidator({ [Symbol.justusAdditionalValidator]: getValidator(validation) })
 }
