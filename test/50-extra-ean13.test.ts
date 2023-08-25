@@ -3,7 +3,13 @@ import { ean13 } from '../src/extra/ean13'
 
 describe('Extra EAN-13 Validator', () => {
   it('should validate all our EAN-13 codes', async () => {
-    for (const ean of correct) validate(ean13, ean)
+    for (const ean of correct) {
+      expect(validate(ean13, ean)).toEqual(ean)
+    }
+  })
+
+  it('should validate an EAN-13 from a number', async () => {
+    expect(validate(ean13, 9780966245417)).toEqual('9780966245417')
   })
 
   it('should reject a short EAN-13', () => {
