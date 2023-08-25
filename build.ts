@@ -1,4 +1,4 @@
-import { banner, build, exec, find, hookAfter, merge, resolve, rmrf, tasks } from '@plugjs/build'
+import { banner, build, exec, find, hookAfter, log, merge, resolve, rmrf, tasks } from '@plugjs/build'
 import '@plugjs/tsd'
 
 const localBuild = build({
@@ -38,6 +38,8 @@ const localBuild = build({
       // run tsc to make sure that all types are exported correctly
       await find('**/*.ts', { directory: tmpdir })
           .tsc('test/sources/tsconfig.json')
+
+      log('Sources compiled successfully')
     } finally {
       await rmrf(tmpdir)
     }
