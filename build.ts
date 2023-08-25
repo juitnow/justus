@@ -3,7 +3,7 @@ import '@plugjs/tsd'
 
 const localBuild = build({
   ...tasks({
-    exportsGlob: '(index|dts-generator).*',
+    exportsGlob: '((index|dts-generator).*)|(extra/**.*)',
   }),
 
   /** Run `tsd` */
