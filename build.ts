@@ -1,4 +1,4 @@
-import { banner, build, exec, find, hookAfter, log, merge, resolve, rmrf, tasks } from '@plugjs/build'
+import { banner, build, exec, find, hookAfter, log, merge, mkdtemp, resolve, rmrf, tasks } from '@plugjs/build'
 import '@plugjs/tsd'
 
 const localBuild = build({
@@ -26,7 +26,7 @@ const localBuild = build({
     await this.transpile()
 
     banner('Testing transpilation of dependant packages')
-    const tmpdir = '../blur' // mkdtemp()
+    const tmpdir = mkdtemp()
     try {
       // copy files to the temporary directory
       await find('**/*', { directory: 'test/sources' })
