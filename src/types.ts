@@ -312,5 +312,5 @@ export type InferInputSchema2<S> = {
 
 /** Utility type to infer primitive branding according to a string */
 export type Branding<S extends string> = {
-  [ key in keyof { __brand: never } as `__brand_${S}` ] : never
+  [ brand in `__brand_${S}` ] : never
 }
