@@ -1,14 +1,14 @@
 import { assertValidation } from '../errors'
 import { StringValidator } from '../validators/string'
 
-import type { Branding } from '../types'
+export type EAN13String = string & { __ean_13: never }
 
-export class EAN13Validator extends StringValidator<string & Branding<'ean_13'>, string | number> {
+export class EAN13Validator extends StringValidator<EAN13String, string | number> {
   constructor() {
     super({ minLength: 13, maxLength: 13, pattern: /^\d{13}$/ })
   }
 
-  validate(value: unknown): string & Branding<'ean_13'>
+  validate(value: unknown): EAN13String
   validate(value: unknown): string {
     if (typeof value === 'number') value = `${value}`
     const ean13 = super.validate(value).toLowerCase()
