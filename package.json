@@ -78,7 +78,7 @@
   "author": "Juit Developers <developers@juit.com>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@plugjs/build": "^0.4.29",
+    "@plugjs/build": "^0.4.30",
     "@plugjs/tsd": "^0.4.31",
     "@types/chai": "^4.3.5",
     "chai": "^4.3.8",

@@ -4,6 +4,7 @@ import '@plugjs/tsd'
 const localBuild = build({
   ...tasks({
     exportsGlob: '((index|dts-generator).*)|(extra/**.*)',
+    extraLint: [ [ '**/*.test-d.ts', { directory: 'test-d' } ] ],
   }),
 
   /** Run `tsd` */
@@ -13,12 +14,6 @@ const localBuild = build({
       find('**/*.test-d.ts', { directory: 'test-d' }),
       find('**/*.d.ts', { directory: 'types' }),
     ]).tsd()
-  },
-
-  /** Lint all sources (including `test-d` stuff) */
-  async lint_tsd(): Promise<void> {
-    banner('Linting type defintion test sources')
-    await find('**/*.test-d.ts', { directory: 'test-d' }).eslint()
   },
 
   /** Text compilation of *dependant* packages */
@@ -47,6 +42,5 @@ const localBuild = build({
 })
 
 hookAfter(localBuild, 'test', [ 'tsd', 'test_dependants' ])
-hookAfter(localBuild, 'lint', [ 'lint_tsd' ])
 
 export default localBuild
