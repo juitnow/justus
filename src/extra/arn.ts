@@ -19,7 +19,11 @@ export interface ParsedArn<Service extends string = string> {
 /* ========================================================================== */
 
 /** Validate a string and convert it into into an {@link ParsedArn} */
-function parse<Service extends string>(value: unknown, service?: Service): ParsedArn<Service> {
+function parse<Service extends string>(
+    value: unknown,
+    service?: Service,
+    type?: string,
+): ParsedArn<Service> {
   assertValidation(typeof value == 'string', 'Value is not a "string"')
 
   const segments = value.split(':')
@@ -44,6 +48,10 @@ function parse<Service extends string>(value: unknown, service?: Service): Parse
 
   assertValidation(!! resArray[0], 'Invalid resource ID in ARN')
 
+  if (type !== undefined) {
+    assertValidation(resArray[0] === type, `ARN Resource Type "${resArray[0]}" mismatch (expected "${type}")`)
+  }
+
   const arn = `arn:${prt}:${svc}:${rgn}:${act}:${resString}`
 
   return {
@@ -61,42 +69,80 @@ function parse<Service extends string>(value: unknown, service?: Service): Parse
 /** Validator parsing an ARN (Amazon Resource Name) and returning its components */
 export class ParsedArnValidator<Service extends string = string>
   extends AbstractValidator<ParsedArn<Service>, string> {
-  constructor(service?: Service)
-  constructor(private _service?: Service) {
+  /**
+   * Create a new {@link ParsedArnValidator} instance.
+   *
+   * @param service The (optional) service the ARN should be pointing to
+   *                (e.g. `iam` or `elasticloadbalancing`)
+   * @param resourceType The (optional) resource _type_ the ARN should be
+   *                     representing (e.g. `role` in the `iam` service, or
+   *                     `targetgroup` in the `elasticloadbalancing` service)
+   */
+  constructor(service?: Service, resourceType?: string)
+  constructor(private _service?: Service, private _type?: string) {
     super()
   }
 
   validate(value: unknown): ParsedArn<Service> {
-    return parse(value, this._service)
+    return parse(value, this._service, this._type)
   }
 }
 
 /** Validator validating an ARN (Amazon Resource Name) _string_ */
 export class ArnValidator<Service extends string = string>
   extends AbstractValidator<ArnString<Service>, string> {
-  constructor(service?: Service)
-  constructor(private _service?: Service) {
+  /**
+   * Create a new {@link ArnValidator} instance.
+   *
+   * @param service The (optional) service the ARN should be pointing to
+   *                (e.g. `iam` or `elasticloadbalancing`)
+   * @param resourceType The (optional) resource _type_ the ARN should be
+   *                     representing (e.g. `role` in the `iam` service, or
+   *                     `targetgroup` in the `elasticloadbalancing` service)
+   */
+  constructor(service?: Service, resourceType?: string)
+  constructor(private _service?: Service, private _type?: string) {
     super()
   }
 
   validate(value: unknown): ArnString<Service> {
-    return parse(value, this._service).Arn
+    return parse(value, this._service, this._type).Arn
   }
 }
 
 /* ========================================================================== */
 
-export function parseArnFactory(): ParsedArnValidator<string>
-export function parseArnFactory<Service extends string = string>(service: Service): ParsedArnValidator<Service>
-export function parseArnFactory(service?: string): ParsedArnValidator<string> {
-  return new ParsedArnValidator(service)
+/**
+ * Create a new {@link ParsedArnValidator} parsing an ARN referring to the
+ * specified `service` (e.g. `iam` or `elasticloadbalancing`).
+ *
+ * An (optional) resource _type_ can be specified, and will validate the first
+ * component of the ARN's resource (e.g. `role` in the `iam` service, or
+ * `targetgroup` in the `elasticloadbalancing` service)
+ */
+export function parseArnFactory<Service extends string = string>(
+    service: Service,
+    resourceType?: string,
+): ParsedArnValidator<Service> {
+  return new ParsedArnValidator(service, resourceType)
 }
 
-export function arnFactory(): ArnValidator<string>
-export function arnFactory<Service extends string = string>(service: Service): ArnValidator<Service>
-export function arnFactory(service?: string): ArnValidator<string> {
-  return new ArnValidator(service)
+/**
+ * Create a new {@link ArnValidator} validating an ARN referring to the
+ * specified `service` (e.g. `iam` or `elasticloadbalancing`).
+ *
+ * An (optional) resource _type_ can be specified, and will validate the first
+ * component of the ARN's resource (e.g. `role` in the `iam` service, or
+ * `targetgroup` in the `elasticloadbalancing` service)
+ */
+export function arnFactory<Service extends string = string>(
+    service: Service,
+    resourceType?: string,
+): ArnValidator<Service> {
+  return new ArnValidator(service, resourceType)
 }
+
+/* ========================================================================== */
 
 /** Validate a string and parse it into into an {@link ParsedArn} */
 export const parseArn = makeValidatorFactory(new ParsedArnValidator(), parseArnFactory)

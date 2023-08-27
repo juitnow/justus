@@ -164,7 +164,7 @@ describe('Extra UUID validator', () => {
     })
 
     it('should fail when the service is mismatched', () => {
-      expect(() => validate(arn('correct'), 'arn:aws:wrong:region:account:/'))
+      expect(() => validate(arn('correct'), 'arn:aws:wrong:region:account:resource'))
           .toThrow((assert) => assert
               .toBeError(ValidationError, /^Found 1 validation error$/m)
               .toHaveProperty('errors', expect.toEqual([ {
@@ -172,12 +172,30 @@ describe('Extra UUID validator', () => {
                 message: 'ARN Service "wrong" mismatch (expected "correct")',
               } ])))
 
-      expect(() => validate(parseArn('correct'), 'arn:aws:wrong:region:account:/'))
+      expect(() => validate(parseArn('correct'), 'arn:aws:wrong:region:account:resource'))
           .toThrow((assert) => assert
               .toBeError(ValidationError, /^Found 1 validation error$/m)
               .toHaveProperty('errors', expect.toEqual([ {
                 path: [],
                 message: 'ARN Service "wrong" mismatch (expected "correct")',
+              } ])))
+    })
+
+    it('should fail when the resource type is mismatched', () => {
+      expect(() => validate(arn('service', 'correct'), 'arn:aws:service:region:account:wrong/foo'))
+          .toThrow((assert) => assert
+              .toBeError(ValidationError, /^Found 1 validation error$/m)
+              .toHaveProperty('errors', expect.toEqual([ {
+                path: [],
+                message: 'ARN Resource Type "wrong" mismatch (expected "correct")',
+              } ])))
+
+      expect(() => validate(parseArn('service', 'correct'), 'arn:aws:service:region:account:wrong/foo'))
+          .toThrow((assert) => assert
+              .toBeError(ValidationError, /^Found 1 validation error$/m)
+              .toHaveProperty('errors', expect.toEqual([ {
+                path: [],
+                message: 'ARN Resource Type "wrong" mismatch (expected "correct")',
               } ])))
     })
   })
