@@ -746,6 +746,10 @@ in order to reduce the bundle size when Justus is bundled in client apps.
 
 Those are:
 
+* `arn`: Validate an ARN (Amazon Resource Name) as a string
+  * `import { arn } from 'justus/extra/arn'`
+* `parseArn`: Validate an ARN (Amazon Resource Name) and parse its components
+  * `import { parseArn } from 'justus/extra/arn'`
 * `ean13`: Validate a standard _EAN-13_ barcode number (as a string)
   * `import { ean13 } from 'justus/extra/ean13'`
 * `url`: Validate a string URL and converts it into a proper `URL` object
