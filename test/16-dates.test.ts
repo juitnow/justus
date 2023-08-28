@@ -9,6 +9,11 @@ describe('Date validator', () => {
     expect(validate(date, 'Thu, 01 Jan 1970 00:00:00 GMT').getTime()).to.eql(0)
   })
 
+  it('should validate a Date instance', () => {
+    const now = new Date()
+    expect(validate(date, now).getTime()).to.eql(now.getTime())
+  })
+
   it('should validate an ISO date', () => {
     const validator = date({ format: 'iso' })
 

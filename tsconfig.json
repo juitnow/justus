@@ -17,7 +17,6 @@
   },
   "include": [
     "./src",
-    "./types",
     "./build.ts",
   ],
 }

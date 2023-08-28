@@ -1,8 +1,4 @@
-import { ConstantValidator, nullValidator } from './validators/constant'
-// eslint-disable-next-line import/no-cycle
-import { ObjectValidator } from './validators/object'
-// eslint-disable-next-line import/no-cycle
-import { TupleValidator } from './validators/tuple'
+import { registry } from './registry'
 
 import type { Schema, Validation, Validator } from './types'
 
@@ -17,7 +13,7 @@ import type { Schema, Validation, Validator } from './types'
  */
 export function getValidator(validation: Validation): Validator {
   // Null is a constant
-  if (validation === null) return nullValidator
+  if (validation === null) return new (registry.get('constant'))(null)
 
   // Anything with a validor associated with
   if ((<any> validation)[Symbol.justusValidator]) {
@@ -30,14 +26,14 @@ export function getValidator(validation: Validation): Validator {
     case 'boolean':
     case 'string':
     case 'number':
-      return new ConstantValidator(validation)
+      return new (registry.get('constant'))(validation)
 
     // other objects...
     case 'object':
       // arrays are tuples
-      if (Array.isArray(validation)) return new TupleValidator(validation)
+      if (Array.isArray(validation)) return new (registry.get('tuple'))(validation)
       // any other object is a schema
-      return new ObjectValidator(validation as Schema)
+      return new (registry.get('object'))(validation as Schema)
 
     // definitely not one of our types
     default:

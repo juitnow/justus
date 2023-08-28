@@ -1,4 +1,5 @@
 import { assertValidation } from '../errors'
+import { registry } from '../registry'
 import { AbstractValidator } from '../types'
 
 import type { Validator } from '../types'
@@ -23,5 +24,5 @@ export function constant<T extends string | number | boolean | null>(constant: T
   return new ConstantValidator(constant)
 }
 
-/** The `Validator` for the `null` constant. */
-export const nullValidator = new ConstantValidator(null)
+// Register our "constant" validator
+registry.set('constant', ConstantValidator)

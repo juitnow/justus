@@ -49,7 +49,7 @@ export const defaultValidationOptions: Readonly<Required<ValidationOptions>> = {
  * A `Validator` is an object capable of validating a given _value_ and
  * (possibly) converting it the required type `T`.
  */
-export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
+export interface Validator<T = any, I = T> extends Iterable<TupleRestParameter<T, I>> {
   [Symbol.justusValidator]: this
 
   optional?: boolean
@@ -58,7 +58,7 @@ export interface Validator<T = any> extends Iterable<TupleRestParameter<T>> {
   validate(value: unknown, options?: ValidationOptions | undefined): T
 
   /** Allow any `Validator` to be used as a rest parameter in `Tuple`s */
-  [Symbol.iterator](): Generator<TupleRestParameter<T>>;
+  [Symbol.iterator](): Generator<TupleRestParameter<T, I>>;
 }
 
 /**
@@ -83,8 +83,8 @@ export function makeValidatorFactory<
  * A `Validator` is an object capable of validating a given _value_ and
  * (possibly) converting it the required type `T`.
  */
-export abstract class AbstractValidator<T = any>
-implements Validator<T>, Iterable<TupleRestParameter<T>> {
+export abstract class AbstractValidator<T, I = T>
+implements Validator<T, I>, Iterable<TupleRestParameter<T, I>> {
   [Symbol.justusValidator] = this
 
   optional?: boolean = undefined
@@ -93,7 +93,7 @@ implements Validator<T>, Iterable<TupleRestParameter<T>> {
   abstract validate(value: unknown, options?: ValidationOptions | undefined): T
 
   /** Allow any `Validator` to be used as a rest parameter in `Tuple`s */
-  * [Symbol.iterator](): Generator<TupleRestParameter<T>> {
+  * [Symbol.iterator](): Generator<TupleRestParameter<T, I>> {
     yield { [Symbol.justusRestValidator]: this }
   }
 }
@@ -118,7 +118,7 @@ export type Validation =
  */
 export type InferValidation<V> =
   // Validators return their validation type
-  V extends Validator<infer T> ? T :
+  V extends Validator<infer T, any> ? T :
 
   // Primitives are returned as constants
   V extends undefined ? V :
@@ -133,6 +133,25 @@ export type InferValidation<V> =
   // Anyhing else can only be a schema
   InferSchema<V>
 
+/**
+ * Infer the type compatible with a `Validation`'s input.
+ */
+export type InferInput<V> =
+  // Validators return their validation type
+  V extends Validator<any, infer T> ? T :
+
+  // Primitives are returned as constants
+  V extends undefined ? V :
+  V extends boolean ? V :
+  V extends number ? V :
+  V extends string ? V :
+  V extends null ? V :
+
+  // // Tuples are inferred using their own types
+  V extends Tuple ? InferInputTuple<V> :
+
+  // // Anyhing else can only be a schema
+  InferInputSchema<V>
 
 /* ========================================================================== *
  * TUPLES                                                                     *
@@ -140,8 +159,14 @@ export type InferValidation<V> =
 
 /** Infer the type validated by a `Validation` or `TupleRestParameter` */
 export type InferValidationOrTupleRest<T> =
-  T extends TupleRestParameter<infer X> ? X :
+  T extends TupleRestParameter<infer X, any> ? X :
   T extends Validation ? InferValidation<T> :
+  never
+
+/** Infer the input type for a `Validation` or `TupleRestParameter` */
+export type InferInputValidationOrTupleRest<T> =
+  T extends TupleRestParameter<any, infer X> ? X :
+  T extends Validation ? InferInput<T> :
   never
 
 /* -------------------------------------------------------------------------- */
@@ -149,7 +174,7 @@ export type InferValidationOrTupleRest<T> =
 /**
  * A `Tuple` is defined to be an array of `Validation` or `TupleRest`
  */
-export type Tuple = readonly (Validation | TupleRestParameter)[]
+export type Tuple = readonly (Validation | TupleRestParameter<any, any>)[]
 
 /**
  * The `TupleRestParameter` defines a tuple member that can occur several
@@ -164,8 +189,8 @@ export type Tuple = readonly (Validation | TupleRestParameter)[]
  * const myTuple = tuple([ number, ...nonEmptyString ])
  * ```
  */
-export type TupleRestParameter<T = any> = {
-  [Symbol.justusRestValidator] : Validator<T>
+export type TupleRestParameter<T, I> = {
+  [Symbol.justusRestValidator] : Validator<T, I>
 }
 
 /**
@@ -187,6 +212,24 @@ export type InferTuple<T> =
     never :
   never
 
+/**
+ * Infer a time compatible with a `TupleValidator`'s input.
+ */
+export type InferInputTuple<T> =
+  T extends Tuple ?
+    T extends readonly [] ? [] :
+    T extends readonly [ Validation, ...any[] ] ?
+      T extends readonly [ infer V, ...infer Rest ] ?
+        [ InferInput<V>, ...InferInputTuple<Rest> ] :
+      never :
+    T extends readonly [ ...any[], Validation ] ?
+      T extends readonly [ ...infer Rest, infer V ] ?
+        [ ...InferInputTuple<Rest>, InferInput<V> ] :
+      never :
+    T extends readonly (infer V)[] ?
+      [ ...InferInputValidationOrTupleRest<V>[] ] :
+    never :
+  never
 
 /* ========================================================================== *
  * OBJECT SCHEMAS                                                             *
@@ -237,11 +280,37 @@ export type InferSchema2<S> = {
   InferValidation<S[key]>
 }
 
+/** Infer the input type compatible with a `Schema` */
+export type InferInputSchema<S> =
+  S extends AdditionalProperties<Validator<any, infer X>> ?
+    { [ key in string ] : X } & InferInputSchema2<S> :
+    InferInputSchema2<S>
+
+/** Infer the input type of the properties described by a `Schema` */
+export type InferInputSchema2<S> = {
+  // this first part of the type infers all keys from the schema into their
+  // type, but makes *each* key optional... we'll restrict in the next part...
+  [ key in keyof S as key extends string ? key : never ] ? : InferInput<S[key]>
+} & {
+  // this second part infers *only* keys that _do not_ contain a "undefined"
+  // in their unions, and associates them with the inferred value, basically
+  // making the key *non optional*
+  [ key in keyof S as
+      key extends string ?
+        InferInput<S[key]> extends never ?
+          never :
+        undefined extends InferInput<S[key]> ?
+          never :
+          key :
+      never ] -? :
+  InferInput<S[key]>
+}
+
 /* ========================================================================== *
  * TYPE BRANDING                                                              *
  * ========================================================================== */
 
 /** Utility type to infer primitive branding according to a string */
 export type Branding<S extends string> = {
-  [ key in keyof { __brand: never } as `__brand_${S}` ] : never
+  [ brand in `__brand_${S}` ] : never
 }

@@ -1,7 +1,7 @@
 import { ValidationError, ValidationErrorBuilder } from '../errors'
 import { AbstractValidator, makeValidatorFactory } from '../types'
-import { ConstantValidator } from './constant'
-import { ObjectValidator } from './object'
+import { ConstantValidator } from '../validators/constant'
+import { ObjectValidator } from '../validators/object'
 
 import type { ValidationOptions } from '..'
 import type { Schema, Validator } from '../types'
@@ -60,7 +60,7 @@ export interface URLConstraints {
 }
 
 /** A `Validator` validating URLs and converting them to `URL` instances. */
-export class URLValidator extends AbstractValidator<URL> {
+export class URLValidator extends AbstractValidator<URL, URL | string> {
   readonly href?: Validator<string>
   readonly origin?: Validator<string>
   readonly protocol?: Validator<string>
@@ -115,9 +115,7 @@ export class URLValidator extends AbstractValidator<URL> {
 
     if (this.searchParams) {
       const parameters: Record<string, string> = {}
-      for (const param of url.searchParams.keys()) {
-        parameters[param] = url.searchParams.get(param) as string
-      }
+      url.searchParams.forEach((value, key) => parameters[key] = value)
 
       try {
         this.searchParams.validate(parameters, OPTIONS)
