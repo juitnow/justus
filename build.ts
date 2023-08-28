@@ -1,4 +1,15 @@
-import { banner, build, exec, find, hookAfter, log, merge, mkdtemp, resolve, rmrf, tasks } from '@plugjs/build'
+import {
+  banner,
+  build,
+  exec,
+  find,
+  hookAfter,
+  log,
+  mkdtemp,
+  resolve,
+  rmrf,
+  tasks,
+} from '@plugjs/build'
 import '@plugjs/tsd'
 
 const localBuild = build({
@@ -10,10 +21,7 @@ const localBuild = build({
   /** Run `tsd` */
   async tsd(): Promise<void> {
     banner('Testing type definitions')
-    await merge([
-      find('**/*.test-d.ts', { directory: 'test-d' }),
-      find('**/*.d.ts', { directory: 'types' }),
-    ]).tsd()
+    await find('**/*.test-d.ts', { directory: 'test-d' }).tsd()
   },
 
   /** Text compilation of *dependant* packages */
