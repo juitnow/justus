@@ -52,7 +52,17 @@ export const defaultValidationOptions: Readonly<Required<ValidationOptions>> = {
 export interface Validator<T = any, I = T> extends Iterable<TupleRestParameter<T, I>> {
   [Symbol.justusValidator]: this
 
-  optional?: boolean
+  /**
+   * A flag indicating whether the type being validated is _optional_ (the input
+   * can be `undefined`) or not (default: `false`).
+   */
+  optional: boolean
+  /**
+   * The _default_ replaced by this `Validator` when the input is `undefined`.
+   *
+   * This is used in conjunction with the `optional` flag.
+   */
+  defaultValue: T | undefined
 
   /** Validate a _value_ and optionally convert it to the required `Type` */
   validate(value: unknown, options?: ValidationOptions | undefined): T
@@ -73,6 +83,7 @@ export function makeValidatorFactory<
 >(validator: V, factory: F): F & V {
   return Object.assign(factory, {
     optional: validator.optional,
+    defaultValue: validator.defaultValue,
     validate: validator.validate.bind(validator),
     [Symbol.iterator]: validator[Symbol.iterator].bind(validator),
     [Symbol.justusValidator]: validator,
@@ -87,7 +98,8 @@ export abstract class AbstractValidator<T, I = T>
 implements Validator<T, I>, Iterable<TupleRestParameter<T, I>> {
   [Symbol.justusValidator] = this
 
-  optional?: boolean = undefined
+  optional: boolean = false
+  defaultValue: T | undefined = undefined
 
   /** Validate a _value_ and optionally convert it to the required `Type` */
   abstract validate(value: unknown, options?: ValidationOptions | undefined): T
