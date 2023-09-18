@@ -1,3 +1,4 @@
+import { assertSchema } from './errors'
 import { registry } from './registry'
 
 import type { Schema, Validation, Validator } from './types'
@@ -6,12 +7,10 @@ import type { Schema, Validation, Validator } from './types'
  * UTILITY FUNCTIONS                                                          *
  * ========================================================================== */
 
-/**
- * Return the `Validator` for the given `Validation`.
- *
- * When `validation` is `undefined` it will return a `Validator<any>`,
- */
+/** Return the `Validator` for the given `Validation` */
 export function getValidator(validation: Validation): Validator {
+  assertSchema(validation !== undefined, 'No validator for undefined validation')
+
   // Null is a constant
   if (validation === null) return new (registry.get('constant'))(null)
 
