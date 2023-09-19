@@ -175,14 +175,7 @@ export function generateDeclarations(validations: Record<string, Validation>): s
   const inputTypes = generateTypeNodes(inputValidators, inputReferences, true)
 
   /* Array of all statements of the DTS, starting with a comment */
-  const statements: ts.Statement[] = [
-    ts.addSyntheticTrailingComment(
-        ts.factory.createEmptyStatement(),
-        ts.SyntaxKind.SingleLineCommentTrivia,
-        ` Generated on ${new Date().toUTCString()}`,
-        false,
-    ),
-  ]
+  const statements: ts.Statement[] = []
 
   /* Go through each validation, exporting types and variable declarations */
   for (const { name, input, output } of names) {
@@ -262,10 +255,12 @@ export function generateDeclarations(validations: Record<string, Validation>): s
   }
 
   /* Pretty print our DTS */
-  return ts.createPrinter().printList(
+  const dts = ts.createPrinter().printList(
       ts.ListFormat.SourceFileStatements,
       ts.factory.createNodeArray(statements),
       ts.createSourceFile('types.d.ts', '', ts.ScriptTarget.Latest))
+  /* Include a leading comment with the generation date and return */
+  return `// Generated on ${new Date().toUTCString()}\n\n${dts}`
 }
 
 /* ========================================================================== *
