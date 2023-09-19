@@ -1,7 +1,9 @@
 import ts from 'typescript'
 
 import { assertSchema } from './errors'
+import { EAN13Validator } from './extra/ean13'
 import { URLValidator } from './extra/url'
+import { UUIDValidator } from './extra/uuid'
 import { getValidator } from './utilities'
 import { AnyValidator } from './validators/any'
 import { AnyArrayValidator, ArrayValidator } from './validators/array'
@@ -16,7 +18,34 @@ import { AnyStringValidator, StringValidator } from './validators/string'
 import { TupleValidator } from './validators/tuple'
 import { AllOfValidator, OneOfValidator } from './validators/union'
 
+
+import type { TypeNode } from 'typescript'
 import type { Validation, Validator } from './types'
+
+/* ========================================================================== *
+ * QUICK SIMPLE DEEP-EQUALITY                                                 *
+ * ========================================================================== */
+
+/** Check that two of our generated types are equal */
+function typeEqual(a: TypeNode, b: TypeNode): boolean {
+  function eq(a: any, b: any): boolean {
+    if ((typeof a == 'object' && a != null) &&
+        (typeof b == 'object' && b != null) ) {
+      for (const key in a) {
+        if (! eq(a[key], b[key])) return false
+      }
+      for (const key in b) {
+        /* coverage ignore if */
+        if (! eq(a[key], b[key])) return false
+      }
+      return true
+    } else {
+      return a === b
+    }
+  }
+
+  return eq(a, b)
+}
 
 /* ========================================================================== *
  * LOCAL TYPES                                                                *
@@ -49,51 +78,323 @@ export function registerTypeGenerator<V extends Validator>(
   generators.set(validator, generator)
 }
 
-/** Generate typings for the given `Validation`s. */
-export function generateTypes(validations: Record<string, Validation>, isInput: boolean = false): string {
-  // Create two maps (one mapping "string -> validator" and another mapping
-  // "validator -> string"). The first map will serve as our "exports" map,
-  // while the second will make sure that any exported validator gets referenced
-  // in the generated DTS, rather than being re-generated
+/**
+ * Generate typings (validated or input type) for the given `Validation`s.
+ *
+ * When `isInput` is `false` (the default) then the _validated_ type will be
+ * generated (that is, optional fields with default values will be considered
+ * as defined).
+ *
+ * When `isInput` is `true` then the _input_ type will be generated (that is,
+ * optional fields will be considered as optional).
+ */
+export function generateTypes(
+    validations: Record<string, Validation>,
+    isInput: boolean = false,
+): string {
+  /* Mapping from names to validators */
   const validators = new Map<string, Validator>()
+  /* Reverse mapping of first validator to their exported name */
   const references = new Map<Validator, string>()
 
-  Object.entries(validations).forEach(([ name, validation ]) => {
+  /* Convert all our input validations into proper validators we can examine */
+  for (const [ name, validation ] of Object.entries(validations)) {
     const validator = getValidator(validation)
-    // References will be added only once, first one takes precedence!
-    if (! references.has(validator)) references.set(validator, name)
     validators.set(name, validator)
-  })
-
-  // Create the array of type alias declarations to be printed and exported
-  const types: ts.TypeAliasDeclaration[] = []
-  for (const [ name, validator ] of validators.entries()) {
-    // Clone our references map, and remove the validator being exported. This
-    // will make sure that we don't have any loops in our types
-    const referenceable = new Map(references)
-    if (referenceable.get(validator) === name) {
-      referenceable.delete(validator)
-    }
-
-    // Generate the type of the validator, with our stripped reference table
-    const type = generateTypeNode(validator, referenceable, isInput)
-
-    // Create a type alias declaration with the name of the export
-    const modifiers = [ ts.factory.createModifier(ts.SyntaxKind.ExportKeyword) ]
-    const decl = ts.factory.createTypeAliasDeclaration(modifiers, name, [], type)
-    types.push(decl)
+    if (! references.has(validator)) references.set(validator, name)
   }
 
-  // Print out all our type aliases
+  /* Now convert all our validators into TypeScript `TypeNode`s */
+  const types = generateTypeNodes(validators, references, isInput)
+
+  /* Then convert all our `TypeNode`s into alias declarations */
+  const aliases: ts.TypeAliasDeclaration[] = []
+  for (const [ name, type ] of types.entries()) {
+    const alias = ts.factory.createTypeAliasDeclaration(exportModifiers, name, [], type)
+    aliases.push(alias)
+  }
+
+  /* And finally print out all our type aliases */
   return ts.createPrinter().printList(
       ts.ListFormat.SourceFileStatements,
-      ts.factory.createNodeArray(types),
+      ts.factory.createNodeArray(aliases),
       ts.createSourceFile('types.d.ts', '', ts.ScriptTarget.Latest))
+}
+
+/**
+ * Generate a full declaration map for the specified validations.
+ *
+ * The full declaration map will include validated and input types and the
+ * declaration of the validator itself. For example:
+ *
+ * ```ts
+ * const testValidator = object({ test: optional(string, 'myValue' ) })
+ * generateDeclarations({ testValidator })
+ * ```
+ *
+ * Will result in the following declaration to be emitted:
+ *
+ * ```ts
+ * export type Test: { test: string }
+ * export type TestInput: { test?: string }
+ * export const testValidator: Validator<Test, TestInput>
+ * ```
+ */
+export function generateDeclarations(validations: Record<string, Validation>): string {
+  /* Array of names: the exported constant, the input type, and the validated output type */
+  const names: { name: string, output: string, input: string }[] = []
+  /* Map of all validators for validated output type generation, and name references */
+  const outputValidators = new Map<string, Validator>()
+  const outputReferences = new Map<Validator, string>()
+  /* Map of all validators for input type generation, and name references */
+  const inputValidators = new Map<string, Validator>()
+  const inputReferences = new Map<Validator, string>()
+
+  /* Go through _all_ validations one by one and prepare names and validators */
+  for (const [ name, validation ] of Object.entries(validations)) {
+    /* Prep the name prefix for input and output types */
+    const prefix = /validator$/i.test(name) ? name.slice(0, -9) :
+                   /validation$/i.test(name) ? name.slice(0, -10) :
+                   name
+    /* Output and input name */
+    const output = `${prefix.slice(0, 1).toUpperCase()}${prefix.slice(1)}`
+    const input = `${prefix.slice(0, 1).toUpperCase()}${prefix.slice(1)}Input`
+    /* Validator from validation */
+    const validator = getValidator(validation)
+
+    /* Remember names and validators */
+    names.push({ name, output, input })
+    outputValidators.set(output, validator)
+    inputValidators.set(input, validator)
+    if (! outputReferences.has(validator)) outputReferences.set(validator, output)
+    if (! inputReferences.has(validator)) inputReferences.set(validator, input)
+  }
+
+  /* Generate all output and input types */
+  const outputTypes = generateTypeNodes(outputValidators, outputReferences, false)
+  const inputTypes = generateTypeNodes(inputValidators, inputReferences, true)
+
+  /* Array of all statements of the DTS, starting with a comment */
+  const statements: ts.Statement[] = [
+    ts.addSyntheticTrailingComment(
+        ts.factory.createEmptyStatement(),
+        ts.SyntaxKind.SingleLineCommentTrivia,
+        ` Generated on ${new Date().toUTCString()}`,
+        false,
+    ),
+  ]
+
+  /* Go through each validation, exporting types and variable declarations */
+  for (const { name, input, output } of names) {
+    /* Get output and input types, asserting their existance */
+    const outputType = outputTypes.get(output)
+    const inputType = inputTypes.get(input)
+    const validation = validations[name]
+    const validator = outputValidators.get(output)
+    assertSchema(!! outputType, `No output type "${output}" generated for validation "${name}"`)
+    assertSchema(!! inputType, `No input type "${input}" generated for validation "${name}"`)
+    assertSchema(!! validator, `No validator for "${name}"`)
+
+    /* Check if input and output types are equal */
+    const sameType = typeEqual(inputType, outputType)
+
+    /* The input can be a simple *reference* to the output type, if those are equal */
+    const inputAlias = sameType ? ts.factory.createTypeReferenceNode(output) : inputType
+
+    /* Type alias declarations for output and input types:
+     * > export type MyType = ....
+     * > export type MyTypeInput = ... _or_ MyType
+     */
+    const outputDeclaration = ts.factory.createTypeAliasDeclaration(exportModifiers, output, [], outputType)
+    const inputDeclaration = ts.factory.createTypeAliasDeclaration(exportModifiers, input, [], inputAlias)
+
+    /* Variable declaration type */
+    const variableDeclarationType = generateVariableDeclarationType(validation, validator, outputReferences)
+
+    /* Variable statement: export const myTypeValidator = ... */
+    const variableDeclaration =
+      ts.factory.createVariableStatement(
+          exportModifiers, // "export"
+          ts.factory.createVariableDeclarationList([
+            ts.factory.createVariableDeclaration(
+                name, // ..................................... "myTypeValidator"
+                undefined, // no exclamation token
+                variableDeclarationType,
+            ),
+          ], ts.NodeFlags.Const), // ......................... "const"
+      )
+
+    /* Comments for the generated nodes */
+    ts.addSyntheticLeadingComment(
+        outputDeclaration,
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        ` ${`----- ${name} `.padEnd(74, '-')} `,
+        true, // newline
+    )
+
+    ts.addSyntheticLeadingComment(
+        outputDeclaration,
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        `* Validated type for {@link ${name}} `,
+        true, // newline
+    )
+
+    ts.addSyntheticLeadingComment(
+        inputDeclaration,
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        `* Input type for {@link ${name}} `,
+        true, // newline
+    )
+
+    ts.addSyntheticLeadingComment(
+        variableDeclaration,
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        `* The \`${name}\` validator `,
+        true, // newline
+    )
+
+    /* Push our statements */
+    statements.push(
+        outputDeclaration,
+        inputDeclaration,
+        variableDeclaration,
+    )
+  }
+
+  /* Pretty print our DTS */
+  return ts.createPrinter().printList(
+      ts.ListFormat.SourceFileStatements,
+      ts.factory.createNodeArray(statements),
+      ts.createSourceFile('types.d.ts', '', ts.ScriptTarget.Latest))
+}
+
+/* ========================================================================== *
+ * VALIDATOR CONSTANT DECLARATIONS                                            *
+ * ========================================================================== */
+
+/** Check if the specified Validation (or function) is a Validator */
+function isValidator(validation: Validation | Function): validation is Validator {
+  assertSchema(validation !== undefined, 'Found "undefined" validation in tree')
+
+  /* Accept only non-null objects or functions */
+  if (validation === null) return false
+  if ((typeof validation !== 'function') && (typeof validation !== 'object')) {
+    return false
+  }
+
+  /* Arrays (tuples) are never a validator */
+  if (Array.isArray(validation)) return false
+
+  /* We must have a "validate" function which is NOT a validator itself: this
+   * is an edge case when a schema is defined as { validate: string } */
+  if (('validate' in validation) && (typeof validation.validate === 'function')) {
+    return ! isValidator(validation.validate)
+  } else {
+    return false
+  }
+}
+
+/** Generate an inline type import from "justus" */
+function generateJustusTypeImport(
+    typeName: string,
+    typeArguments: ts.TypeNode[] = [],
+): ts.TypeNode {
+  return ts.factory.createImportTypeNode( // .................... "import"
+      ts.factory.createLiteralTypeNode(
+          ts.factory.createStringLiteral('justus'), // .......... "justus"
+      ),
+      undefined, // import assertions
+      ts.factory.createIdentifier(typeName), // ................. "JustusType"
+      typeArguments) // ......................................... "<Arg, ...>"
+}
+
+/** Generate the _type_ for a variable declaration associated with a validator */
+function generateVariableDeclarationType(
+    validation: Validation,
+    validator: Validator,
+    references: Map<Validator, string>,
+): ts.TypeNode {
+  /* Validation can be one of the following:
+   * - validator
+   * - constant (null, number, string, boolean, ...)
+   * - schema (any other object that is _not_ an array)
+   * - tuple (an array)
+   */
+
+  /* This will take care of validators: import("justus").Validator<MyType> */
+  if (isValidator(validation)) {
+    const validatedType = generateTypeNode(validator, references, false)
+    return generateJustusTypeImport('Validator', [ validatedType ])
+  }
+
+  /* This will take care of constants */
+  if (validator instanceof ConstantValidator) {
+    return generateTypeNode(validator, references, false)
+  }
+
+  /* This will take care of schemas */
+  if (validator instanceof ObjectValidator) {
+    const properties: ts.PropertySignature[] = []
+
+    for (const [ key, valueValidator ] of validator.validators.entries()) {
+      const value = validator.schema[key]
+      const type = generateVariableDeclarationType(value, valueValidator, references)
+
+      properties.push(ts.factory.createPropertySignature(
+          readonlyModifiers,
+          key,
+          undefined, // no question mark
+          type))
+    }
+
+    if (validator.additionalProperties) {
+      const additional = validator.additionalProperties
+      const type = generateVariableDeclarationType(additional, additional, references)
+
+      properties.push(ts.factory.createPropertySignature(
+          readonlyModifiers,
+          ts.factory.createComputedPropertyName(
+              ts.factory.createPropertyAccessExpression(
+                  ts.factory.createIdentifier('Symbol'),
+                  'justusAdditionalValidator')),
+          undefined, // no question mark
+          type))
+    }
+
+    return ts.factory.createTypeLiteralNode(properties)
+  }
+
+  /* Still to do: tuples */
+  assertSchema(false, `Unable to generate variable declaration for ${validator.constructor.name}`)
 }
 
 /* ========================================================================== *
  * TYPE GENERATORS                                                            *
  * ========================================================================== */
+
+/** Generate all TypeScript `TypeNode` following the validators specified. */
+function generateTypeNodes(
+    validators: ReadonlyMap<string, Validator>,
+    references: ReadonlyMap<Validator, string>,
+    isInput: boolean,
+): Map<string, ts.TypeNode> {
+  /* Our types map, */
+  const types = new Map<string, ts.TypeNode>()
+
+  /* Walk through our validators map, and produce all `TypeNode`s */
+  for (const [ name, validator ] of validators.entries()) {
+    /* Here we _clone_ our references map, and remove the validator being
+     * exported, if it has the same name. This will make sure that we don't
+     * have any loops in our types or things like `type Foo = Foo`. */
+    const referenceable = new Map(references)
+    if (referenceable.get(validator) === name) referenceable.delete(validator)
+
+    types.set(name, generateTypeNode(validator, referenceable, isInput))
+  }
+
+  /* Return our new map */
+  return types
+}
 
 /** Generate a TypeScript `TypeNode` for the given validator instance. */
 function generateTypeNode(
@@ -108,12 +409,11 @@ function generateTypeNode(
   assertSchema(!! generator, `Type generator for "${validator.constructor.name}" not found`)
   const type = generator(validator, references, isInput)
 
+  // If the validator is not optional (or has no default value and we're
+  // generating an _input_ type), then we return the type straight
   if (!(validator.optional || (isInput && (validator.defaultValue !== undefined)))) {
     return type
   }
-
-  // If the validator is not optional, then we return the type straight
-  // if (! validator.optional) return type
 
   // If the type would result in "never | undefined" simply return "undefined"
   if (type === neverType) return undefinedType
@@ -134,6 +434,7 @@ function generateTypeNode(
 const anyType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
 const anyArrayType = ts.factory.createArrayTypeNode(anyType)
 const booleanType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword)
+const dateType = ts.factory.createTypeReferenceNode('Date')
 const numberType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
 const neverType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
 const stringType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
@@ -148,6 +449,10 @@ const recordType = ts.factory.createMappedTypeNode(
 
 // "Optional" modifier (the "?" token )
 const optionalKeyword = ts.factory.createToken(ts.SyntaxKind.QuestionToken)
+// "export" modifier for declarations
+const exportModifiers = [ ts.factory.createModifier(ts.SyntaxKind.ExportKeyword) ]
+// "readonly" modifier for declarations
+const readonlyModifiers = [ ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword ) ]
 
 /* ========================================================================== */
 
@@ -158,10 +463,7 @@ registerTypeGenerator(AnyArrayValidator, () => anyArrayType)
 registerTypeGenerator(AnyNumberValidator, () => numberType)
 registerTypeGenerator(AnyObjectValidator, () => recordType)
 registerTypeGenerator(AnyStringValidator, () => stringType)
-registerTypeGenerator(BooleanValidator, () => booleanType)
 registerTypeGenerator(NeverValidator, () => neverType)
-registerTypeGenerator(DateValidator, () => ts.factory.createTypeReferenceNode('Date'))
-registerTypeGenerator(URLValidator, () => ts.factory.createTypeReferenceNode('URL'))
 
 /* ========================================================================== */
 
@@ -170,6 +472,16 @@ registerTypeGenerator(URLValidator, () => ts.factory.createTypeReferenceNode('UR
 registerTypeGenerator(ArrayValidator, (validator, references, isInput) => {
   const itemType = generateTypeNode(validator.items, references, isInput)
   return ts.factory.createArrayTypeNode(itemType)
+})
+
+registerTypeGenerator(BooleanValidator, (validator, _references, isInput) => {
+  return (isInput && validator.fromString) ?
+      ts.factory.createUnionTypeNode([
+        booleanType,
+        ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral('true')),
+        ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral('false')),
+      ]) :
+      booleanType
 })
 
 registerTypeGenerator(ConstantValidator, (validator) => {
@@ -185,7 +497,21 @@ registerTypeGenerator(ConstantValidator, (validator) => {
   return ts.factory.createLiteralTypeNode(literal)
 })
 
-registerTypeGenerator(NumberValidator, (validator: NumberValidator) => {
+registerTypeGenerator(DateValidator, (validator: DateValidator, _references, isInput) => {
+  return isInput ?
+             validator.format === 'iso' ? stringType :
+             validator.format === 'timestamp' ? numberType :
+             ts.factory.createUnionTypeNode([ dateType, numberType, stringType ]) :
+         dateType
+})
+
+registerTypeGenerator(NumberValidator, (validator: NumberValidator, _references, isInput) => {
+  if (isInput) {
+    return validator.fromString ?
+      ts.factory.createUnionTypeNode([ numberType, stringType ]) :
+      numberType
+  }
+
   if (! validator.brand) return numberType
 
   const signature = ts.factory.createPropertySignature(undefined, `__brand_${validator.brand}`, undefined, neverType)
@@ -199,8 +525,8 @@ registerTypeGenerator(OptionalValidator, (validator: OptionalValidator, referenc
   return generateTypeNode(validator.validator, references, isInput)
 })
 
-registerTypeGenerator(StringValidator, (validator: StringValidator) => {
-  if (! validator.brand) return stringType
+registerTypeGenerator(StringValidator, (validator: StringValidator, _references, isInput) => {
+  if ((! validator.brand) || (isInput)) return stringType
 
   const signature = ts.factory.createPropertySignature(undefined, `__brand_${validator.brand}`, undefined, neverType)
   const literal = ts.factory.createTypeLiteralNode([ signature ])
@@ -266,7 +592,11 @@ registerTypeGenerator(ObjectValidator, (validator, references, isInput) => {
 
   for (const [ key, valueValidator ] of validator.validators.entries()) {
     const type = generateTypeNode(valueValidator, references, isInput)
-    const optional = valueValidator.optional || (isInput && valueValidator.defaultValue !== undefined)
+
+    // the optional keyword (question mark) is added when either the validator
+    // is optional or, when in input mode, there is no default value
+    const optional = (isInput && valueValidator.defaultValue !== undefined) ||
+                     valueValidator.optional
 
     const signature = ts.factory.createPropertySignature(
         undefined,
@@ -294,5 +624,32 @@ registerTypeGenerator(ObjectValidator, (validator, references, isInput) => {
     return ts.factory.createIntersectionTypeNode([ type, extra ])
   } else {
     return ts.factory.createTypeLiteralNode(properties)
+  }
+})
+
+/* ===== EXTRA TYPES ======================================================== */
+
+registerTypeGenerator(EAN13Validator, (_validator, _references, isInput) => {
+  if (isInput) return ts.factory.createUnionTypeNode([ numberType, stringType ])
+
+  const signature = ts.factory.createPropertySignature(undefined, '__ean_13', undefined, neverType)
+  const literal = ts.factory.createTypeLiteralNode([ signature ])
+  return ts.factory.createIntersectionTypeNode([ stringType, literal ])
+})
+
+registerTypeGenerator(UUIDValidator, (_validator, _references, isInput) => {
+  if (isInput) return stringType
+
+  const signature = ts.factory.createPropertySignature(undefined, '__uuid', undefined, neverType)
+  const literal = ts.factory.createTypeLiteralNode([ signature ])
+  return ts.factory.createIntersectionTypeNode([ stringType, literal ])
+})
+
+registerTypeGenerator(URLValidator, (_validator, _references, isInput) => {
+  const urlType = ts.factory.createTypeReferenceNode('URL')
+  if (isInput) {
+    return ts.factory.createUnionTypeNode([ urlType, stringType ])
+  } else {
+    return urlType
   }
 })
