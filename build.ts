@@ -20,6 +20,8 @@ const localBuild = build({
 
   /** Run `tsd` */
   async tsd(): Promise<void> {
+    await this.transpile()
+
     banner('Testing type definitions')
     await find('**/*.test-d.ts', { directory: 'test-d' }).tsd()
   },
@@ -39,8 +41,7 @@ const localBuild = build({
       await exec('npm', 'install', '--no-save', '--prefix', tmpdir, resolve('.'))
 
       // run tsc to make sure that all types are exported correctly
-      await find('**/*.ts', { directory: tmpdir })
-          .tsc('test/sources/tsconfig.json')
+      await find('**/*.ts', { directory: tmpdir }).tsc()
 
       log('Sources compiled successfully')
     } finally {
