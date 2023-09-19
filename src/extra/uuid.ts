@@ -4,7 +4,7 @@ export const UUID_EXPR = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a
 
 export type UUIDString = string & { __uuid: never }
 
-export class UUIDValidator extends StringValidator<UUIDString> {
+export class UUIDValidator extends StringValidator<UUIDString, string> {
   constructor() {
     super({ minLength: 36, maxLength: 36, pattern: UUID_EXPR })
   }
