@@ -281,6 +281,22 @@ describe('Object validator', () => {
         ])
   })
 
+  it('should extends and allow additional properties', () => {
+    const object1 = object({ foo: string, ...allowAdditionalProperties(number) })
+    const object2 = object({ ...object1, bar: boolean })
+
+    expect(validate(object1, { foo: 'bar', bar: 321, baz: 123 }))
+        .to.eql({ foo: 'bar', bar: 321, baz: 123 })
+    expect(validate(object2, { foo: 'bar', bar: true, baz: 123 }))
+        .to.eql({ foo: 'bar', bar: true, baz: 123 })
+
+    expect(() => validate(object1, { foo: 'bar', bar: true, baz: 123 }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'bar' ], message: 'Value is not a "number"' },
+        ])
+  })
+
   it('should extends and remove additional properties', () => {
     const object1 = object({ foo: string, ...allowAdditionalProperties(number) })
     const object2 = object({ ...object1, ...allowAdditionalProperties(false) })
