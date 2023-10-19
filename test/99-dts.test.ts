@@ -490,7 +490,7 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').slice(2).map((s) => s.trim())).to.eql(`
+      expect(result.split('\n').map((s) => s.trim())).to.eql(`
         /* ----- ean ---------------------------------------------------------------- */
         /** Validated type for {@link ean} */
         export type Ean = string & {
@@ -538,8 +538,6 @@ describe('DTS Generation', () => {
         /** The \`testValidator\` validator */
         export const testValidator: import("justus").Validator<Ean>;`
           .split('\n').slice(1).map((s) => s.trim()))
-
-      expect(result.split('\n')[0]).to.match(/^\/\/ Generated on .* GMT$/)
     })
 
     it('should generate a full type declaration for constants', () => {
@@ -553,7 +551,7 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').slice(2).map((s) => s.trim())).to.eql(`
+      expect(result.split('\n').map((s) => s.trim())).to.eql(`
         /* ----- nullValidator ------------------------------------------------------ */
         /** Validated type for {@link nullValidator} */
         export type Null = null;
@@ -602,7 +600,7 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').slice(2).map((s) => s.trim())).to.eql(`
+      expect(result.split('\n').map((s) => s.trim())).to.eql(`
         /* ----- myObjectValidator -------------------------------------------------- */
         /** Validated type for {@link myObjectValidator} */
         export type MyObject = {
@@ -629,7 +627,7 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').slice(2).map((s) => s.trim())).to.eql(`
+      expect(result.split('\n').map((s) => s.trim())).to.eql(`
         /* ----- myObjectValidator -------------------------------------------------- */
         /** Validated type for {@link myObjectValidator} */
         export type MyObject = {
@@ -653,7 +651,7 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').slice(2).map((s) => s.trim())).to.eql(`
+      expect(result.split('\n').map((s) => s.trim())).to.eql(`
         /* ----- myObjectValidator -------------------------------------------------- */
         /** Validated type for {@link myObjectValidator} */
         export type MyObject = {
@@ -675,7 +673,7 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').slice(2).map((s) => s.trim())).to.eql(`
+      expect(result.split('\n').map((s) => s.trim())).to.eql(`
         /* ----- myTuple ------------------------------------------------------------ */
         /** Validated type for {@link myTuple} */
         export type MyTuple = [

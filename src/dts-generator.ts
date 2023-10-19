@@ -255,12 +255,10 @@ export function generateDeclarations(validations: Record<string, Validation>): s
   }
 
   /* Pretty print our DTS */
-  const dts = ts.createPrinter().printList(
+  return ts.createPrinter().printList(
       ts.ListFormat.SourceFileStatements,
       ts.factory.createNodeArray(statements),
       ts.createSourceFile('types.d.ts', '', ts.ScriptTarget.Latest))
-  /* Include a leading comment with the generation date and return */
-  return `// Generated on ${new Date().toUTCString()}\n\n${dts}`
 }
 
 /* ========================================================================== *
