@@ -84,9 +84,6 @@
     "chai": "^4.3.10",
     "typescript": "^5.2.2"
   },
-  "optionalDependencies": {
-    "typescript": "^5.2.2"
-  },
   "directories": {
     "test": "test"
   },
