@@ -278,12 +278,12 @@ export type InferSchema<S> =
 export type InferSchema2<S> = {
   // this first part of the type infers all keys from the schema into their
   // type, but makes *each* key optional... we'll restrict in the next part...
-  [ key in keyof S as key extends string ? key : never ] ? : InferValidation<S[key]>
+  -readonly [ key in keyof S as key extends string ? key : never ] ? : InferValidation<S[key]>
 } & {
   // this second part infers *only* keys that _do not_ contain a "undefined"
   // in their unions, and associates them with the inferred value, basically
   // making the key *non optional*
-  [ key in keyof S as
+  -readonly [ key in keyof S as
       key extends string ?
         undefined extends InferValidation<S[key]> ?
           never :
@@ -302,12 +302,12 @@ export type InferInputSchema<S> =
 export type InferInputSchema2<S> = {
   // this first part of the type infers all keys from the schema into their
   // type, but makes *each* key optional... we'll restrict in the next part...
-  [ key in keyof S as key extends string ? key : never ] ? : InferInput<S[key]>
+  -readonly [ key in keyof S as key extends string ? key : never ] ? : InferInput<S[key]>
 } & {
   // this second part infers *only* keys that _do not_ contain a "undefined"
   // in their unions, and associates them with the inferred value, basically
   // making the key *non optional*
-  [ key in keyof S as
+  -readonly [ key in keyof S as
       key extends string ?
         InferInput<S[key]> extends never ?
           never :
