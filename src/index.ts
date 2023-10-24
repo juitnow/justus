@@ -11,6 +11,7 @@ export * from './utilities'
 // Validators
 export { AnyValidator, any } from './validators/any'
 export { AnyArrayValidator, ArrayValidator, array, arrayOf } from './validators/array'
+export { AnyBigIntValidator, BigIntValidator, bigint } from './validators/bigint'
 export { BooleanValidator, boolean } from './validators/boolean'
 export { ConstantValidator, constant } from './validators/constant'
 export { DateValidator, date } from './validators/date'
@@ -24,6 +25,7 @@ export { AllOfValidator, OneOfValidator, allOf, oneOf } from './validators/union
 
 // Validator Types
 export type { ArrayConstraints, arrayFactory } from './validators/array'
+export type { BrandedBigIntConstraints, bigintFactory } from './validators/bigint'
 export type { BooleanConstraints, booleanFactory } from './validators/boolean'
 export type { DateConstraints, dateFactory } from './validators/date'
 export type { BrandedNumberConstraints, numberFactory } from './validators/number'
