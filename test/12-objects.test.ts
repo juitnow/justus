@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { allowAdditionalProperties, any, array, boolean, never, number, object, objectOf, string, strip, validate, ValidationError } from '../src'
+import { allowAdditionalProperties, any, array, boolean, never, number, object, objectOf, optional, partial, string, strip, validate, ValidationError } from '../src'
 
 describe('Object validator', () => {
   it('should validate a generic object', () => {
@@ -278,6 +278,45 @@ describe('Object validator', () => {
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').to.eql([
           { path: [ 'bar' ], message: 'Unknown property' },
+        ])
+  })
+
+  it('should perform a partial validation', () => {
+    const validation = object({
+      required: string,
+      optional: optional(boolean),
+      defaults: optional(number, 123),
+      ...allowAdditionalProperties(string),
+    })
+
+    expect(partial(validation, {})).to.eql({})
+    expect(partial(validation, { required: 'foo' })).to.eql({ required: 'foo' })
+    expect(partial(validation, { optional: false })).to.eql({ optional: false })
+    expect(partial(validation, { defaults: 12345 })).to.eql({ defaults: 12345 })
+    expect(partial(validation, { addition: 'bar' })).to.eql({ addition: 'bar' })
+
+    expect(() => partial(validation, { required: 12345 }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'required' ], message: 'Value is not a "string"' },
+        ])
+
+    expect(() => partial(validation, { optional: 12345 }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'optional' ], message: 'Value is not a "boolean"' },
+        ])
+
+    expect(() => partial(validation, { defaults: 'foo' }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'defaults' ], message: 'Value is not a "number"' },
+        ])
+
+    expect(() => partial(validation, { addition: 12345 }))
+        .to.throw(ValidationError, 'Found 1 validation error')
+        .with.property('errors').to.eql([
+          { path: [ 'addition' ], message: 'Value is not a "string"' },
         ])
   })
 
