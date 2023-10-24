@@ -5,7 +5,7 @@ import { AbstractValidator } from '../types'
 import type { Validator } from '../types'
 
 /** A `Validator` for _constants_. */
-export class ConstantValidator<T extends string | number | boolean | null> extends AbstractValidator<T> {
+export class ConstantValidator<T extends string | number | boolean | bigint | null> extends AbstractValidator<T> {
   readonly constant: T
 
   constructor(constant: T) {
@@ -20,7 +20,7 @@ export class ConstantValidator<T extends string | number | boolean | null> exten
 }
 
 /** Validate _constants_. */
-export function constant<T extends string | number | boolean | null>(constant: T): Validator<T> {
+export function constant<T extends string | number | boolean | bigint | null>(constant: T): Validator<T> {
   return new ConstantValidator(constant)
 }
 

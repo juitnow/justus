@@ -110,13 +110,13 @@ implements Validator<T, I>, Iterable<TupleRestParameter<T, I>> {
  * Those are:
  *
  * * A `Validator` instance or a _zero-arguments_ function returning one
- * * A `Tuple` or a `Schema`, validated as arrays or object
- * * Either `null`, a `boolean`, a `number` or a `string` for constants
+ * * A `Tuple` or a `Schema`, validated as arrays or objects
+ * * Either `null`, a `boolean`, a `number`, a `bigint` or a `string` for constants
  */
 export type Validation =
   Validator | // Validator instances
   Tuple | Schema | // Tuples or schemas (arrays, objects)
-  null | boolean | number | string // Primitives, mapped as constants
+  null | boolean | bigint | number | string // Primitives, mapped as constants
 
 /**
  * Infer the type returned by a `Validation` when validating.
@@ -128,6 +128,7 @@ export type InferValidation<V> =
   // Primitives are returned as constants
   V extends undefined ? V :
   V extends boolean ? V :
+  V extends bigint ? V :
   V extends number ? V :
   V extends string ? V :
   V extends null ? V :
@@ -148,6 +149,7 @@ export type InferInput<V> =
   // Primitives are returned as constants
   V extends undefined ? V :
   V extends boolean ? V :
+  V extends bigint ? V :
   V extends number ? V :
   V extends string ? V :
   V extends null ? V :

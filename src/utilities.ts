@@ -23,6 +23,7 @@ export function getValidator(validation: Validation): Validator {
   switch (typeof validation) {
     // constants
     case 'boolean':
+    case 'bigint':
     case 'string':
     case 'number':
       return new (registry.get('constant'))(validation)
