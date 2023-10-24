@@ -49,10 +49,14 @@ describe('Primitive validators', () => {
       expect(validate(constant(null), null)).to.be.null
       expect(validate(constant(false), false)).to.be.false
       expect(validate(constant('foo'), 'foo')).to.equal('foo')
+      expect(validate(constant(12345), 12345)).to.equal(12345)
+      expect(validate(constant(1234n), 1234n)).to.equal(1234n)
 
       expect(validate(null, null)).to.be.null
       expect(validate(false as const, false)).to.be.false
       expect(validate('foo' as const, 'foo')).to.equal('foo')
+      expect(validate(12345, 12345)).to.equal(12345)
+      expect(validate(1234n, 1234n)).to.equal(1234n)
     })
 
     it('should fail validating the wrong constant', () => {
