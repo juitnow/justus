@@ -20,7 +20,7 @@ describe('Date validator', () => {
     expect(validate(validator, '1970-01-01T00:00:00.000Z').getTime()).to.eql(0)
 
     expect(() => validate(validator, 'Thu, 01 Jan 1970 00:00:00 GMT'))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Invalid format for ISO Date',
         } ])
@@ -32,7 +32,7 @@ describe('Date validator', () => {
     expect(validate(validator, 0).getTime()).to.eql(0)
 
     expect(() => validate(validator, 'Thu, 01 Jan 1970 00:00:00 GMT'))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Timestamp is not a "number"',
         } ])
@@ -45,13 +45,13 @@ describe('Date validator', () => {
     expect(validate(v1, 3000).getTime()).to.eql(3000)
 
     expect(() => validate(v1, 1999))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Date is before 1970-01-01T00:00:02.000Z',
         } ])
 
     expect(() => validate(v1, 3001))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Date is after 1970-01-01T00:00:03.000Z',
         } ])
@@ -62,13 +62,13 @@ describe('Date validator', () => {
     expect(validate(v2, 2000).getTime()).to.eql(2000)
 
     expect(() => validate(v2, 1999))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Date is before 1970-01-01T00:00:02.000Z',
         } ])
 
     expect(() => validate(v2, 2001))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Date is after 1970-01-01T00:00:02.000Z',
         } ])
@@ -79,13 +79,13 @@ describe('Date validator', () => {
 
   it('should consider edge cases', () => {
     expect(() => validate(date, Symbol()))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Value could not be converted to a "Date"',
         } ])
 
     expect(() => validate(date, Number.POSITIVE_INFINITY))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').to.eql([ {
           path: [], message: 'Invalid date',
         } ])

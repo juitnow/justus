@@ -26,7 +26,7 @@ describe('URL validator', () => {
     expect(validator.validate('http://www/a/b/c#foo').href).to.equal('http://www/a/b/c#foo')
 
     expect(() => validator.validate('ftp://funet/fi'))
-        .to.throw(ValidationError, 'Found 3 validation errors')
+        .to.throw(ValidationError, /^Found 3 validation errors/)
         .with.property('errors').to.eql([
           { path: [ 'protocol' ], message: 'String does not match required pattern /^https?:$/' },
           { path: [ 'hostname' ], message: 'Value does not match constant "www" (string)' },
@@ -44,7 +44,7 @@ describe('URL validator', () => {
 
     expect(validator.validate('http://www/?foo=bar&baz=xyz').href).to.eql('http://www/?foo=bar&baz=xyz')
     expect(() => validator.validate('http://www/?baz=abc').href)
-        .to.throw(ValidationError, 'Found 2 validation errors')
+        .to.throw(ValidationError, /^Found 2 validation errors/)
         .with.property('errors').to.eql([
           { path: [ 'searchParams', 'foo' ], message: 'Required property missing' },
           { path: [ 'searchParams', 'baz' ], message: 'Value does not match constant "xyz" (string)' },

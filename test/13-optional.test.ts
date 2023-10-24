@@ -8,7 +8,7 @@ describe('Object modifiers', () => {
     expect(validate(validation, undefined)).to.be.undefined
     expect(validate(validation, 'foobar')).to.equal('foobar')
     expect(() => validate(validation, 'wrong'))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').eql([
           { path: [], message: 'Value does not match constant "foobar" (string)' },
         ])
@@ -21,7 +21,7 @@ describe('Object modifiers', () => {
     expect(validate(validation, [ undefined, 'foobar' ])).to.eql([ undefined, 'foobar' ])
 
     expect(() => validate(validation, [ 'wrong', 12 ]))
-        .to.throw(ValidationError, 'Found 2 validation errors')
+        .to.throw(ValidationError, /^Found 2 validation errors/)
         .with.property('errors').eql([
           { path: [ 0 ], message: 'Value does not match constant "foobar" (string)' },
           { path: [ 1 ], message: 'Value does not match constant "foobar" (string)' },
@@ -41,7 +41,7 @@ describe('Object modifiers', () => {
         .to.eql({ foo: 'hello' })
 
     expect(() => validate(schema1, { foo: 'hello', bar: 40, baz: 60 }))
-        .to.throw(ValidationError, 'Found 2 validation errors')
+        .to.throw(ValidationError, /^Found 2 validation errors/)
         .with.property('errors').eql([
           { path: [ 'bar' ], message: 'Number is less than 50' },
           { path: [ 'baz' ], message: 'Unknown property' },
@@ -62,7 +62,7 @@ describe('Object modifiers', () => {
         .to.eql({ foo: 'world', bar: 15, baz: 'hello' })
 
     expect(() => validate(schema, { foo: 'nope', bar: 0, baz: 0 }))
-        .to.throw(ValidationError, 'Found 4 validation errors')
+        .to.throw(ValidationError, /^Found 4 validation errors/)
         .with.property('errors').eql([
           { path: [ 'foo' ], message: 'Value does not match constant "hello" (string)' },
           { path: [ 'foo' ], message: 'Value does not match constant "world" (string)' },
@@ -80,7 +80,7 @@ describe('Object modifiers', () => {
 
     expect(validate({ test: validator }, {})).to.eql({})
     expect(() => validate({ test: validator }, { test: 123 }))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').eql([
           { path: [ 'test' ], message: 'Value is not a "string"' },
         ])
@@ -114,7 +114,7 @@ describe('Object modifiers', () => {
         .to.eql({ foo: 'hello' })
 
     expect(() => strip(schema1, { foo: 'hello', bar: 40, baz: 60, extra: 'foo' }))
-        .to.throw(ValidationError, 'Found 1 validation error')
+        .to.throw(ValidationError, /^Found 1 validation error/)
         .with.property('errors').eql([
           { path: [ 'bar' ], message: 'Number is less than 50' },
         ])
