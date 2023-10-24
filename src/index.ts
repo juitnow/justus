@@ -82,3 +82,20 @@ export function strip<V extends Validation>(
 
   return getValidator(validation).validate(value, opts)
 }
+
+/**
+ * Validate a _value_ using the specified `Validation`, automatically stripping
+ * additional properties and optional `null`s (but not forbidden ones), and
+ * treating all properties as optional.
+ *
+ * This is equivalent to setting the `partialValidation` option to `true` in
+ * `validate(...)`, but this function correctly represents the returned type as
+ * a `Partial<...>` type.
+ */
+export function partial<V extends Validation>(
+    validation: V,
+    value: any,
+    options?: ValidationOptions,
+): Partial<InferValidation<V>> {
+  return getValidator(validation).validate(value, { ...options, partialValidation: true })
+}

@@ -47,7 +47,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
 
-    const { stripAdditionalProperties, stripOptionalNulls } = options
+    const { stripAdditionalProperties, stripOptionalNulls, partialValidation } = options
 
     const record: { [ k in string | number | symbol ]?: unknown } = value
     const builder = new ValidationErrorBuilder()
@@ -63,10 +63,12 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
       }
 
       // if we have no value, then we have few possibilities:
+      // - we are performing a partial validation, so we ignore
       // - the (optional) validator provides a valid value
       // - the validator is optional, so we can simply ignore
       // - the validator is not optional, so the property is missing
       if (original === undefined) {
+        if (partialValidation) continue
         try {
           // try to validate, the validator _might_ be giving us a value
           const validated = validator.validate(original, options)

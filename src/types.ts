@@ -34,6 +34,8 @@ export interface ValidationOptions {
   stripOptionalNulls?: boolean,
   /** Ignore and strip forbidden (`never`) properties from objects (default: `false`) */
   stripForbiddenProperties?: boolean,
+  /**  Perform a _partial_ validation, treating all properties as optional (default: `false`) */
+  partialValidation?: boolean,
 }
 
 /**
