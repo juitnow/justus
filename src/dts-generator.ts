@@ -7,6 +7,7 @@ import { UUIDValidator } from './extra/uuid'
 import { getValidator } from './utilities'
 import { AnyValidator } from './validators/any'
 import { AnyArrayValidator, ArrayValidator } from './validators/array'
+import { AnyBigIntValidator, BigIntValidator } from './validators/bigint'
 import { BooleanValidator } from './validators/boolean'
 import { ConstantValidator } from './validators/constant'
 import { DateValidator } from './validators/date'
@@ -426,6 +427,7 @@ function generateTypeNode(
 
 const anyType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
 const anyArrayType = ts.factory.createArrayTypeNode(anyType)
+const bigintType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
 const booleanType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword)
 const dateType = ts.factory.createTypeReferenceNode('Date')
 const numberType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
@@ -453,6 +455,7 @@ const readonlyModifiers = [ ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyw
 
 registerTypeGenerator(AnyValidator, () => anyType)
 registerTypeGenerator(AnyArrayValidator, () => anyArrayType)
+registerTypeGenerator(AnyBigIntValidator, () => bigintType)
 registerTypeGenerator(AnyNumberValidator, () => numberType)
 registerTypeGenerator(AnyObjectValidator, () => recordType)
 registerTypeGenerator(AnyStringValidator, () => stringType)
@@ -465,6 +468,21 @@ registerTypeGenerator(NeverValidator, () => neverType)
 registerTypeGenerator(ArrayValidator, (validator, references, isInput) => {
   const itemType = generateTypeNode(validator.items, references, isInput)
   return ts.factory.createArrayTypeNode(itemType)
+})
+
+registerTypeGenerator(BigIntValidator, (validator: BigIntValidator, _references, isInput) => {
+  if (isInput) {
+    const types: ts.TypeNode[] = [ bigintType ]
+    if (validator.fromNumber) types.push(numberType)
+    if (validator.fromString) types.push(stringType)
+    return types.length === 1 ? types[0] : ts.factory.createUnionTypeNode(types)
+  }
+
+  if (! validator.brand) return bigintType
+
+  const signature = ts.factory.createPropertySignature(undefined, `__brand_${validator.brand}`, undefined, neverType)
+  const literal = ts.factory.createTypeLiteralNode([ signature ])
+  return ts.factory.createIntersectionTypeNode([ bigintType, literal ])
 })
 
 registerTypeGenerator(BooleanValidator, (validator, _references, isInput) => {
@@ -481,6 +499,7 @@ registerTypeGenerator(ConstantValidator, (validator) => {
   const literal =
     typeof validator.constant === 'number' ? ts.factory.createNumericLiteral(validator.constant) :
     typeof validator.constant === 'string' ? ts.factory.createStringLiteral(validator.constant) :
+    typeof validator.constant === 'bigint' ? ts.factory.createBigIntLiteral(`${validator.constant}n`) :
     validator.constant === false ? ts.factory.createFalse() :
     validator.constant === true ? ts.factory.createTrue() :
     validator.constant === null ? ts.factory.createNull() :

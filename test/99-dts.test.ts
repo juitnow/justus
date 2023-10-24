@@ -5,12 +5,15 @@ import {
   allowAdditionalProperties,
   any,
   AnyArrayValidator,
+  AnyBigIntValidator,
   AnyNumberValidator,
   AnyObjectValidator,
   AnyStringValidator,
   AnyValidator,
   array,
   arrayOf,
+  bigint,
+  BigIntValidator,
   boolean,
   BooleanValidator,
   constant,
@@ -59,6 +62,10 @@ describe('DTS Generation', () => {
       })).to.equal('export type test = boolean;')
 
       expect(generateTypes({
+        test: bigint,
+      })).to.equal('export type test = bigint;')
+
+      expect(generateTypes({
         test: date,
       })).to.equal('export type test = Date;')
 
@@ -77,6 +84,10 @@ describe('DTS Generation', () => {
       })).to.equal('export type test = any[];')
 
       expect(generateTypes({
+        test: new AnyBigIntValidator(),
+      })).to.equal('export type test = bigint;')
+
+      expect(generateTypes({
         test: new AnyNumberValidator(),
       })).to.equal('export type test = number;')
 
@@ -92,6 +103,10 @@ describe('DTS Generation', () => {
       expect(generateTypes({
         test: new BooleanValidator(),
       })).to.equal('export type test = boolean;')
+
+      expect(generateTypes({
+        test: new BigIntValidator(),
+      })).to.equal('export type test = bigint;')
 
       expect(generateTypes({
         test: new DateValidator(),
@@ -122,6 +137,10 @@ describe('DTS Generation', () => {
       })).to.equal('export type test = 12345;')
 
       expect(generateTypes({
+        test: 1234n,
+      })).to.equal('export type test = 1234n;')
+
+      expect(generateTypes({
         test: false,
       })).to.equal('export type test = false;')
 
@@ -136,6 +155,17 @@ describe('DTS Generation', () => {
       expect(() => generateTypes({
         test: constant(<any> { toString: () => 'foo' }),
       })).to.throw(TypeError, 'Invalid constant "foo"')
+    })
+
+    it('should generate the validated type for (branded) bigints', () => {
+      expect(generateTypes({
+        test: bigint({}),
+      })).to.equal('export type test = bigint;')
+
+      expect(generateTypes({
+        test: bigint({ brand: 'foo' }),
+      }).replace(/\s+/gm, ' '))
+          .to.equal('export type test = bigint & { __brand_foo: never; };')
     })
 
     it('should generate the validated type for (branded) numbers', () => {
@@ -307,6 +337,24 @@ describe('DTS Generation', () => {
       expect(generateTypes({
         test: boolean({ fromString: true }),
       }, true)).to.equal('export type test = boolean | "true" | "false";')
+    })
+
+    it('should generate the input type for (branded) bigints', () => {
+      expect(generateTypes({
+        test: bigint({}),
+      }, true)).to.equal('export type test = bigint | number;')
+
+      expect(generateTypes({
+        test: bigint({ fromString: true }),
+      }, true)).to.equal('export type test = bigint | number | string;')
+
+      expect(generateTypes({
+        test: bigint({ fromNumber: false }),
+      }, true)).to.equal('export type test = bigint;')
+
+      expect(generateTypes({
+        test: bigint({ brand: 'foo' }),
+      }, true)).to.equal('export type test = bigint | number;')
     })
 
     it('should generate the input type for (branded) numbers', () => {
