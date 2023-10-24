@@ -46,7 +46,7 @@ export interface BrandedNumberConstraints<B extends string> extends NumberConstr
 /** A `Validator` validating any `number`. */
 export class AnyNumberValidator extends AbstractValidator<number> {
   validate(value: unknown): number {
-    assertValidation(typeof value == 'number', 'Value is not a "number"')
+    assertValidation(typeof value === 'number', 'Value is not a "number"')
     assertValidation(! isNaN(value), 'Number is "NaN"')
     return value
   }
@@ -131,13 +131,13 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
 
   validate(value: unknown): N {
     // Allow parsing from strings
-    if ((typeof value == 'string') && (this.fromString)) {
+    if ((typeof value === 'string') && (this.fromString)) {
       const parsed = +`${value}`
       assertValidation(! isNaN(parsed), 'Number can not be parsed from string')
       value = parsed
     }
 
-    assertValidation(typeof value == 'number', 'Value is not a "number"')
+    assertValidation(typeof value === 'number', 'Value is not a "number"')
 
     if (isNaN(value)) {
       assertValidation(this.allowNaN, 'Number is "NaN"')
@@ -147,10 +147,10 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
     assertValidation(value >= this.minimum, `Number is less than ${this.minimum}`)
     assertValidation(value <= this.maximum, `Number is greater than ${this.maximum}`)
 
-    assertValidation((this.exclusiveMinimum == undefined) || (value > this.exclusiveMinimum),
+    assertValidation((this.exclusiveMinimum === undefined) || (value > this.exclusiveMinimum),
         `Number is less than or equal to ${this.exclusiveMinimum}`)
 
-    assertValidation((this.exclusiveMaximum == undefined) || (value < this.exclusiveMaximum),
+    assertValidation((this.exclusiveMaximum === undefined) || (value < this.exclusiveMaximum),
         `Number is greater than or equal to ${this.exclusiveMaximum}`)
 
     assertValidation(this.#isMultipleOf ? this.#isMultipleOf(value) : true,

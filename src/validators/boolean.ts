@@ -25,7 +25,7 @@ export class BooleanValidator extends AbstractValidator<boolean> {
 
   validate(value: unknown): boolean {
     // Allow parsing from strings
-    if ((typeof value == 'string') && (this.fromString)) {
+    if ((typeof value === 'string') && (this.fromString)) {
       const string = value.toLowerCase()
       const parsed = string === 'true' ? true : string === 'false' ? false : undefined
       assertValidation(parsed !== undefined, 'Boolean can not be parsed from string')

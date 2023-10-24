@@ -5,6 +5,7 @@ import {
   any,
   array,
   arrayOf,
+  bigint,
   boolean,
   constant,
   date,
@@ -30,20 +31,23 @@ function inputType<T>(param: T): InferInput<T> {
 
 expectType<true>(inputType(true as const))
 expectType<false>(inputType(false as const))
-expectType<123>(inputType(123 as const))
-expectType<'hello'>(inputType('hello' as const))
+expectType<12345>(inputType(12345 as const))
+expectType<1234n>(inputType(1234n as const))
+expectType<'foo'>(inputType('foo' as const))
 
 expectType<undefined>(inputType(undefined))
 expectType<null>(inputType(null))
 
 expectType<true>(inputType(constant(true)))
 expectType<false>(inputType(constant(false)))
-expectType<123>(inputType(constant(123)))
-expectType<'hello'>(inputType(constant('hello')))
+expectType<12345>(inputType(constant(12345)))
+expectType<1234n>(inputType(constant(1234n)))
+expectType<'foo'>(inputType(constant('foo')))
 
 // validation _keywords_ (that is, no functions...)
 
 expectType<any>(inputType(any))
+expectType<bigint>(inputType(bigint))
 expectType<boolean>(inputType(boolean))
 expectType<Date | string | number>(inputType(date))
 expectType<never>(inputType(never))
@@ -54,6 +58,7 @@ expectType<URL | string>(inputType(url))
 
 // validation factories (keywords as functions)
 
+expectType<bigint>(inputType(bigint({})))
 expectType<boolean>(inputType(boolean({})))
 expectType<Date | string | number>(inputType(date({})))
 expectType<number>(inputType(number({})))
@@ -62,9 +67,11 @@ expectType<URL | string>(inputType(url({})))
 
 // branded numbers/strings
 
+expectType<bigint>(inputType(bigint({ brand: 'foobar' })))
 expectType<number>(inputType(number({ brand: 'foobar' })))
 expectType<string>(inputType(string({ brand: 'foobar' })))
 
+expectType<bigint & { __brand_foobar: never }>(validate(bigint({ brand: 'foobar' }), 'x'))
 expectType<number & { __brand_foobar: never }>(validate(number({ brand: 'foobar' }), 'x'))
 expectType<string & { __brand_foobar: never }>(validate(string({ brand: 'foobar' }), 'x'))
 

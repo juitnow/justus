@@ -1,4 +1,4 @@
-import { AbstractValidator, defaultValidationOptions } from '../types'
+import { AbstractValidator } from '../types'
 import { getValidator } from '../utilities'
 
 import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types'
@@ -27,7 +27,7 @@ export class OptionalValidator<
     }
 
     try {
-      this.defaultValue = validator.validate(defaultValue, defaultValidationOptions)
+      this.defaultValue = validator.validate(defaultValue, {})
     } catch (cause) {
       throw new TypeError('Default value does not match validator', { cause })
     }

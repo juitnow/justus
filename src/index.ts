@@ -11,6 +11,7 @@ export * from './utilities'
 // Validators
 export { AnyValidator, any } from './validators/any'
 export { AnyArrayValidator, ArrayValidator, array, arrayOf } from './validators/array'
+export { AnyBigIntValidator, BigIntValidator, bigint } from './validators/bigint'
 export { BooleanValidator, boolean } from './validators/boolean'
 export { ConstantValidator, constant } from './validators/constant'
 export { DateValidator, date } from './validators/date'
@@ -24,6 +25,7 @@ export { AllOfValidator, OneOfValidator, allOf, oneOf } from './validators/union
 
 // Validator Types
 export type { ArrayConstraints, arrayFactory } from './validators/array'
+export type { BrandedBigIntConstraints, bigintFactory } from './validators/bigint'
 export type { BooleanConstraints, booleanFactory } from './validators/boolean'
 export type { DateConstraints, dateFactory } from './validators/date'
 export type { BrandedNumberConstraints, numberFactory } from './validators/number'
@@ -35,7 +37,6 @@ export type { TupleMember } from './validators/tuple'
  * VALIDATE FUNCTION (our main entry point)                                   *
  * ========================================================================== */
 
-import { defaultValidationOptions } from './types'
 import { getValidator } from './utilities'
 
 import type { InferValidation, Validation, ValidationOptions } from './types'
@@ -51,7 +52,7 @@ export function validate<V extends Validation>(
     value: any,
     options?: ValidationOptions,
 ): InferValidation<V> {
-  const opts: ValidationOptions = { ...defaultValidationOptions, ...options }
+  const opts: ValidationOptions = { ...options }
   return getValidator(validation).validate(value, opts)
 }
 
@@ -82,4 +83,21 @@ export function strip<V extends Validation>(
   }
 
   return getValidator(validation).validate(value, opts)
+}
+
+/**
+ * Validate a _value_ using the specified `Validation`, automatically stripping
+ * additional properties and optional `null`s (but not forbidden ones), and
+ * treating all properties as optional.
+ *
+ * This is equivalent to setting the `partialValidation` option to `true` in
+ * `validate(...)`, but this function correctly represents the returned type as
+ * a `Partial<...>` type.
+ */
+export function partial<V extends Validation>(
+    validation: V,
+    value: any,
+    options?: ValidationOptions,
+): Partial<InferValidation<V>> {
+  return getValidator(validation).validate(value, { ...options, partialValidation: true })
 }

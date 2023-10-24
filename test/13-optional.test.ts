@@ -1,31 +1,31 @@
-import { expect } from 'chai'
-
 import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from '../src'
 
 describe('Object modifiers', () => {
   it('should validate a simple optional validation', () => {
     const validation = optional('foobar')
-    expect(validate(validation, undefined)).to.be.undefined
-    expect(validate(validation, 'foobar')).to.equal('foobar')
+    expect(validate(validation, undefined)).toBeUndefined()
+    expect(validate(validation, 'foobar')).toStrictlyEqual('foobar')
     expect(() => validate(validation, 'wrong'))
-        .to.throw(ValidationError, 'Found 1 validation error')
-        .with.property('errors').eql([
-          { path: [], message: 'Value does not match constant "foobar"' },
-        ])
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [], message: 'Value does not match constant "foobar" (string)' },
+            ])))
   })
 
   it('should validate an array with optional elements', () => {
     const validation = arrayOf(optional('foobar'))
-    expect(validate(validation, [ undefined ])).to.eql([ undefined ])
-    expect(validate(validation, [ 'foobar' ])).to.eql([ 'foobar' ])
-    expect(validate(validation, [ undefined, 'foobar' ])).to.eql([ undefined, 'foobar' ])
+    expect(validate(validation, [ undefined ])).toEqual([ undefined ])
+    expect(validate(validation, [ 'foobar' ])).toEqual([ 'foobar' ])
+    expect(validate(validation, [ undefined, 'foobar' ])).toEqual([ undefined, 'foobar' ])
 
     expect(() => validate(validation, [ 'wrong', 12 ]))
-        .to.throw(ValidationError, 'Found 2 validation errors')
-        .with.property('errors').eql([
-          { path: [ 0 ], message: 'Value does not match constant "foobar"' },
-          { path: [ 1 ], message: 'Value does not match constant "foobar"' },
-        ])
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 2 validation errors/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 0 ], message: 'Value does not match constant "foobar" (string)' },
+              { path: [ 1 ], message: 'Value does not match constant "foobar" (string)' },
+            ])))
   })
 
   it('should validate an object with optional properties', () => {
@@ -35,17 +35,18 @@ describe('Object modifiers', () => {
     })
 
     expect(validate(schema1, { foo: 'hello', bar: 50 }))
-        .to.eql({ foo: 'hello', bar: 50 })
+        .toEqual({ foo: 'hello', bar: 50 })
 
     expect(validate(schema1, { foo: 'hello' }))
-        .to.eql({ foo: 'hello' })
+        .toEqual({ foo: 'hello' })
 
     expect(() => validate(schema1, { foo: 'hello', bar: 40, baz: 60 }))
-        .to.throw(ValidationError, 'Found 2 validation errors')
-        .with.property('errors').eql([
-          { path: [ 'bar' ], message: 'Number is less than 50' },
-          { path: [ 'baz' ], message: 'Unknown property' },
-        ])
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 2 validation errors/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 'bar' ], message: 'Number is less than 50' },
+              { path: [ 'baz' ], message: 'Unknown property' },
+            ])))
   })
 
   it('should validate an object with optional properties and defaults', () => {
@@ -56,19 +57,20 @@ describe('Object modifiers', () => {
     })
 
     expect(validate(schema, {}))
-        .to.eql({ foo: 'hello', bar: 10, baz: 'world' })
+        .toEqual({ foo: 'hello', bar: 10, baz: 'world' })
 
     expect(validate(schema, { foo: 'world', bar: 15, baz: 'hello' }))
-        .to.eql({ foo: 'world', bar: 15, baz: 'hello' })
+        .toEqual({ foo: 'world', bar: 15, baz: 'hello' })
 
     expect(() => validate(schema, { foo: 'nope', bar: 0, baz: 0 }))
-        .to.throw(ValidationError, 'Found 4 validation errors')
-        .with.property('errors').eql([
-          { path: [ 'foo' ], message: 'Value does not match constant "hello"' },
-          { path: [ 'foo' ], message: 'Value does not match constant "world"' },
-          { path: [ 'bar' ], message: 'Number is less than 5' },
-          { path: [ 'baz' ], message: 'Value is not a "string"' },
-        ])
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 4 validation errors/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 'foo' ], message: 'Value does not match constant "hello" (string)' },
+              { path: [ 'foo' ], message: 'Value does not match constant "world" (string)' },
+              { path: [ 'bar' ], message: 'Number is less than 5' },
+              { path: [ 'baz' ], message: 'Value is not a "string"' },
+            ])))
   })
 
   it('should validate an object when a validator is forced as "optional"', () => {
@@ -78,24 +80,26 @@ describe('Object modifiers', () => {
     const validator = new StringValidator()
     validator.optional = true
 
-    expect(validate({ test: validator }, {})).to.eql({})
+    expect(validate({ test: validator }, {})).toEqual({})
     expect(() => validate({ test: validator }, { test: 123 }))
-        .to.throw(ValidationError, 'Found 1 validation error')
-        .with.property('errors').eql([
-          { path: [ 'test' ], message: 'Value is not a "string"' },
-        ])
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 'test' ], message: 'Value is not a "string"' },
+            ])))
   })
 
   it('should fail when a default value does not match the validation', () => {
     expect(() => object({
       foo: optional(oneOf('hello', 'world'), 'nope' as any),
-    })).to.throw(TypeError, 'Default value does not match validator')
-        .and.have.property('cause')
-        .instanceOf(ValidationError)
-        .with.property('errors').eql([
-          { path: [], message: 'Value does not match constant "hello"' },
-          { path: [], message: 'Value does not match constant "world"' },
-        ])
+    })).toThrow((assert) => assert
+        .toBeError(TypeError, 'Default value does not match validator')
+        .toHaveProperty('cause', expect
+            .toBeError(ValidationError, /^Found 2 validation errors/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [], message: 'Value does not match constant "hello" (string)' },
+              { path: [], message: 'Value does not match constant "world" (string)' },
+            ]))))
   })
 
   it('should strip an object with optional properties', () => {
@@ -105,18 +109,19 @@ describe('Object modifiers', () => {
     })
 
     expect(strip(schema1, { foo: 'hello', bar: 50, extra: 'foo' }))
-        .to.eql({ foo: 'hello', bar: 50 })
+        .toEqual({ foo: 'hello', bar: 50 })
 
     expect(strip(schema1, { foo: 'hello', bar: null, extra: 'foo' }))
-        .to.eql({ foo: 'hello' })
+        .toEqual({ foo: 'hello' })
 
     expect(strip(schema1, { foo: 'hello', extra: 'foo' }))
-        .to.eql({ foo: 'hello' })
+        .toEqual({ foo: 'hello' })
 
     expect(() => strip(schema1, { foo: 'hello', bar: 40, baz: 60, extra: 'foo' }))
-        .to.throw(ValidationError, 'Found 1 validation error')
-        .with.property('errors').eql([
-          { path: [ 'bar' ], message: 'Number is less than 50' },
-        ])
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 'bar' ], message: 'Number is less than 50' },
+            ])))
   })
 })

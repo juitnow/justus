@@ -1,6 +1,6 @@
 import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { registry } from '../registry'
-import { AbstractValidator, defaultValidationOptions, makeValidatorFactory } from '../types'
+import { AbstractValidator, makeValidatorFactory } from '../types'
 import { getValidator } from '../utilities'
 
 import type {
@@ -17,7 +17,7 @@ import type {
 /** A `Validator` validating any `object`. */
 export class AnyObjectValidator extends AbstractValidator<Record<string, any>> {
   validate(value: unknown): Record<string, any> {
-    assertValidation(typeof value == 'object', 'Value is not an "object"')
+    assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
     return value
   }
@@ -43,11 +43,11 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     this.schema = schema
   }
 
-  validate(value: unknown, options: ValidationOptions = defaultValidationOptions): InferSchema<S> {
+  validate(value: unknown, options: ValidationOptions = {}): InferSchema<S> {
     assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
 
-    const { stripAdditionalProperties, stripOptionalNulls } = options
+    const { stripAdditionalProperties, stripOptionalNulls, partialValidation } = options
 
     const record: { [ k in string | number | symbol ]?: unknown } = value
     const builder = new ValidationErrorBuilder()
@@ -63,19 +63,20 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
       }
 
       // if we have no value, then we have few possibilities:
+      // - we are performing a partial validation, so we ignore
       // - the (optional) validator provides a valid value
       // - the validator is optional, so we can simply ignore
       // - the validator is not optional, so the property is missing
       if (original === undefined) {
+        if (partialValidation) continue
         try {
           // try to validate, the validator _might_ be giving us a value
           const validated = validator.validate(original, options)
           // put the validated value in the clone, unless optional and undefined
-          if (! (optional && (validated == undefined))) clone[key] = validated
+          if (! (optional && (validated === undefined))) clone[key] = validated
         } catch (error) {
           if (optional) continue // original was undefined, so we can skip!
           builder.record('Required property missing', key)
-          // builder.record(error, key) // double error!
         }
 
         continue
@@ -85,7 +86,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
       try {
         const validated = validator.validate(original, options)
         // put the validated value in the clone, unless optional and undefined
-        if (! (optional && (validated == undefined))) clone[key] = validated
+        if (! (optional && (validated === undefined))) clone[key] = validated
       } catch (error) {
         builder.record(error, key)
       }
