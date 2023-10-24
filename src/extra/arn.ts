@@ -42,7 +42,7 @@ function parse<Service extends string, ResourceType extends string>(
     service?: Service,
     type?: ResourceType,
 ): ParsedArn<Service, ResourceType> {
-  assertValidation(typeof value == 'string', 'Value is not a "string"')
+  assertValidation(typeof value === 'string', 'Value is not a "string"')
 
   const segments = value.split(':')
 

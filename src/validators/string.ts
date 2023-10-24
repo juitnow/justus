@@ -22,7 +22,7 @@ export interface BrandedStringConstraints<B extends string> extends StringConstr
 /** A `Validator` validating any `string`. */
 export class AnyStringValidator extends AbstractValidator<string> {
   validate(value: unknown): string {
-    assertValidation(typeof value == 'string', 'Value is not a "string"')
+    assertValidation(typeof value === 'string', 'Value is not a "string"')
     return value
   }
 }
@@ -55,7 +55,7 @@ export class StringValidator<S extends string = string, I = string> extends Abst
   }
 
   validate(value: unknown): S {
-    assertValidation(typeof value == 'string', 'Value is not a "string"')
+    assertValidation(typeof value === 'string', 'Value is not a "string"')
 
     assertValidation(value.length >= this.minLength,
         `String must have a minimum length of ${this.minLength}`)

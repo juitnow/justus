@@ -17,7 +17,7 @@ import type {
 /** A `Validator` validating any `object`. */
 export class AnyObjectValidator extends AbstractValidator<Record<string, any>> {
   validate(value: unknown): Record<string, any> {
-    assertValidation(typeof value == 'object', 'Value is not an "object"')
+    assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
     return value
   }
@@ -73,7 +73,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
           // try to validate, the validator _might_ be giving us a value
           const validated = validator.validate(original, options)
           // put the validated value in the clone, unless optional and undefined
-          if (! (optional && (validated == undefined))) clone[key] = validated
+          if (! (optional && (validated === undefined))) clone[key] = validated
         } catch (error) {
           if (optional) continue // original was undefined, so we can skip!
           builder.record('Required property missing', key)
@@ -86,7 +86,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
       try {
         const validated = validator.validate(original, options)
         // put the validated value in the clone, unless optional and undefined
-        if (! (optional && (validated == undefined))) clone[key] = validated
+        if (! (optional && (validated === undefined))) clone[key] = validated
       } catch (error) {
         builder.record(error, key)
       }

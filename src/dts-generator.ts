@@ -29,8 +29,8 @@ import type { Validation, Validator } from './types'
 /** Check that two of our generated types are equal */
 function typeEqual(a: TypeNode, b: TypeNode): boolean {
   function eq(a: any, b: any): boolean {
-    if ((typeof a == 'object' && a != null) &&
-        (typeof b == 'object' && b != null) ) {
+    if ((typeof a === 'object' && a != null) &&
+        (typeof b === 'object' && b != null) ) {
       for (const key in a) {
         if (! eq(a[key], b[key])) return false
       }
@@ -611,7 +611,7 @@ registerTypeGenerator(ObjectValidator, (validator, references, isInput) => {
         propertyType, // type
         undefined) // members
 
-    if (properties.length == 0) return extra
+    if (properties.length === 0) return extra
 
     const type = ts.factory.createTypeLiteralNode(properties)
     return ts.factory.createIntersectionTypeNode([ type, extra ])
