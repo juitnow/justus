@@ -95,7 +95,7 @@ describe('Object validator', () => {
     expect(() => validate(validator, { version: 2, contents: [] }))
         .to.throw(ValidationError, 'Found 3 validation errors')
         .with.property('errors').to.eql([
-          { path: [ 'version' ], message: 'Value does not match constant "1"' },
+          { path: [ 'version' ], message: 'Value does not match constant "1" (number)' },
           { path: [ 'title' ], message: 'Required property missing' },
           { path: [ 'contents' ], message: 'Array must have a minimum length of 2' },
         ])
@@ -103,7 +103,7 @@ describe('Object validator', () => {
     expect(() => validate(validator, { version: 3, contents: [ {}, 'foo' ] }))
         .to.throw(ValidationError, 'Found 5 validation errors')
         .with.property('errors').to.eql([
-          { path: [ 'version' ], message: 'Value does not match constant "1"' },
+          { path: [ 'version' ], message: 'Value does not match constant "1" (number)' },
           { path: [ 'title' ], message: 'Required property missing' },
           { path: [ 'contents', 0, 'description' ], message: 'Required property missing' },
           { path: [ 'contents', 0, 'value' ], message: 'Required property missing' },
@@ -132,7 +132,7 @@ describe('Object validator', () => {
     expect(() => validate(validator1, { foo: false, bar: 'whatever', baz: true }))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
-          { path: [ 'foo' ], message: 'Value does not match constant "true"' },
+          { path: [ 'foo' ], message: 'Value does not match constant "true" (boolean)' },
           { path: [ 'baz' ], message: 'Forbidden property' },
         ])
 
@@ -142,7 +142,7 @@ describe('Object validator', () => {
     expect(() => validate(validator2, { foo: false, bar: 'whatever', baz: true }))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
-          { path: [ 'foo' ], message: 'Value does not match constant "true"' },
+          { path: [ 'foo' ], message: 'Value does not match constant "true" (boolean)' },
           { path: [ 'baz' ], message: 'Forbidden property' },
         ])
 
@@ -152,7 +152,7 @@ describe('Object validator', () => {
     expect(() => validate(validator3, { foo: false, bar: 'whatever', baz: true }))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
-          { path: [ 'foo' ], message: 'Value does not match constant "true"' },
+          { path: [ 'foo' ], message: 'Value does not match constant "true" (boolean)' },
           { path: [ 'baz' ], message: 'Forbidden property' },
         ])
 

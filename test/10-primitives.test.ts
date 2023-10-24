@@ -63,13 +63,25 @@ describe('Primitive validators', () => {
       expect(() => validate(constant('foo'), 'bar'))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { path: [], message: 'Value does not match constant "foo"' },
+            { path: [], message: 'Value does not match constant "foo" (string)' },
+          ])
+
+      expect(() => validate(constant(123n), 123))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { path: [], message: 'Value does not match constant "123" (bigint)' },
+          ])
+
+      expect(() => validate(constant(123), 123n))
+          .to.throw(ValidationError, 'Found 1 validation error')
+          .with.property('errors').to.eql([
+            { path: [], message: 'Value does not match constant "123" (number)' },
           ])
 
       expect(() => validate(constant(true), false))
           .to.throw(ValidationError, 'Found 1 validation error')
           .with.property('errors').to.eql([
-            { path: [], message: 'Value does not match constant "true"' },
+            { path: [], message: 'Value does not match constant "true" (boolean)' },
           ])
 
       expect(() => validate(constant(null), undefined))

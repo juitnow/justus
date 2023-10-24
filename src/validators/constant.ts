@@ -14,7 +14,8 @@ export class ConstantValidator<T extends string | number | boolean | bigint | nu
   }
 
   validate(value: unknown): T {
-    assertValidation(value === this.constant, `Value does not match constant "${this.constant}"`)
+    const extra = this.constant === null ? '' : ` (${typeof this.constant})`
+    assertValidation(value === this.constant, `Value does not match constant "${this.constant}"${extra}`)
     return value as T
   }
 }

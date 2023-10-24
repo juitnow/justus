@@ -10,7 +10,7 @@ describe('Object modifiers', () => {
     expect(() => validate(validation, 'wrong'))
         .to.throw(ValidationError, 'Found 1 validation error')
         .with.property('errors').eql([
-          { path: [], message: 'Value does not match constant "foobar"' },
+          { path: [], message: 'Value does not match constant "foobar" (string)' },
         ])
   })
 
@@ -23,8 +23,8 @@ describe('Object modifiers', () => {
     expect(() => validate(validation, [ 'wrong', 12 ]))
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').eql([
-          { path: [ 0 ], message: 'Value does not match constant "foobar"' },
-          { path: [ 1 ], message: 'Value does not match constant "foobar"' },
+          { path: [ 0 ], message: 'Value does not match constant "foobar" (string)' },
+          { path: [ 1 ], message: 'Value does not match constant "foobar" (string)' },
         ])
   })
 
@@ -64,8 +64,8 @@ describe('Object modifiers', () => {
     expect(() => validate(schema, { foo: 'nope', bar: 0, baz: 0 }))
         .to.throw(ValidationError, 'Found 4 validation errors')
         .with.property('errors').eql([
-          { path: [ 'foo' ], message: 'Value does not match constant "hello"' },
-          { path: [ 'foo' ], message: 'Value does not match constant "world"' },
+          { path: [ 'foo' ], message: 'Value does not match constant "hello" (string)' },
+          { path: [ 'foo' ], message: 'Value does not match constant "world" (string)' },
           { path: [ 'bar' ], message: 'Number is less than 5' },
           { path: [ 'baz' ], message: 'Value is not a "string"' },
         ])
@@ -93,8 +93,8 @@ describe('Object modifiers', () => {
         .and.have.property('cause')
         .instanceOf(ValidationError)
         .with.property('errors').eql([
-          { path: [], message: 'Value does not match constant "hello"' },
-          { path: [], message: 'Value does not match constant "world"' },
+          { path: [], message: 'Value does not match constant "hello" (string)' },
+          { path: [], message: 'Value does not match constant "world" (string)' },
         ])
   })
 

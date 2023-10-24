@@ -75,9 +75,9 @@ describe('Array validator', () => {
     expect(() => validate(arrayOf('a'), [ 'a', true, 'b', 123 ]))
         .to.throw(ValidationError, 'Found 3 validation errors')
         .with.property('errors').to.eql([
-          { path: [ 1 ], message: 'Value does not match constant "a"' },
-          { path: [ 2 ], message: 'Value does not match constant "a"' },
-          { path: [ 3 ], message: 'Value does not match constant "a"' },
+          { path: [ 1 ], message: 'Value does not match constant "a" (string)' },
+          { path: [ 2 ], message: 'Value does not match constant "a" (string)' },
+          { path: [ 3 ], message: 'Value does not match constant "a" (string)' },
         ])
 
     expect(validate(arrayOf('a'), [ 'a', 'a', 'a' ])).to.eql([ 'a', 'a', 'a' ])
@@ -85,9 +85,9 @@ describe('Array validator', () => {
     expect(() => validate(array({ items: 'a', uniqueItems: true }), [ 'a', true, 'a', 123 ]))
         .to.throw(ValidationError, 'Found 3 validation errors')
         .with.property('errors').to.eql([
-          { path: [ 1 ], message: 'Value does not match constant "a"' },
+          { path: [ 1 ], message: 'Value does not match constant "a" (string)' },
           { path: [ 2 ], message: 'Duplicate of item at index 0' },
-          { path: [ 3 ], message: 'Value does not match constant "a"' },
+          { path: [ 3 ], message: 'Value does not match constant "a" (string)' },
         ])
   })
 

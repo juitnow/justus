@@ -29,8 +29,8 @@ describe('URL validator', () => {
         .to.throw(ValidationError, 'Found 3 validation errors')
         .with.property('errors').to.eql([
           { path: [ 'protocol' ], message: 'String does not match required pattern /^https?:$/' },
-          { path: [ 'hostname' ], message: 'Value does not match constant "www"' },
-          { path: [ 'pathname' ], message: 'Value does not match constant "/a/b/c"' },
+          { path: [ 'hostname' ], message: 'Value does not match constant "www" (string)' },
+          { path: [ 'pathname' ], message: 'Value does not match constant "/a/b/c" (string)' },
         ])
   })
 
@@ -47,7 +47,7 @@ describe('URL validator', () => {
         .to.throw(ValidationError, 'Found 2 validation errors')
         .with.property('errors').to.eql([
           { path: [ 'searchParams', 'foo' ], message: 'Required property missing' },
-          { path: [ 'searchParams', 'baz' ], message: 'Value does not match constant "xyz"' },
+          { path: [ 'searchParams', 'baz' ], message: 'Value does not match constant "xyz" (string)' },
         ])
   })
 })
