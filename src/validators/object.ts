@@ -1,6 +1,6 @@
 import { assertValidation, ValidationErrorBuilder } from '../errors'
 import { registry } from '../registry'
-import { AbstractValidator, defaultValidationOptions, makeValidatorFactory } from '../types'
+import { AbstractValidator, makeValidatorFactory } from '../types'
 import { getValidator } from '../utilities'
 
 import type {
@@ -43,7 +43,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     this.schema = schema
   }
 
-  validate(value: unknown, options: ValidationOptions = defaultValidationOptions): InferSchema<S> {
+  validate(value: unknown, options: ValidationOptions = {}): InferSchema<S> {
     assertValidation(typeof value === 'object', 'Value is not an "object"')
     assertValidation(value !== null, 'Value is "null"')
 
@@ -75,7 +75,6 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
         } catch (error) {
           if (optional) continue // original was undefined, so we can skip!
           builder.record('Required property missing', key)
-          // builder.record(error, key) // double error!
         }
 
         continue

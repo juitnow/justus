@@ -37,15 +37,6 @@ export interface ValidationOptions {
 }
 
 /**
- * Default validation options.
- */
-export const defaultValidationOptions: Readonly<Required<ValidationOptions>> = {
-  stripAdditionalProperties: false,
-  stripForbiddenProperties: false,
-  stripOptionalNulls: false,
-}
-
-/**
  * A `Validator` is an object capable of validating a given _value_ and
  * (possibly) converting it the required type `T`.
  */

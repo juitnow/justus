@@ -35,7 +35,6 @@ export type { TupleMember } from './validators/tuple'
  * VALIDATE FUNCTION (our main entry point)                                   *
  * ========================================================================== */
 
-import { defaultValidationOptions } from './types'
 import { getValidator } from './utilities'
 
 import type { InferValidation, Validation, ValidationOptions } from './types'
@@ -51,7 +50,7 @@ export function validate<V extends Validation>(
     value: any,
     options?: ValidationOptions,
 ): InferValidation<V> {
-  const opts: ValidationOptions = { ...defaultValidationOptions, ...options }
+  const opts: ValidationOptions = { ...options }
   return getValidator(validation).validate(value, opts)
 }
 
