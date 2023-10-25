@@ -64,9 +64,9 @@ export class DateValidator extends AbstractValidator<Date, Date | string | numbe
   }
 }
 
-export function dateFactory(constraints: DateConstraints): DateValidator {
+export function dateValidatorFactory(constraints: DateConstraints): DateValidator {
   return new DateValidator(constraints)
 }
 
 /** Validate dates and convert them to `Date` instances. */
-export const date = makeValidatorFactory(new DateValidator(), dateFactory)
+export const date = makeValidatorFactory(new DateValidator(), dateValidatorFactory)

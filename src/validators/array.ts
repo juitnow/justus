@@ -22,7 +22,7 @@ export interface ArrayConstraints<V extends Validation> {
 }
 
 /** Basic validator for `Array` instances. */
-export class AnyArrayValidator<T = any> extends AbstractValidator<T[], T[]> {
+export class AnyArrayValidator<T = any> extends AbstractValidator<T[]> {
   validate(value: unknown): T[] {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
     return [ ...value ]
@@ -89,13 +89,13 @@ export class ArrayValidator<T> extends AbstractValidator<T[]> {
 
 /* -------------------------------------------------------------------------- */
 
-export function arrayFactory<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>> {
+export function arrayValidatorFactory<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>> {
   const items = constraints.items ? getValidator(constraints.items) : any
   return new ArrayValidator({ ...constraints, items })
 }
 
 /** Validate `Array`s. */
-export const array = makeValidatorFactory(new AnyArrayValidator(), arrayFactory)
+export const array = makeValidatorFactory(new AnyArrayValidator(), arrayValidatorFactory)
 
 /** Validate `Array`s containing only the specified elements. */
 export function arrayOf<V extends Validation>(validation: V): Validator<InferValidation<V>[]> {

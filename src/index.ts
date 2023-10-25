@@ -24,13 +24,13 @@ export { TupleValidator, tuple } from './validators/tuple'
 export { AllOfValidator, OneOfValidator, allOf, oneOf } from './validators/union'
 
 // Validator Types
-export type { ArrayConstraints, arrayFactory } from './validators/array'
-export type { BrandedBigIntConstraints, bigintFactory } from './validators/bigint'
-export type { BooleanConstraints, booleanFactory } from './validators/boolean'
-export type { DateConstraints, dateFactory } from './validators/date'
-export type { BrandedNumberConstraints, numberFactory } from './validators/number'
-export type { objectFactory } from './validators/object'
-export type { BrandedStringConstraints, StringConstraints, stringFactory } from './validators/string'
+export type { ArrayConstraints, arrayValidatorFactory } from './validators/array'
+export type { BrandedBigIntConstraints, bigintValidatorFactory } from './validators/bigint'
+export type { BooleanConstraints, booleanValidatorFactory } from './validators/boolean'
+export type { DateConstraints, dateValidatorFactory } from './validators/date'
+export type { BrandedNumberConstraints, numberValidatorFactory } from './validators/number'
+export type { objectValidatorFactory } from './validators/object'
+export type { BrandedStringConstraints, StringConstraints, stringValidatorFactory } from './validators/string'
 export type { TupleMember } from './validators/tuple'
 
 /* ========================================================================== *

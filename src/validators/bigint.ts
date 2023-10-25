@@ -136,12 +136,12 @@ export class BigIntValidator<N extends bigint = bigint> extends AbstractValidato
   }
 }
 
-export function bigintFactory(constraints: BigIntConstraints): BigIntValidator<bigint>
-export function bigintFactory<N extends bigint>(constraints: BigIntConstraints): BigIntValidator<N>
-export function bigintFactory<B extends string>(constraints: BrandedBigIntConstraints<B>): BigIntValidator<bigint & Branding<B>>
-export function bigintFactory(constraints: BigIntConstraints): Validator<bigint> {
+export function bigintValidatorFactory(constraints: BigIntConstraints): BigIntValidator<bigint>
+export function bigintValidatorFactory<N extends bigint>(constraints: BigIntConstraints): BigIntValidator<N>
+export function bigintValidatorFactory<B extends string>(constraints: BrandedBigIntConstraints<B>): BigIntValidator<bigint & Branding<B>>
+export function bigintValidatorFactory(constraints: BigIntConstraints): Validator<bigint> {
   return new BigIntValidator(constraints)
 }
 
 /** Validate `bigint`s. */
-export const bigint = makeValidatorFactory(new AnyBigIntValidator(), bigintFactory)
+export const bigint = makeValidatorFactory(new AnyBigIntValidator(), bigintValidatorFactory)

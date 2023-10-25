@@ -70,12 +70,12 @@ export class StringValidator<S extends string = string, I = string> extends Abst
   }
 }
 
-export function stringFactory(constraints: StringConstraints): StringValidator<string>
-export function stringFactory<S extends string>(constraints: StringConstraints): StringValidator<S>
-export function stringFactory<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
-export function stringFactory(constraints: StringConstraints): Validator<string> {
+export function stringValidatorFactory(constraints: StringConstraints): StringValidator<string>
+export function stringValidatorFactory<S extends string>(constraints: StringConstraints): StringValidator<S>
+export function stringValidatorFactory<B extends string>(constraints: BrandedStringConstraints<B>): StringValidator<string & Branding<B>>
+export function stringValidatorFactory(constraints: StringConstraints): Validator<string> {
   return new StringValidator(constraints)
 }
 
 /** Validate `string`s. */
-export const string = makeValidatorFactory(new AnyStringValidator(), stringFactory)
+export const string = makeValidatorFactory(new AnyStringValidator(), stringValidatorFactory)
