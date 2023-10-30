@@ -1,13 +1,14 @@
 import { assertSchema } from './errors'
 import { registry } from './registry'
 
-import type { Schema, Validation, Validator } from './types'
+import type { InferInput, InferValidation, Schema, Validation, Validator } from './types'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
  * ========================================================================== */
 
 /** Return the `Validator` for the given `Validation` */
+export function getValidator<V extends Validation>(validation: V): Validator<InferValidation<V>, InferInput<V>>
 export function getValidator(validation: Validation): Validator {
   assertSchema(validation !== undefined, 'No validator for undefined validation')
 

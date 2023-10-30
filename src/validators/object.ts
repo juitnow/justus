@@ -135,7 +135,7 @@ export const object = makeValidatorFactory(new AnyObjectValidator(), objectValid
 
 /** Validate `Object`s containing only the specified elements. */
 export function objectOf<V extends Validation>(validation: V): Validator<Record<string, InferValidation<V>>> {
-  return new ObjectValidator({ [Symbol.justusAdditionalValidator]: getValidator(validation) })
+  return new ObjectValidator<any>({ [Symbol.justusAdditionalValidator]: getValidator(validation) })
 }
 
 // Register our "object" validator
