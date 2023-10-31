@@ -81,13 +81,16 @@ expectType<any[]>(inputType(array))
 expectType<any[]>(inputType(array({})))
 expectType<number[]>(inputType(array({ items: number })))
 expectType<string[]>(inputType(arrayOf(string)))
+expectType<(string | URL)[]>(inputType(arrayOf(url)))
 
 // one of / all of
 
 expectType<string | number>(inputType(oneOf(number, string)))
 expectType<string | number | Date | URL>(inputType(oneOf(date, url)))
+expectType<string | number | Date | URL>(inputType(oneOf(url, date))) // reversed
 
-expectType<(string | number | Date) & URL>(inputType(allOf(date, url)))
+expectType<(string | number | Date) & (string | URL)>(inputType(allOf(date, url)))
+expectType<(string | URL) & (string | number | Date)>(inputType(allOf(url, date))) // reversed
 expectAssignable<{ a: number } & { b: string }>(inputType(allOf({ a: number }, { b: string })))
 
 // optional
@@ -103,3 +106,8 @@ expectType<number[] | undefined>(inputType(optional(arrayOf(number), 12345 as co
 expectType<Date | string | number | undefined>(inputType(optional(date)))
 expectType<Date | string | number | undefined>(inputType(optional(date, 'foo' as const)))
 expectType<Date | string | number | undefined>(inputType(optional(date, 12345 as const)))
+
+// optional + array + oneof
+
+expectType<(string | number | Date | URL)[] | undefined>(inputType(optional(arrayOf(oneOf(url, date)))))
+expectType<(string | number | Date | URL)[] | undefined>(inputType(optional(arrayOf(oneOf(date, url)))))
