@@ -31,7 +31,7 @@ export type InferOneOfInput<A extends OneOfArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
       Rest extends OneOfArguments ?
-        InferInput<First> | InferOneOfValidation<Rest> :
+        InferInput<First> | InferOneOfInput<Rest> :
         InferInput<First> :
     never :
   A extends readonly (infer Type)[] ?
@@ -86,7 +86,7 @@ export type InferAllOfInput<A extends AllOfArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
       Rest extends AllOfArguments ?
-        InferInput<First> & InferAllOfValidation<Rest> :
+        InferInput<First> & InferAllOfInput<Rest> :
       InferInput<First> :
     never :
   never
