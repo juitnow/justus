@@ -3,7 +3,7 @@ import { AbstractValidator, makeValidatorFactory } from '../types'
 import { getValidator } from '../utilities'
 import { any } from './any'
 
-import type { InferValidation, Validation, ValidationOptions, Validator } from '../types'
+import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -30,7 +30,7 @@ export class AnyArrayValidator<T = any> extends AbstractValidator<T[]> {
 }
 
 /** A validator for `Array` instances with constraints. */
-export class ArrayValidator<T> extends AbstractValidator<T[]> {
+export class ArrayValidator<T, I = T> extends AbstractValidator<T[], I[]> {
   readonly maxItems: number
   readonly minItems: number
   readonly uniqueItems: boolean
@@ -89,7 +89,9 @@ export class ArrayValidator<T> extends AbstractValidator<T[]> {
 
 /* -------------------------------------------------------------------------- */
 
-export function arrayValidatorFactory<V extends Validation>(constraints: ArrayConstraints<V>): ArrayValidator<InferValidation<V>> {
+export function arrayValidatorFactory<V extends Validation>(
+    constraints: ArrayConstraints<V>,
+): ArrayValidator<InferValidation<V>, InferInput<V>> {
   const items = constraints.items ? getValidator(constraints.items) : any
   return new ArrayValidator<any>({ ...constraints, items })
 }
@@ -98,6 +100,6 @@ export function arrayValidatorFactory<V extends Validation>(constraints: ArrayCo
 export const array = makeValidatorFactory(new AnyArrayValidator(), arrayValidatorFactory)
 
 /** Validate `Array`s containing only the specified elements. */
-export function arrayOf<V extends Validation>(validation: V): Validator<InferValidation<V>[]> {
+export function arrayOf<V extends Validation>(validation: V): Validator<InferValidation<V>[], InferInput<V>[]> {
   return new ArrayValidator({ items: getValidator(validation) })
 }
