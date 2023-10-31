@@ -123,6 +123,10 @@ describe('DTS Generation', () => {
       expect(generateTypes({
         test: arrayOf(string),
       })).toStrictlyEqual('export type test = string[];')
+
+      expect(generateTypes({
+        test: arrayOf(url),
+      })).toStrictlyEqual('export type test = URL[];')
     })
 
     it('should generate the validated type for constants', () => {
@@ -335,6 +339,20 @@ describe('DTS Generation', () => {
       expect(generateTypes({
         test: boolean({ fromString: true }),
       }, true)).toStrictlyEqual('export type test = boolean | "true" | "false";')
+    })
+
+    it('should generate the input type for arrays', () => {
+      expect(generateTypes({
+        test: array,
+      }, true)).toStrictlyEqual('export type test = any[];')
+
+      expect(generateTypes({
+        test: arrayOf(string),
+      }, true)).toStrictlyEqual('export type test = string[];')
+
+      expect(generateTypes({
+        test: arrayOf(url),
+      }, true)).toStrictlyEqual('export type test = (URL | string)[];')
     })
 
     it('should generate the input type for (branded) bigints', () => {
