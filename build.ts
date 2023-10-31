@@ -1,18 +1,18 @@
 import {
   banner,
-  build,
   exec,
   find,
   hookAfter,
   log,
   mkdtemp,
+  plugjs,
   resolve,
   rmrf,
   tasks,
 } from '@plugjs/build'
 import '@plugjs/tsd'
 
-const localBuild = build({
+const localBuild = plugjs({
   ...tasks({
     exportsGlob: '((index|dts-generator).*)|(extra/**.*)',
     extraLint: [ [ '**/*.test-d.ts', { directory: 'test-d' } ] ],
