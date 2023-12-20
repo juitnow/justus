@@ -482,56 +482,32 @@ describe('DTS Generation', () => {
 
   describe('DTS generation', () => {
     it('should reference exported validators in validated types', () => {
-      // this will be exported
+      // this will be exported, but as it's a core type will never be aliased
       const ean = ean13
-      // this will be embedded in product below
+      // this will be embedded in product below because it's not exported
       const price = number({ brand: 'price', minimum: 0, multipleOf: 0.01 })
+      // this will be referenced in the product below because it's exported
+      const description = string({ minLength: 1, maxLength: 100 })
       // object mapping two validators above
-      const product = object({ ean, price })
-      // this is an export aliasing "uuid" as "test"
-      const test = ean
+      const product = object({ ean, price, description })
 
       // what we expect to see...
       const expected = `
         export type ean = string & { __ean_13: never; };
         export type product = {
-          ean: ean;
+          ean: string & { __ean_13: never; };
           price: number & { __brand_price: never; };
+          description: description;
         };
-        export type test = ean;`
+        export type description = string;`
           .replace(/\s+/gm, ' ').trim()
 
       // run our little test...
-      expect(generateTypes({ ean, product, test })
+      expect(generateTypes({ ean, product, description })
           .replace(/\s+/gm, ' ').trim())
           .toStrictlyEqual(expected)
     })
 
-    it('should reference exported validators in input types', () => {
-      // this will be exported
-      const ean = ean13
-      // this will be embedded in product below
-      const price = number({ brand: 'price', minimum: 0, multipleOf: 0.01 })
-      // object mapping two validators above
-      const product = object({ ean, price })
-      // this is an export aliasing "uuid" as "test"
-      const test = ean
-
-      // what we expect to see...
-      const expected = `
-        export type ean = number | string;
-        export type product = {
-          ean: ean;
-          price: number;
-        };
-        export type test = ean;`
-          .replace(/\s+/gm, ' ').trim()
-
-      // run our little test...
-      expect(generateTypes({ ean, product, test }, true)
-          .replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual(expected)
-    })
 
     it('should generate a full type declaration', () => {
       // this will be exported...
