@@ -1,27 +1,32 @@
 import ts from 'typescript'
 
 import { assertSchema } from './errors'
-import { EAN13Validator } from './extra/ean13'
-import { URLValidator } from './extra/url'
-import { UUIDValidator } from './extra/uuid'
+import { EAN13Validator, ean13 } from './extra/ean13'
+import { URLValidator, url } from './extra/url'
+import { UUIDValidator, uuid } from './extra/uuid'
 import { getValidator } from './utilities'
-import { AnyValidator } from './validators/any'
-import { AnyArrayValidator, ArrayValidator } from './validators/array'
-import { AnyBigIntValidator, BigIntValidator } from './validators/bigint'
-import { BooleanValidator } from './validators/boolean'
+import { AnyValidator, any } from './validators/any'
+import { AnyArrayValidator, ArrayValidator, array } from './validators/array'
+import { AnyBigIntValidator, BigIntValidator, bigint } from './validators/bigint'
+import { BooleanValidator, boolean } from './validators/boolean'
 import { ConstantValidator } from './validators/constant'
-import { DateValidator } from './validators/date'
-import { NeverValidator } from './validators/never'
-import { AnyNumberValidator, NumberValidator } from './validators/number'
-import { AnyObjectValidator, ObjectValidator } from './validators/object'
+import { DateValidator, date } from './validators/date'
+import { NeverValidator, never } from './validators/never'
+import { AnyNumberValidator, NumberValidator, number } from './validators/number'
+import { AnyObjectValidator, ObjectValidator, object } from './validators/object'
 import { OptionalValidator } from './validators/optional'
-import { AnyStringValidator, StringValidator } from './validators/string'
+import { AnyStringValidator, StringValidator, string } from './validators/string'
 import { TupleValidator } from './validators/tuple'
 import { AllOfValidator, OneOfValidator } from './validators/union'
 
-
 import type { TypeNode } from 'typescript'
 import type { Validation, Validator } from './types'
+
+/* Our "main" validators */
+const coreValidators = new Set<Validator>([
+  any, array, bigint, boolean, date, ean13,
+  never, number, object, string, url, uuid,
+])
 
 /* ========================================================================== *
  * QUICK SIMPLE DEEP-EQUALITY                                                 *
@@ -102,7 +107,9 @@ export function generateTypes(
   for (const [ name, validation ] of Object.entries(validations)) {
     const validator = getValidator(validation)
     validators.set(name, validator)
-    if (! references.has(validator)) references.set(validator, name)
+    if ((! references.has(validator)) && (! coreValidators.has(validator))) {
+      references.set(validator, name)
+    }
   }
 
   /* Now convert all our validators into TypeScript `TypeNode`s */
