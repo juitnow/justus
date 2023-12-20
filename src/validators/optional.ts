@@ -35,7 +35,7 @@ export class OptionalValidator<
 
   validate(value: unknown, options?: ValidationOptions): D extends undefined ? T | undefined : T
   validate(value: unknown, options?: ValidationOptions): T | undefined {
-    if (value === undefined) return this.defaultValue // do not validate defaults!
+    if (value === undefined) return structuredClone(this.defaultValue) // do not validate defaults!
     return this.validator.validate(value, options)
   }
 }
