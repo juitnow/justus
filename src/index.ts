@@ -99,5 +99,10 @@ export function partial<V extends Validation>(
     value: any,
     options?: ValidationOptions,
 ): Partial<InferValidation<V>> {
-  return getValidator(validation).validate(value, { ...options, partialValidation: true })
+  return getValidator(validation).validate(value, {
+    partialValidation: true,
+    stripAdditionalProperties: true,
+    stripOptionalNulls: true,
+    ...options,
+  })
 }
