@@ -291,10 +291,53 @@ describe('Object validator', () => {
       required: string,
       optional: optional(boolean),
       defaults: optional(number, 123),
+    })
+
+    expect(partial(validation, {})).toEqual({})
+
+    expect(partial(validation, { required: 'foo' })).toEqual({ required: 'foo' })
+    expect(partial(validation, { optional: false })).toEqual({ optional: false })
+    expect(partial(validation, { defaults: 12345 })).toEqual({ defaults: 12345 })
+
+    expect(partial(validation, { required: null })).toEqual({})
+    expect(partial(validation, { optional: null })).toEqual({})
+    expect(partial(validation, { defaults: null })).toEqual({})
+
+    expect(partial(validation, { addition: 'bar' })).toEqual({})
+    expect(partial(validation, { addition: null })).toEqual({})
+
+    expect(() => partial(validation, { required: 12345 }))
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 'required' ], message: 'Value is not a "string"' },
+            ])))
+
+    expect(() => partial(validation, { optional: 12345 }))
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 'optional' ], message: 'Value is not a "boolean"' },
+            ])))
+
+    expect(() => partial(validation, { defaults: 'foo' }))
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([
+              { path: [ 'defaults' ], message: 'Value is not a "number"' },
+            ])))
+  })
+
+  it('should perform a partial validation with allowed additional propertiees', () => {
+    const validation = object({
+      required: string,
+      optional: optional(boolean),
+      defaults: optional(number, 123),
       ...allowAdditionalProperties(string),
     })
 
     expect(partial(validation, {})).toEqual({})
+
     expect(partial(validation, { required: 'foo' })).toEqual({ required: 'foo' })
     expect(partial(validation, { optional: false })).toEqual({ optional: false })
     expect(partial(validation, { defaults: 12345 })).toEqual({ defaults: 12345 })
