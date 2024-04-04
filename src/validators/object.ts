@@ -54,7 +54,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     const clone: Record<string, any> = {}
 
     for (const [ key, validator ] of this.validators.entries()) {
-      const optional = !! validator.optional
+      const optional = (!! validator.optional) || (!! partialValidation)
       const original = record[key]
 
       // strip any optional "null" value if told to do so

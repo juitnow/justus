@@ -52,7 +52,13 @@ export function validate<V extends Validation>(
     value: any,
     options?: ValidationOptions,
 ): InferValidation<V> {
-  const opts: ValidationOptions = { ...options }
+  const opts: ValidationOptions = {
+    partialValidation: false,
+    stripAdditionalProperties: false,
+    stripForbiddenProperties: false,
+    stripOptionalNulls: false,
+    ...options,
+  }
   return getValidator(validation).validate(value, opts)
 }
 
@@ -64,6 +70,7 @@ export function validate<V extends Validation>(
  *
  * ```
  * validate(validation, value, {
+ *   partialValidation: false,
  *   stripAdditionalProperties: true,
  *   stripForbiddenProperties: false,
  *   stripOptionalNulls: true,
@@ -76,6 +83,7 @@ export function strip<V extends Validation>(
     options?: ValidationOptions,
 ): InferValidation<V> {
   const opts: ValidationOptions = {
+    partialValidation: false,
     stripAdditionalProperties: true,
     stripForbiddenProperties: false,
     stripOptionalNulls: true,
@@ -90,14 +98,30 @@ export function strip<V extends Validation>(
  * additional properties and optional `null`s (but not forbidden ones), and
  * treating all properties as optional.
  *
- * This is equivalent to setting the `partialValidation` option to `true` in
- * `validate(...)`, but this function correctly represents the returned type as
- * a `Partial<...>` type.
+ * This is equivalent to:
+ *
+ * ```
+ * validate(validation, value, {
+ *   partialValidation: true,
+ *   stripAdditionalProperties: true,
+ *   stripForbiddenProperties: false,
+ *   stripOptionalNulls: true,
+ * })
+ * ```
+ *
+ * This function also correctly represents the returned type as a
+ * `Partial<...>` type.
  */
 export function partial<V extends Validation>(
     validation: V,
     value: any,
     options?: ValidationOptions,
 ): Partial<InferValidation<V>> {
-  return getValidator(validation).validate(value, { ...options, partialValidation: true })
+  return getValidator(validation).validate(value, {
+    partialValidation: true,
+    stripAdditionalProperties: true,
+    stripForbiddenProperties: false,
+    stripOptionalNulls: true,
+    ...options,
+  })
 }
