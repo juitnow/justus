@@ -78,8 +78,8 @@
   "author": "Juit Developers <developers@juit.com>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@plugjs/build": "^0.5.43",
-    "@plugjs/tsd": "^0.5.42",
+    "@plugjs/build": "eslintv9",
+    "@plugjs/tsd": "eslintv9",
     "typescript": "^5.5.2"
   },
   "directories": {
