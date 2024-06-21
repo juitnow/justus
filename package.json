@@ -1,6 +1,6 @@
 {
   "name": "justus",
-  "version": "0.5.34",
+  "version": "0.5.35",
   "description": "A JavaScript validation library, with types!",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
