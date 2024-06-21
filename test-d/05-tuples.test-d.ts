@@ -75,7 +75,7 @@ const validatorX = object({
   tuple: [ number, string, ...boolean ],
 }) // no as const... types are messed up! :-)
 const resultX = validate(validatorX, null)
-expectAssignable<{ tuple:(number|string|boolean)[] }>(resultX)
+expectAssignable<{ tuple: (number|string|boolean)[] }>(resultX)
 expectType<(number|string|boolean)[]>(resultX.tuple)
 expectType<number|string|boolean>(resultX.tuple[0])
 expectType<number|string|boolean>(resultX.tuple[1])

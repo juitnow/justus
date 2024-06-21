@@ -13,7 +13,9 @@ import type {
   Validator,
 } from '../types'
 
-export interface TupleMember { single: boolean, validator: Validator }
+export interface TupleMember {
+  single: boolean, validator: Validator
+}
 
 /** A `Validator` for _tuples_. */
 export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTuple<T>, InferInputTuple<T>> {
@@ -87,7 +89,7 @@ export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTupl
 export function tuple<T extends
 | readonly [ Validation | TupleRestParameter<any, any>, ...Tuple ]
 | readonly [ ...Tuple, Validation | TupleRestParameter<any, any> ]
-| readonly [ ...Tuple ] // ... this is bascially an array...
+| readonly [ ...Tuple ], // ... this is bascially an array...
 >(tuple: T): Validator<InferTuple<T>, InferInputTuple<T>> {
   return new TupleValidator(tuple)
 }

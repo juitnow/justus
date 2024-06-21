@@ -96,7 +96,7 @@ export class URLValidator extends AbstractValidator<URL, URL | string> {
     let url: URL
     try {
       url = value instanceof URL ? value : new URL(value as any)
-    } catch (error) {
+    } catch {
       throw new ValidationError('Value could not be converted to a "URL"')
     }
 

@@ -74,7 +74,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
           const validated = validator.validate(original, options)
           // put the validated value in the clone, unless optional and undefined
           if (! (optional && (validated === undefined))) clone[key] = validated
-        } catch (error) {
+        } catch {
           if (optional) continue // original was undefined, so we can skip!
           builder.record('Required property missing', key)
         }

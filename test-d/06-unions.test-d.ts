@@ -33,13 +33,13 @@ const oneOf3 = oneOf(t1, t2)
 expectAssignable<Validator<InferValidation<typeof t1 | typeof t2>>>(oneOf3)
 
 const oneOfR3 = validate(oneOf3, null)
-expectAssignable<{ o1: string } | { o2: number}>(oneOfR3)
+expectAssignable<{ o1: string } | { o2: number }>(oneOfR3)
 
 const oneOf4 = oneOf(t3, t3)
 expectAssignable<Validator<InferValidation<typeof t3>>>(oneOf4)
 
 const oneOfR4 = validate(oneOf4, null)
-expectAssignable<{ o3?: string } | { readonly o4: number}>(oneOfR4)
+expectAssignable<{ o3?: string } | { readonly o4: number }>(oneOfR4)
 
 if ('o1' in oneOfR3) {
   expectType<string>(oneOfR3.o1)
@@ -59,7 +59,7 @@ const allOf2 = allOf(t1, t2)
 expectAssignable<Validator<InferValidation<typeof t1 & typeof t2>>>(allOf2)
 
 const allOfR2 = validate(allOf2, null)
-expectAssignable<{ o1: string, o2: number}>(allOfR2)
+expectAssignable<{ o1: string, o2: number }>(allOfR2)
 
 expectType<string>(allOfR2.o1)
 expectType<number>(allOfR2.o2)

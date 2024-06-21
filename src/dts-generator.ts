@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import ts from 'typescript'
 
 import { assertSchema } from './errors'

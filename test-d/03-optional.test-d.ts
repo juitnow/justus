@@ -175,9 +175,9 @@ const v8 = object({
 type T8 = InferValidation<typeof v8>
 
 const o8 = validate(v8, null)
-o8.fixed
-o8.optional1
-o8.optional2
+expectType<string>(o8.fixed)
+expectType<number | undefined>(o8.optional1)
+expectType<number>(o8.optional2)
 
 expectAssignable<T8>({ fixed: 'foo', optional2: 123456789 })
 expectAssignable<T8>({ fixed: 'foo', optional1: 123456789, optional2: 123456789 })

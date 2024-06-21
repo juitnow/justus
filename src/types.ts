@@ -197,7 +197,7 @@ export type Tuple = readonly (Validation | TupleRestParameter<any, any>)[]
  * ```
  */
 export type TupleRestParameter<T, I> = {
-  [Symbol.justusRestValidator] : Validator<T, I>
+  [Symbol.justusRestValidator]: Validator<T, I>
 }
 
 /**
@@ -247,7 +247,7 @@ export type InferInputTuple<T> =
  * how they should be validated.
  */
 export interface Schema {
-  [ key: string ] : Validation
+  [ key: string ]: Validation
   [ Symbol.justusAdditionalValidator ]?: Validator | false
 }
 

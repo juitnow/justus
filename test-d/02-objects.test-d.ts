@@ -65,7 +65,7 @@ expectAssignable<{
   n: number,
   s: string,
   a: boolean[],
-  o: { x : boolean },
+  o: { x: boolean },
 }>(o2)
 
 // -------------------------------------------------------------------------- //
@@ -86,7 +86,7 @@ expectAssignable<{
   n: number,
   s: string,
   a: string[],
-  o: { x : string },
+  o: { x: string },
 }>(o3)
 
 // -------------------------------------------------------------------------- //

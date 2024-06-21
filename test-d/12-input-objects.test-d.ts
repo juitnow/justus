@@ -16,8 +16,8 @@ import type { InferInput, Validation } from '../src'
 
 printType('__file_marker__')
 
-function input<V extends Validation>(validation: V, input: InferInput<V>): void {
-  void validation, input
+function input<V extends Validation>(_validation: V, _input: InferInput<V>): void {
+  // do nothing
 }
 
 // normal stuff

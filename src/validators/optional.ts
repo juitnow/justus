@@ -46,7 +46,7 @@ export class OptionalValidator<
  * @param validation - A `Validation` to be marked as _optional_.
  */
 export function optional<
-  V extends Validation
+  V extends Validation,
 >(validation: V): OptionalValidator<InferValidation<V>, InferInput<V>, undefined>
 
 export function optional<

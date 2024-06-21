@@ -35,7 +35,7 @@ export class AnyBigIntValidator extends AbstractValidator<bigint> {
     if (typeof value === 'number') {
       try {
         value = BigInt(value)
-      } catch (error) {
+      } catch {
         throw new ValidationError('BigInt can not be parsed from number')
       }
     }
@@ -114,7 +114,7 @@ export class BigIntValidator<N extends bigint = bigint> extends AbstractValidato
         ((typeof value === 'number') && (this.fromNumber))) {
       try {
         value = BigInt(value)
-      } catch (error) {
+      } catch {
         throw new ValidationError('BigInt can not be parsed from ' + typeof value)
       }
     }
