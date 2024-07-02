@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { assertSchema, assertValidation, ValidationError, ValidationErrorBuilder } from '../src'
 
 describe('Errors', () => {

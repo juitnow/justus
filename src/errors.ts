@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 export type ValidationErrors = { path: (string | number)[], message: string }[]
 
 /** Combine the components of a _path_ into a human readable string */
