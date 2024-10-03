@@ -45,11 +45,13 @@ export class DateValidator extends AbstractValidator<Date, Date | string | numbe
 
     if (isNaN(date.getTime())) throw new ValidationError('Invalid date')
 
-    if (this.format === 'iso') {
-      assertValidation(typeof value === 'string', 'ISO Date is not a "string"')
-      assertValidation(ISO_8601_REGEX.test(value), 'Invalid format for ISO Date')
-    } else if (this.format === 'timestamp') {
-      assertValidation(typeof value === 'number', 'Timestamp is not a "number"')
+    if (!(value instanceof Date)) {
+      if (this.format === 'iso') {
+        assertValidation(typeof value === 'string', 'ISO Date is not a "string"')
+        assertValidation(ISO_8601_REGEX.test(value), 'Invalid format for ISO Date')
+      } else if (this.format === 'timestamp') {
+        assertValidation(typeof value === 'number', 'Timestamp is not a "number"')
+      }
     }
 
     if (this.from) {

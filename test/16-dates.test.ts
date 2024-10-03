@@ -16,6 +16,14 @@ describe('Date validator', () => {
     const validator = date({ format: 'iso' })
 
     expect(validate(validator, '1970-01-01T00:00:00.000Z').getTime()).toEqual(0)
+    expect(validate(validator, new Date(0)).getTime()).toEqual(0)
+
+    expect(() => validate(validator, 0))
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([ {
+              path: [], message: 'ISO Date is not a "string"',
+            } ])))
 
     expect(() => validate(validator, 'Thu, 01 Jan 1970 00:00:00 GMT'))
         .toThrow((assert) => assert
@@ -29,6 +37,7 @@ describe('Date validator', () => {
     const validator = date({ format: 'timestamp' })
 
     expect(validate(validator, 0).getTime()).toEqual(0)
+    expect(validate(validator, new Date(0)).getTime()).toEqual(0)
 
     expect(() => validate(validator, 'Thu, 01 Jan 1970 00:00:00 GMT'))
         .toThrow((assert) => assert
