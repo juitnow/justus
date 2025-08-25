@@ -78,9 +78,9 @@
   "author": "Juit Developers <developers@juit.com>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@plugjs/build": "^0.6.49",
-    "@plugjs/tsd": "^0.6.55",
-    "typescript": "^5.8.3"
+    "@plugjs/build": "^0.6.58",
+    "@plugjs/tsd": "^0.6.65",
+    "typescript": "^5.9.2"
   },
   "directories": {
     "test": "test"
