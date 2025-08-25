@@ -19,13 +19,13 @@ export type InferOneOfValidation<A extends OneOfArguments> =
     First extends Validation ?
       Rest extends OneOfArguments ?
         InferValidation<First> | InferOneOfValidation<Rest> :
-      InferValidation<First> :
-    never :
-  A extends readonly (infer Type)[] ?
-    Type extends Validation ?
-      InferValidation<Type> :
-    never :
-  never
+        InferValidation<First> :
+      never :
+    A extends readonly (infer Type)[] ?
+      Type extends Validation ?
+        InferValidation<Type> :
+        never :
+      never
 
 export type InferOneOfInput<A extends OneOfArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
@@ -33,12 +33,12 @@ export type InferOneOfInput<A extends OneOfArguments> =
       Rest extends OneOfArguments ?
         InferInput<First> | InferOneOfInput<Rest> :
         InferInput<First> :
-    never :
-  A extends readonly (infer Type)[] ?
-    Type extends Validation ?
-      InferInput<Type> :
-    never :
-  never
+      never :
+    A extends readonly (infer Type)[] ?
+      Type extends Validation ?
+        InferInput<Type> :
+        never :
+      never
 
 /** A `Validator` validating a value as _one of_ the specified arguments. */
 export class OneOfValidator<A extends OneOfArguments>
@@ -78,18 +78,18 @@ export type InferAllOfValidation<A extends AllOfArguments> =
     First extends Validation ?
       Rest extends AllOfArguments ?
         InferValidation<First> & InferAllOfValidation<Rest> :
-      InferValidation<First> :
-    never :
-  never
+        InferValidation<First> :
+      never :
+    never
 
 export type InferAllOfInput<A extends AllOfArguments> =
   A extends readonly [ infer First, ...infer Rest ] ?
     First extends Validation ?
       Rest extends AllOfArguments ?
         InferInput<First> & InferAllOfInput<Rest> :
-      InferInput<First> :
-    never :
-  never
+        InferInput<First> :
+      never :
+    never
 
 /** A `Validator` validating a value as _all of_ the specified arguments. */
 export class AllOfValidator<A extends AllOfArguments>

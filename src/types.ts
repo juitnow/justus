@@ -114,9 +114,9 @@ implements Validator<T, I>, Iterable<TupleRestParameter<T, I>> {
  * * Either `null`, a `boolean`, a `number`, a `bigint` or a `string` for constants
  */
 export type Validation =
-  Validator | // Validator instances
-  Tuple | Schema | // Tuples or schemas (arrays, objects)
-  null | boolean | bigint | number | string // Primitives, mapped as constants
+  | Validator // Validator instances
+  | Tuple | Schema // Tuples or schemas (arrays, objects)
+  | null | boolean | bigint | number | string // Primitives, mapped as constants
 
 /**
  * Infer the type returned by a `Validation` when validating.
@@ -209,15 +209,15 @@ export type InferTuple<T> =
     T extends readonly [ Validation, ...any[] ] ?
       T extends readonly [ infer V, ...infer Rest ] ?
         [ InferValidation<V>, ...InferTuple<Rest> ] :
-      never :
-    T extends readonly [ ...any[], Validation ] ?
-      T extends readonly [ ...infer Rest, infer V ] ?
-        [ ...InferTuple<Rest>, InferValidation<V> ] :
-      never :
-    T extends readonly (infer V)[] ?
-      [ ...InferValidationOrTupleRest<V>[] ] :
-    never :
-  never
+        never :
+      T extends readonly [ ...any[], Validation ] ?
+        T extends readonly [ ...infer Rest, infer V ] ?
+          [ ...InferTuple<Rest>, InferValidation<V> ] :
+          never :
+        T extends readonly (infer V)[] ?
+          [ ...InferValidationOrTupleRest<V>[] ] :
+          never :
+    never
 
 /**
  * Infer a time compatible with a `TupleValidator`'s input.
@@ -228,15 +228,15 @@ export type InferInputTuple<T> =
     T extends readonly [ Validation, ...any[] ] ?
       T extends readonly [ infer V, ...infer Rest ] ?
         [ InferInput<V>, ...InferInputTuple<Rest> ] :
-      never :
-    T extends readonly [ ...any[], Validation ] ?
-      T extends readonly [ ...infer Rest, infer V ] ?
-        [ ...InferInputTuple<Rest>, InferInput<V> ] :
-      never :
-    T extends readonly (infer V)[] ?
-      [ ...InferInputValidationOrTupleRest<V>[] ] :
-    never :
-  never
+        never :
+      T extends readonly [ ...any[], Validation ] ?
+        T extends readonly [ ...infer Rest, infer V ] ?
+          [ ...InferInputTuple<Rest>, InferInput<V> ] :
+          never :
+        T extends readonly (infer V)[] ?
+          [ ...InferInputValidationOrTupleRest<V>[] ] :
+          never :
+    never
 
 /* ========================================================================== *
  * OBJECT SCHEMAS                                                             *
@@ -279,11 +279,11 @@ export type InferSchema2<S> = {
   // in their unions, and associates them with the inferred value, basically
   // making the key *non optional*
   -readonly [ key in keyof S as
-      key extends string ?
-        undefined extends InferValidation<S[key]> ?
-          never :
-          key :
-      never ] -? :
+  key extends string ?
+    undefined extends InferValidation<S[key]> ?
+      never :
+      key :
+    never ] -? :
   InferValidation<S[key]>
 }
 
@@ -303,13 +303,13 @@ export type InferInputSchema2<S> = {
   // in their unions, and associates them with the inferred value, basically
   // making the key *non optional*
   -readonly [ key in keyof S as
-      key extends string ?
-        InferInput<S[key]> extends never ?
-          never :
-        undefined extends InferInput<S[key]> ?
-          never :
-          key :
-      never ] -? :
+  key extends string ?
+    InferInput<S[key]> extends never ?
+      never :
+      undefined extends InferInput<S[key]> ?
+        never :
+        key :
+    never ] -? :
   InferInput<S[key]>
 }
 

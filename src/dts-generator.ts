@@ -163,8 +163,8 @@ export function generateDeclarations(validations: Record<string, Validation>): s
   for (const [ name, validation ] of Object.entries(validations)) {
     /* Prep the name prefix for input and output types */
     const prefix = /validator$/i.test(name) ? name.slice(0, -9) :
-                   /validation$/i.test(name) ? name.slice(0, -10) :
-                   name
+      /validation$/i.test(name) ? name.slice(0, -10) :
+      name
     /* Output and input name */
     const output = `${prefix.slice(0, 1).toUpperCase()}${prefix.slice(1)}`
     const input = `${prefix.slice(0, 1).toUpperCase()}${prefix.slice(1)}Input`
@@ -495,12 +495,12 @@ registerTypeGenerator(BigIntValidator, (validator: BigIntValidator, _references,
 
 registerTypeGenerator(BooleanValidator, (validator, _references, isInput) => {
   return (isInput && validator.fromString) ?
-      ts.factory.createUnionTypeNode([
-        booleanType,
-        ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral('true')),
-        ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral('false')),
-      ]) :
-      booleanType
+    ts.factory.createUnionTypeNode([
+      booleanType,
+      ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral('true')),
+      ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral('false')),
+    ]) :
+    booleanType
 })
 
 registerTypeGenerator(ConstantValidator, (validator) => {
@@ -519,10 +519,10 @@ registerTypeGenerator(ConstantValidator, (validator) => {
 
 registerTypeGenerator(DateValidator, (validator: DateValidator, _references, isInput) => {
   return isInput ?
-             validator.format === 'iso' ? stringType :
-             validator.format === 'timestamp' ? numberType :
-             ts.factory.createUnionTypeNode([ dateType, numberType, stringType ]) :
-         dateType
+    validator.format === 'iso' ? stringType :
+    validator.format === 'timestamp' ? numberType :
+    ts.factory.createUnionTypeNode([ dateType, numberType, stringType ]) :
+    dateType
 })
 
 registerTypeGenerator(NumberValidator, (validator: NumberValidator, _references, isInput) => {
