@@ -558,14 +558,14 @@ registerTypeGenerator(TupleValidator, (validator: TupleValidator<any>, reference
 
   // count how many rest parameters do we have..
   const { count, first, next } =
-      members.reduce(({ count, first, next }, { single }, i) => {
-        if (! single) {
-          if (i < first) first = i
-          next = i + 1
-          count += 1
-        }
-        return { count, first, next }
-      }, { count: 0, first: members.length, next: -1 })
+    members.reduce(({ count, first, next }, { single }, i) => {
+      if (! single) {
+        if (i < first) first = i
+        next = i + 1
+        count += 1
+      }
+      return { count, first, next }
+    }, { count: 0, first: members.length, next: -1 })
 
   // if we have zero or one rest parameter, things are easy...
   if (count < 2) {

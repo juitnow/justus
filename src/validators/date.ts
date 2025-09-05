@@ -37,10 +37,10 @@ export class DateValidator extends AbstractValidator<Date, Date | string | numbe
 
   validate(value: unknown): Date {
     const date =
-        value instanceof Date ? new Date(value.getTime()) :
-        typeof value === 'string' ? new Date(value) :
-        typeof value === 'number' ? new Date(value) :
-        undefined
+      value instanceof Date ? new Date(value.getTime()) :
+      typeof value === 'string' ? new Date(value) :
+      typeof value === 'number' ? new Date(value) :
+      undefined
     assertValidation(!! date, 'Value could not be converted to a "Date"')
 
     if (isNaN(date.getTime())) throw new ValidationError('Invalid date')
