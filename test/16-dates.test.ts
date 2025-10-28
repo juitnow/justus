@@ -36,8 +36,8 @@ describe('Date validator', () => {
   it('should validate a timestamp', () => {
     const validator = date({ format: 'timestamp' })
 
-    expect(validate(validator, 0).getTime()).toEqual(0)
-    expect(validate(validator, new Date(0)).getTime()).toEqual(0)
+    expect(validate(validator, 123).getTime()).toEqual(123)
+    expect(validate(validator, new Date(123)).getTime()).toEqual(123)
 
     expect(() => validate(validator, 'Thu, 01 Jan 1970 00:00:00 GMT'))
         .toThrow((assert) => assert
@@ -46,6 +46,21 @@ describe('Date validator', () => {
               path: [], message: 'Timestamp is not a "number"',
             } ])))
   })
+
+  it('should validate a timestamp', () => {
+    const validator = date({ format: 'unix-timestamp' })
+
+    expect(validate(validator, 123).getTime()).toEqual(123_000)
+    expect(validate(validator, new Date(123)).getTime()).toEqual(123)
+
+    expect(() => validate(validator, 'Thu, 01 Jan 1970 00:00:00 GMT'))
+        .toThrow((assert) => assert
+            .toBeError(ValidationError, /^Found 1 validation error/)
+            .toHaveProperty('errors', expect.toMatchContents([ {
+              path: [], message: 'Unix Timestamp is not a "number"',
+            } ])))
+  })
+
 
   it('should validate a date within a range', () => {
     const v1 = date({ from: new Date(2000), until: new Date(3000) })
