@@ -3,6 +3,7 @@ import ts from 'typescript'
 
 import { assertSchema } from './errors'
 import { EAN13Validator, ean13 } from './extra/ean13'
+import { EmailValidator } from './extra/email'
 import { URLValidator, url } from './extra/url'
 import { UUIDValidator, uuid } from './extra/uuid'
 import { getValidator } from './utilities'
@@ -653,6 +654,14 @@ registerTypeGenerator(EAN13Validator, (_validator, _references, isInput) => {
   if (isInput) return ts.factory.createUnionTypeNode([ numberType, stringType ])
 
   const signature = ts.factory.createPropertySignature(undefined, '__ean_13', undefined, neverType)
+  const literal = ts.factory.createTypeLiteralNode([ signature ])
+  return ts.factory.createIntersectionTypeNode([ stringType, literal ])
+})
+
+registerTypeGenerator(EmailValidator, (_validator, _references, isInput) => {
+  if (isInput) return stringType
+
+  const signature = ts.factory.createPropertySignature(undefined, '__email', undefined, neverType)
   const literal = ts.factory.createTypeLiteralNode([ signature ])
   return ts.factory.createIntersectionTypeNode([ stringType, literal ])
 })

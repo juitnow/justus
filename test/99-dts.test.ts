@@ -28,6 +28,7 @@ import {
 } from '../src'
 import { generateDeclarations, generateTypes } from '../src/dts-generator'
 import { ean13, EAN13Validator } from '../src/extra/ean13'
+import { email, EmailValidator } from '../src/extra/email'
 import { url, URLValidator } from '../src/extra/url'
 import { uuid, UUIDValidator } from '../src/extra/uuid'
 
@@ -425,6 +426,18 @@ describe('DTS Generation', () => {
           .toStrictlyEqual('export type test = string & { __ean_13: never; };')
     })
 
+    it('email', () => {
+      expect(generateTypes({
+        test: email,
+      }).replace(/\s+/gm, ' ').trim())
+          .toStrictlyEqual('export type test = string & { __email: never; };')
+
+      expect(generateTypes({
+        test: new EmailValidator(),
+      }).replace(/\s+/gm, ' ').trim())
+          .toStrictlyEqual('export type test = string & { __email: never; };')
+    })
+
     it('url', () => {
       expect(generateTypes({
         test: url,
@@ -457,6 +470,16 @@ describe('DTS Generation', () => {
       expect(generateTypes({
         test: new EAN13Validator(),
       }, true)).toStrictlyEqual('export type test = number | string;')
+    })
+
+    it('email', () => {
+      expect(generateTypes({
+        test: email,
+      }, true)).toStrictlyEqual('export type test = string;')
+
+      expect(generateTypes({
+        test: new EmailValidator(),
+      }, true)).toStrictlyEqual('export type test = string;')
     })
 
     it('url', () => {
