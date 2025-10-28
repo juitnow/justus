@@ -1,6 +1,6 @@
 {
   "name": "justus",
-  "version": "0.5.98",
+  "version": "0.5.100",
   "description": "A JavaScript validation library, with types!",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -43,6 +43,16 @@
       "import": {
         "types": "./dist/extra/ean13.d.ts",
         "default": "./dist/extra/ean13.mjs"
+      }
+    },
+    "./extra/email": {
+      "require": {
+        "types": "./dist/extra/email.d.ts",
+        "default": "./dist/extra/email.cjs"
+      },
+      "import": {
+        "types": "./dist/extra/email.d.ts",
+        "default": "./dist/extra/email.mjs"
       }
     },
     "./extra/url": {
