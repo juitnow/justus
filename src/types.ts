@@ -263,11 +263,14 @@ export interface AdditionalProperties<V extends Validator | false> {
  * INFER OBJECT TYPE FROM SCHEMA                                              *
  * ========================================================================== */
 
+/** Utility type to "prettify" a type */
+type Prettify<T extends object> = { [ K in keyof T ]: T[K] } & {}
+
 /** Infer the type validated by a `Schema` */
 export type InferSchema<S> =
   S extends AdditionalProperties<Validator<infer V>> ?
-    { [ key in string ] : V } & InferSchema2<S> :
-    InferSchema2<S>
+    Prettify<{ [ key in string ] : V } & InferSchema2<S>> :
+    Prettify<InferSchema2<S>>
 
 /** Infer the property types described by a `Schema` */
 export type InferSchema2<S> = {
@@ -290,8 +293,8 @@ export type InferSchema2<S> = {
 /** Infer the input type compatible with a `Schema` */
 export type InferInputSchema<S> =
   S extends AdditionalProperties<Validator<any, infer X>> ?
-    { [ key in string ] : X } & InferInputSchema2<S> :
-    InferInputSchema2<S>
+    Prettify<{ [ key in string ] : X } & InferInputSchema2<S>> :
+    Prettify<InferInputSchema2<S>>
 
 /** Infer the input type of the properties described by a `Schema` */
 export type InferInputSchema2<S> = {
