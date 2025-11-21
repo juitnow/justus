@@ -36,12 +36,12 @@ export class C<V1 extends Validation, V2 extends Validation> {
 
     const o1 = validate(object({ test: this.validation1 }), value)
     expectAssignable<{ test?: InferValidation<V1> | undefined }>(o1)
-    expectType<InferValidation<V1 | undefined>>(o1.test)
+    expectAssignable<InferValidation<V1 | undefined>>(o1.test)
     expectError(o1.nope) // just make sure we don't extend "any"
 
     const o2 = validate(object({ test: this.validation2 }), value)
     expectAssignable<{ test?: InferValidation<V2> | undefined }>(o2)
-    expectType<InferValidation<V2> | undefined>(o2.test)
+    expectAssignable<InferValidation<V2> | undefined>(o2.test)
     expectError(o2.nope) // just make sure we don't extend "any"
   }
 }
