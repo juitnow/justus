@@ -5,6 +5,5 @@ on:
 
 jobs:
   build-pr:
-    name: Build Pull Request
     uses: juitnow/workflows-public/.github/workflows/build.yml@main
     secrets: inherit
