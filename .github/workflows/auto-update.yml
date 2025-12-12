@@ -12,3 +12,4 @@ jobs:
   auto-update:
     name: Automatic Updates
     uses: juitnow/workflows-public/.github/workflows/auto-update.yml@main
+    secrets: inherit
