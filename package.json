@@ -1,6 +1,6 @@
 {
   "name": "justus",
-  "version": "0.5.117",
+  "version": "0.5.118",
   "description": "A JavaScript validation library, with types!",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -88,8 +88,8 @@
   "author": "Juit Developers <developers@juit.com>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@plugjs/build": "^0.6.81",
-    "@plugjs/tsd": "^0.6.92",
+    "@plugjs/build": "^0.6.82",
+    "@plugjs/tsd": "^0.6.93",
     "typescript": "^5.9.3"
   },
   "directories": {
