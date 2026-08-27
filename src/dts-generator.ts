@@ -212,7 +212,7 @@ export function generateDeclarations(validations: Record<string, Validation>): s
     const inputDeclaration = ts.factory.createTypeAliasDeclaration(exportModifiers, input, [], inputAlias)
 
     /* Variable declaration type */
-    const variableDeclarationType = generateVariableDeclarationType(validation, validator, outputReferences)
+    const variableDeclarationType = generateVariableDeclarationType(validation, validator, outputReferences, inputReferences)
 
     /* Variable statement: export const myTypeValidator = ... */
     const variableDeclaration =
@@ -315,7 +315,8 @@ function generateJustusTypeImport(
 function generateVariableDeclarationType(
     validation: Validation,
     validator: Validator,
-    references: Map<Validator, string>,
+    outputReferences: Map<Validator, string>,
+    inputReferences: Map<Validator, string>,
 ): ts.TypeNode {
   /* Validation can be one of the following:
    * - validator
@@ -326,13 +327,14 @@ function generateVariableDeclarationType(
 
   /* This will take care of validators: import("justus").Validator<MyType> */
   if (isValidator(validation)) {
-    const validatedType = generateTypeNode(validator, references, false)
-    return generateJustusTypeImport('Validator', [ validatedType ])
+    const validatedType = generateTypeNode(validator, outputReferences, false)
+    const validatedInput = generateTypeNode(validator, inputReferences, true)
+    return generateJustusTypeImport('Validator', [ validatedType, validatedInput ])
   }
 
   /* This will take care of constants */
   if (validator instanceof ConstantValidator) {
-    return generateTypeNode(validator, references, false)
+    return generateTypeNode(validator, outputReferences, false)
   }
 
   /* This will take care of schemas */
@@ -341,7 +343,7 @@ function generateVariableDeclarationType(
 
     for (const [ key, valueValidator ] of validator.validators.entries()) {
       const value = validator.schema[key]
-      const type = generateVariableDeclarationType(value, valueValidator, references)
+      const type = generateVariableDeclarationType(value, valueValidator, outputReferences, inputReferences)
 
       properties.push(ts.factory.createPropertySignature(
           readonlyModifiers,
@@ -352,7 +354,7 @@ function generateVariableDeclarationType(
 
     if (validator.additionalProperties) {
       const additional = validator.additionalProperties
-      const type = generateVariableDeclarationType(additional, additional, references)
+      const type = generateVariableDeclarationType(additional, additional, outputReferences, inputReferences)
 
       properties.push(ts.factory.createPropertySignature(
           readonlyModifiers,

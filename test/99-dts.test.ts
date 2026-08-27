@@ -562,14 +562,14 @@ describe('DTS Generation', () => {
         /** Input type for {@link ean} */
         export type EanInput = number | string;
         /** The \`ean\` validator */
-        export const ean: import("justus").Validator<Ean>;
+        export const ean: import("justus").Validator<Ean, EanInput>;
         /* ----- description -------------------------------------------------------- */
         /** Validated type for {@link description} */
         export type Description = string;
         /** Input type for {@link description} */
         export type DescriptionInput = Description;
         /** The \`description\` validator */
-        export const description: import("justus").Validator<Description>;
+        export const description: import("justus").Validator<Description, DescriptionInput>;
         /* ----- productValidation -------------------------------------------------- */
         /** Validated type for {@link productValidation} */
         export type Product = {
@@ -587,11 +587,11 @@ describe('DTS Generation', () => {
         };
         /** The \`productValidation\` validator */
         export const productValidation: {
-            readonly ean: import("justus").Validator<Ean>;
-            readonly description: import("justus").Validator<Description>;
+            readonly ean: import("justus").Validator<Ean, EanInput>;
+            readonly description: import("justus").Validator<Description, DescriptionInput>;
             readonly price: import("justus").Validator<number & {
                 __brand_price: never;
-            }>;
+            }, number>;
         };
         /* ----- testValidator ------------------------------------------------------ */
         /** Validated type for {@link testValidator} */
@@ -599,7 +599,7 @@ describe('DTS Generation', () => {
         /** Input type for {@link testValidator} */
         export type TestInput = EanInput;
         /** The \`testValidator\` validator */
-        export const testValidator: import("justus").Validator<Ean>;`
+        export const testValidator: import("justus").Validator<Ean, EanInput>;`
           .split('\n').slice(1).map((s) => s.trim()))
     })
 
@@ -675,8 +675,8 @@ describe('DTS Generation', () => {
         export type MyObjectInput = MyObject;
         /** The \`myObjectValidator\` validator */
         export const myObjectValidator: {
-            readonly foo: import("justus").Validator<string>;
-            readonly [Symbol.justusAdditionalValidator]: import("justus").Validator<any>;
+            readonly foo: import("justus").Validator<string, string>;
+            readonly [Symbol.justusAdditionalValidator]: import("justus").Validator<any, any>;
         };`.split('\n').slice(1).map((s) => s.trim()))
     })
 
@@ -700,7 +700,7 @@ describe('DTS Generation', () => {
         export type MyObjectInput = MyObject;
         /** The \`myObjectValidator\` validator */
         export const myObjectValidator: {
-            readonly foo: import("justus").Validator<string>;
+            readonly foo: import("justus").Validator<string, string>;
         };`.split('\n').slice(1).map((s) => s.trim()))
     })
 
@@ -726,8 +726,8 @@ describe('DTS Generation', () => {
         export type MyObjectInput = MyObject;
         /** The \`myObjectValidator\` validator */
         export const myObjectValidator: {
-            readonly foo: import("justus").Validator<string>;
-            readonly [Symbol.justusAdditionalValidator]: import("justus").Validator<number>;
+            readonly foo: import("justus").Validator<string, string>;
+            readonly [Symbol.justusAdditionalValidator]: import("justus").Validator<number, number>;
         };`.split('\n').slice(1).map((s) => s.trim()))
     })
 
@@ -746,7 +746,7 @@ describe('DTS Generation', () => {
         /** Input type for {@link myTuple} */
         export type MyTupleInput = MyTuple;
         /** The \`myTuple\` validator */
-        export const myTuple: import("justus").Validator<MyTuple>;`
+        export const myTuple: import("justus").Validator<MyTuple, MyTupleInput>;`
           .split('\n').slice(1).map((s) => s.trim()))
     })
 
