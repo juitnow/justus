@@ -10,6 +10,7 @@ export default [
         createDefaultProgram: false,
         project: [
           './tsconfig.json',
+          './src/tsconfig.json',
           './test/tsconfig.json',
           './test-d/tsconfig.json',
         ],
