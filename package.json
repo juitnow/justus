@@ -1,79 +1,44 @@
 {
   "name": "justus",
-  "version": "0.5.145",
+  "version": "0.6.0",
   "description": "A JavaScript validation library, with types!",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.mjs",
+  "type": "module",
   "exports": {
     ".": {
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.mjs"
-      }
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
     },
     "./dts-generator": {
-      "require": {
-        "types": "./dist/dts-generator.d.ts",
-        "default": "./dist/dts-generator.cjs"
-      },
-      "import": {
-        "types": "./dist/dts-generator.d.ts",
-        "default": "./dist/dts-generator.mjs"
-      }
+      "types": "./dist/dts-generator.d.ts",
+      "require": "./dist/dts-generator.cjs",
+      "default": "./dist/dts-generator.mjs"
     },
     "./extra/arn": {
-      "require": {
-        "types": "./dist/extra/arn.d.ts",
-        "default": "./dist/extra/arn.cjs"
-      },
-      "import": {
-        "types": "./dist/extra/arn.d.ts",
-        "default": "./dist/extra/arn.mjs"
-      }
+      "types": "./dist/extra/arn.d.ts",
+      "require": "./dist/extra/arn.cjs",
+      "default": "./dist/extra/arn.mjs"
     },
     "./extra/ean13": {
-      "require": {
-        "types": "./dist/extra/ean13.d.ts",
-        "default": "./dist/extra/ean13.cjs"
-      },
-      "import": {
-        "types": "./dist/extra/ean13.d.ts",
-        "default": "./dist/extra/ean13.mjs"
-      }
+      "types": "./dist/extra/ean13.d.ts",
+      "require": "./dist/extra/ean13.cjs",
+      "default": "./dist/extra/ean13.mjs"
     },
     "./extra/email": {
-      "require": {
-        "types": "./dist/extra/email.d.ts",
-        "default": "./dist/extra/email.cjs"
-      },
-      "import": {
-        "types": "./dist/extra/email.d.ts",
-        "default": "./dist/extra/email.mjs"
-      }
+      "types": "./dist/extra/email.d.ts",
+      "require": "./dist/extra/email.cjs",
+      "default": "./dist/extra/email.mjs"
     },
     "./extra/url": {
-      "require": {
-        "types": "./dist/extra/url.d.ts",
-        "default": "./dist/extra/url.cjs"
-      },
-      "import": {
-        "types": "./dist/extra/url.d.ts",
-        "default": "./dist/extra/url.mjs"
-      }
+      "types": "./dist/extra/url.d.ts",
+      "require": "./dist/extra/url.cjs",
+      "default": "./dist/extra/url.mjs"
     },
     "./extra/uuid": {
-      "require": {
-        "types": "./dist/extra/uuid.d.ts",
-        "default": "./dist/extra/uuid.cjs"
-      },
-      "import": {
-        "types": "./dist/extra/uuid.d.ts",
-        "default": "./dist/extra/uuid.mjs"
-      }
+      "types": "./dist/extra/uuid.d.ts",
+      "require": "./dist/extra/uuid.cjs",
+      "default": "./dist/extra/uuid.mjs"
     }
   },
   "types": "./dist/index.d.ts",
