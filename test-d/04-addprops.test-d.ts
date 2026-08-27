@@ -8,7 +8,7 @@ import {
   object,
   string,
   validate,
-} from '../src'
+} from '../src/index.ts'
 
 printType('__file_marker__')
 
@@ -36,10 +36,10 @@ expectError(validate(object({
 
 // -------------------------------------------------------------------------- //
 
-expectType<null>(validate(object({ ...allowAdditionalProperties(null) }), null).extra)
-expectType<Record<string, any>>(validate(object({ ...allowAdditionalProperties(object) }), null).extra)
-expectType<number>(validate(object({ ...allowAdditionalProperties(number) }), null).extra)
-expectType<'hello'>(validate(object({ ...allowAdditionalProperties('hello') }), null).extra)
+expectType<null | undefined>(validate(object({ ...allowAdditionalProperties(null) }), null).extra)
+expectType<Record<string, any> | undefined>(validate(object({ ...allowAdditionalProperties(object) }), null).extra)
+expectType<number | undefined>(validate(object({ ...allowAdditionalProperties(number) }), null).extra)
+expectType<'hello' | undefined>(validate(object({ ...allowAdditionalProperties('hello') }), null).extra)
 
 // -------------------------------------------------------------------------- //
 // combining schemas
@@ -66,7 +66,7 @@ const o1 = validate(s1, null)
 expectType<number>(o1.a)
 expectType<string>(o1.b)
 expectType<string>(o1.c)
-expectType<boolean>(o1.extra)
+expectType<boolean | undefined>(o1.extra)
 
 const o2 = validate(s2, null)
 
@@ -107,4 +107,4 @@ expectType<number>(o5.a)
 expectType<never>(o5.b) // forcedly removed from the resulting object
 expectType<string>(o5.c)
 expectAssignable<{ a: number, b?: undefined, c: string } & { [ k in string ]: boolean }>(o5)
-expectType<boolean>(o5.extra) // defined in additionalProperties
+expectType<boolean | undefined>(o5.extra) // defined in additionalProperties

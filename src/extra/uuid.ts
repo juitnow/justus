@@ -1,4 +1,4 @@
-import { StringValidator } from '../validators/string'
+import { StringValidator } from '../validators/string.ts'
 
 export const UUID_EXPR = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -9,8 +9,8 @@ export class UUIDValidator extends StringValidator<UUIDString, string> {
     super({ minLength: 36, maxLength: 36, pattern: UUID_EXPR })
   }
 
-  validate(value: unknown): UUIDString
-  validate(value: unknown): string {
+  override validate(value: unknown): UUIDString
+  override validate(value: unknown): string {
     return super.validate(value).toLowerCase()
   }
 }

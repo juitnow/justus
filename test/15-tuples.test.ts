@@ -1,4 +1,4 @@
-import { boolean, number, object, string, tuple, validate, ValidationError } from '../src'
+import { boolean, number, object, string, tuple, validate, ValidationError } from '../src/index.ts'
 
 describe('Tuple validator', () => {
   it('should not validate non-arrays', () => {

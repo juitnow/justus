@@ -1,5 +1,5 @@
-import { ValidationError, validate } from '../src'
-import { uuid } from '../src/extra/uuid'
+import { uuid } from '../src/extra/uuid.ts'
+import { ValidationError, validate } from '../src/index.ts'
 
 describe('Extra UUID validator', () => {
   it('should validate and normalize an UUID', () => {

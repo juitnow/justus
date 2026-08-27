@@ -1,3 +1,8 @@
+import { generateDeclarations, generateTypes } from '../src/dts-generator.ts'
+import { ean13, EAN13Validator } from '../src/extra/ean13.ts'
+import { email, EmailValidator } from '../src/extra/email.ts'
+import { url, URLValidator } from '../src/extra/url.ts'
+import { uuid, UUIDValidator } from '../src/extra/uuid.ts'
 import {
   allOf,
   allowAdditionalProperties,
@@ -25,12 +30,7 @@ import {
   optional,
   string,
   tuple,
-} from '../src'
-import { generateDeclarations, generateTypes } from '../src/dts-generator'
-import { ean13, EAN13Validator } from '../src/extra/ean13'
-import { email, EmailValidator } from '../src/extra/email'
-import { url, URLValidator } from '../src/extra/url'
-import { uuid, UUIDValidator } from '../src/extra/uuid'
+} from '../src/index.ts'
 
 describe('DTS Generation', () => {
   describe('Validated types', () => {

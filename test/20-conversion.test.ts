@@ -1,4 +1,4 @@
-import { arrayOf, date, object, tuple, validate } from '../src'
+import { arrayOf, date, object, tuple, validate } from '../src/index.ts'
 
 describe('Type conversion', () => {
   it('should convert types in arrays', () => {
@@ -10,7 +10,7 @@ describe('Type conversion', () => {
 
     expect(tgt).toBeA('array').toHaveLength(1)
     expect(tgt[0]).toBeInstanceOf(Date)
-    expect(tgt[0].getTime()).toStrictlyEqual(0)
+    expect(tgt[0]!.getTime()).toStrictlyEqual(0)
   })
 
   it('should convert types in tuples', () => {

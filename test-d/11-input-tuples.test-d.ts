@@ -1,9 +1,9 @@
 import { expectType, printType } from 'tsd'
 
-import { date, tuple } from '../src'
-import { url } from '../src/extra/url'
+import { url } from '../src/extra/url.ts'
+import { date, tuple } from '../src/index.ts'
 
-import type { InferInput } from '../src'
+import type { InferInput } from '../src/index.ts'
 
 printType('__file_marker__')
 

@@ -10,8 +10,8 @@ import {
   object,
   string,
   validate,
-} from '../src'
-import { objectOf } from '../src/validators/object'
+} from '../src/index.ts'
+import { objectOf } from '../src/validators/object.ts'
 
 printType('__file_marker__')
 

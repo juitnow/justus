@@ -1,9 +1,9 @@
-import { assertSchema, assertValidation, ValidationErrorBuilder } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
-import { getValidator } from '../utilities'
-import { any } from './any'
+import { assertSchema, assertValidation, ValidationErrorBuilder } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
+import { getValidator } from '../utilities.ts'
+import { any } from './any.ts'
 
-import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types'
+import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types.ts'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *

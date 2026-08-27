@@ -1,4 +1,4 @@
-import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from '../src'
+import { arrayOf, number, object, oneOf, optional, string, StringValidator, strip, validate, ValidationError } from '../src/index.ts'
 
 describe('Object modifiers', () => {
   it('should validate a simple optional validation', () => {

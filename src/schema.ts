@@ -1,12 +1,12 @@
-import { getValidator } from './utilities'
-import { any } from './validators/any'
+import { getValidator } from './utilities.ts'
+import { any } from './validators/any.ts'
 
 import type {
   AdditionalProperties,
   InferValidation,
   Validation,
   Validator,
-} from './types'
+} from './types.ts'
 
 /* ========================================================================== *
  * ADDITIONAL PROPERTIES IN SCHEMAS                                           *

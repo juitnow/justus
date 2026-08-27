@@ -1,7 +1,7 @@
-import { assertSchema } from './errors'
-import { registry } from './registry'
+import { assertSchema } from './errors.ts'
+import { registry } from './registry.ts'
 
-import type { InferInput, InferValidation, Schema, Validation, Validator } from './types'
+import type { InferInput, InferValidation, Schema, Validation, Validator } from './types.ts'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *

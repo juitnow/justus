@@ -1,4 +1,4 @@
-import { allowAdditionalProperties, any, array, boolean, never, number, object, objectOf, optional, partial, string, strip, validate, ValidationError } from '../src'
+import { allowAdditionalProperties, any, array, boolean, never, number, object, objectOf, optional, partial, string, strip, validate, ValidationError } from '../src/index.ts'
 
 describe('Object validator', () => {
   it('should validate a generic object', () => {

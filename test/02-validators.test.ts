@@ -1,6 +1,6 @@
-import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, TupleValidator } from '../src'
+import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, TupleValidator } from '../src/index.ts'
 
-import type { Schema } from '../src'
+import type { Schema } from '../src/index.ts'
 
 describe('Validators', () => {
   const fakeValidator = new class extends AbstractValidator<never, never> {

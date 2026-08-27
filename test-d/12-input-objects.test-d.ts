@@ -1,5 +1,6 @@
 import { expectError, printType } from 'tsd'
 
+import { url } from '../src/extra/url.ts'
 import {
   allOf,
   date,
@@ -9,10 +10,9 @@ import {
   oneOf,
   optional,
   string,
-} from '../src'
-import { url } from '../src/extra/url'
+} from '../src/index.ts'
 
-import type { InferInput, Validation } from '../src'
+import type { InferInput, Validation } from '../src/index.ts'
 
 printType('__file_marker__')
 

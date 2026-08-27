@@ -1,6 +1,6 @@
 import { expectAssignable, expectType, printType } from 'tsd'
 
-import { boolean, number, object, string, tuple, validate } from '../src'
+import { boolean, number, object, string, tuple, validate } from '../src/index.ts'
 
 printType('__file_marker__')
 
@@ -56,8 +56,8 @@ expectAssignable<{ tuple: [ number, string, ...boolean[] ] }>(result1)
 expectType<[ number, string, ...boolean[] ]>(result1.tuple)
 expectType<number>(result1.tuple[0])
 expectType<string>(result1.tuple[1])
-expectType<boolean>(result1.tuple[2])
-expectType<boolean>(result1.tuple[9])
+expectType<boolean | undefined>(result1.tuple[2])
+expectType<boolean | undefined>(result1.tuple[9])
 
 const validator2 = object({
   tuple: [ 12345, 'foo', ...boolean ],
@@ -68,8 +68,8 @@ expectAssignable<{ tuple: [ 12345, 'foo', ...boolean[] ] }>(result2)
 expectType<[ 12345, 'foo', ...boolean[] ]>(result2.tuple)
 expectType<12345>(result2.tuple[0])
 expectType<'foo'>(result2.tuple[1])
-expectType<boolean>(result2.tuple[2])
-expectType<boolean>(result2.tuple[9])
+expectType<boolean | undefined>(result2.tuple[2])
+expectType<boolean | undefined>(result2.tuple[9])
 
 const validatorX = object({
   tuple: [ number, string, ...boolean ],
@@ -77,10 +77,10 @@ const validatorX = object({
 const resultX = validate(validatorX, null)
 expectAssignable<{ tuple: (number|string|boolean)[] }>(resultX)
 expectType<(number|string|boolean)[]>(resultX.tuple)
-expectType<number|string|boolean>(resultX.tuple[0])
-expectType<number|string|boolean>(resultX.tuple[1])
-expectType<number|string|boolean>(resultX.tuple[2])
-expectType<number|string|boolean>(resultX.tuple[9])
+expectType<number|string|boolean|undefined>(resultX.tuple[0])
+expectType<number|string|boolean|undefined>(resultX.tuple[1])
+expectType<number|string|boolean|undefined>(resultX.tuple[2])
+expectType<number|string|boolean|undefined>(resultX.tuple[9])
 
 // tuples in tuples
 const tuple1 = tuple([ string, number ] as const)
@@ -89,14 +89,14 @@ const result = validate(tuple2, null)
 
 expectType<'header'>(result[0])
 
-expectType<[ string, number ]>(result[1])
-expectType<[ string, number ]>(result[9])
+expectType<[ string, number ] | undefined>(result[1])
+expectType<[ string, number ] | undefined>(result[9])
 
-expectType<string>(result[1][0])
-expectType<number>(result[1][1])
+expectType<string|undefined>(result[1]?.[0])
+expectType<number|undefined>(result[1]?.[1])
 
-expectType<string>(result[9][0])
-expectType<number>(result[9][1])
+expectType<string|undefined>(result[9]?.[0])
+expectType<number|undefined>(result[9]?.[1])
 
 // objects in tuples
 const testObject = object({ foo: string })
@@ -117,8 +117,8 @@ const result4 = validate(tuple4, null)
 expectAssignable<[ string, ...({ foo: string })[]]>(result4)
 expectType<string>(result4[0])
 
-expectAssignable<{ foo: string }>(result4[1])
-expectType<string>(result4[1].foo)
+expectAssignable<{ foo: string } | undefined>(result4[1])
+expectType<string|undefined>(result4[1]?.foo)
 
-expectAssignable<{ foo: string }>(result4[999])
-expectType<string>(result4[999].foo)
+expectAssignable<{ foo: string } | undefined>(result4[999])
+expectType<string|undefined>(result4[999]?.foo)

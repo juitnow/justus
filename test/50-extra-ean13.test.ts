@@ -1,5 +1,5 @@
-import { ValidationError, validate } from '../src'
-import { ean13 } from '../src/extra/ean13'
+import { ean13 } from '../src/extra/ean13.ts'
+import { ValidationError, validate } from '../src/index.ts'
 
 describe('Extra EAN-13 Validator', () => {
   it('should validate all our EAN-13 codes', async () => {

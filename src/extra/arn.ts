@@ -1,5 +1,5 @@
-import { assertValidation } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
+import { assertValidation } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
 
 /*  ===== TYPES ============================================================= */
 

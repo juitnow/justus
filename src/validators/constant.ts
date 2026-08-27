@@ -1,8 +1,8 @@
-import { assertValidation } from '../errors'
-import { registry } from '../registry'
-import { AbstractValidator } from '../types'
+import { assertValidation } from '../errors.ts'
+import { registry } from '../registry.ts'
+import { AbstractValidator } from '../types.ts'
 
-import type { Validator } from '../types'
+import type { Validator } from '../types.ts'
 
 /** A `Validator` for _constants_. */
 export class ConstantValidator<T extends string | number | boolean | bigint | null> extends AbstractValidator<T> {

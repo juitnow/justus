@@ -1,10 +1,9 @@
-import { ValidationError, ValidationErrorBuilder } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
-import { ConstantValidator } from '../validators/constant'
-import { ObjectValidator } from '../validators/object'
+import { ValidationError, ValidationErrorBuilder } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
+import { ConstantValidator } from '../validators/constant.ts'
+import { ObjectValidator } from '../validators/object.ts'
 
-import type { ValidationOptions } from '..'
-import type { Schema, Validator } from '../types'
+import type { Schema, ValidationOptions, Validator } from '../types.ts'
 
 const KEYS: Exclude<keyof URLConstraints, 'searchParams'>[] = [
   'href',

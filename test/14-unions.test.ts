@@ -1,4 +1,4 @@
-import { allOf, number, oneOf, string, validate, ValidationError } from '../src'
+import { allOf, number, oneOf, string, validate, ValidationError } from '../src/index.ts'
 
 describe('Union validators', () => {
   it('should validate one of the given options', () => {

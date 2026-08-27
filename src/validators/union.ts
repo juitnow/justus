@@ -1,6 +1,6 @@
-import { assertSchema, ValidationErrorBuilder } from '../errors'
-import { AbstractValidator } from '../types'
-import { getValidator } from '../utilities'
+import { assertSchema, ValidationErrorBuilder } from '../errors.ts'
+import { AbstractValidator } from '../types.ts'
+import { getValidator } from '../utilities.ts'
 
 import type {
   InferInput,
@@ -8,7 +8,7 @@ import type {
   Validation,
   ValidationOptions,
   Validator,
-} from '../types'
+} from '../types.ts'
 
 /* -------------------------------------------------------------------------- */
 

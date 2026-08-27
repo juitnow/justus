@@ -1,5 +1,5 @@
-import { constant, optional, string, validate, ValidationError } from '../src'
-import { url } from '../src/extra/url'
+import { url } from '../src/extra/url.ts'
+import { constant, optional, string, validate, ValidationError } from '../src/index.ts'
 
 describe('URL validator', () => {
   it('should validate a simple URL', () => {

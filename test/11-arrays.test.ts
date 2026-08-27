@@ -1,4 +1,4 @@
-import { array, arrayOf, ArrayValidator, string, validate, ValidationError } from '../src'
+import { array, arrayOf, ArrayValidator, string, validate, ValidationError } from '../src/index.ts'
 
 describe('Array validator', () => {
   it('should validate an array', () => {

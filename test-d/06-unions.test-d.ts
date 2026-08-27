@@ -9,9 +9,9 @@ import {
   optional,
   string,
   validate,
-} from '../src'
+} from '../src/index.ts'
 
-import type { InferValidation, Validator } from '../src'
+import type { InferValidation, Validator } from '../src/index.ts'
 
 printType('__file_marker__')
 

@@ -1,4 +1,4 @@
-import { date, validate, ValidationError } from '../src'
+import { date, validate, ValidationError } from '../src/index.ts'
 
 describe('Date validator', () => {
   it('should validate a simple date', () => {

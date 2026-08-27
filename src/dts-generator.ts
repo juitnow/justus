@@ -1,28 +1,28 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import ts from 'typescript'
 
-import { assertSchema } from './errors'
-import { EAN13Validator, ean13 } from './extra/ean13'
-import { EmailValidator } from './extra/email'
-import { URLValidator, url } from './extra/url'
-import { UUIDValidator, uuid } from './extra/uuid'
-import { getValidator } from './utilities'
-import { AnyValidator, any } from './validators/any'
-import { AnyArrayValidator, ArrayValidator, array } from './validators/array'
-import { AnyBigIntValidator, BigIntValidator, bigint } from './validators/bigint'
-import { BooleanValidator, boolean } from './validators/boolean'
-import { ConstantValidator } from './validators/constant'
-import { DateValidator, date } from './validators/date'
-import { NeverValidator, never } from './validators/never'
-import { AnyNumberValidator, NumberValidator, number } from './validators/number'
-import { AnyObjectValidator, ObjectValidator, object } from './validators/object'
-import { OptionalValidator } from './validators/optional'
-import { AnyStringValidator, StringValidator, string } from './validators/string'
-import { TupleValidator } from './validators/tuple'
-import { AllOfValidator, OneOfValidator } from './validators/union'
+import { assertSchema } from './errors.ts'
+import { EAN13Validator, ean13 } from './extra/ean13.ts'
+import { EmailValidator } from './extra/email.ts'
+import { URLValidator, url } from './extra/url.ts'
+import { UUIDValidator, uuid } from './extra/uuid.ts'
+import { getValidator } from './utilities.ts'
+import { AnyValidator, any } from './validators/any.ts'
+import { AnyArrayValidator, ArrayValidator, array } from './validators/array.ts'
+import { AnyBigIntValidator, BigIntValidator, bigint } from './validators/bigint.ts'
+import { BooleanValidator, boolean } from './validators/boolean.ts'
+import { ConstantValidator } from './validators/constant.ts'
+import { DateValidator, date } from './validators/date.ts'
+import { NeverValidator, never } from './validators/never.ts'
+import { AnyNumberValidator, NumberValidator, number } from './validators/number.ts'
+import { AnyObjectValidator, ObjectValidator, object } from './validators/object.ts'
+import { OptionalValidator } from './validators/optional.ts'
+import { AnyStringValidator, StringValidator, string } from './validators/string.ts'
+import { TupleValidator } from './validators/tuple.ts'
+import { AllOfValidator, OneOfValidator } from './validators/union.ts'
 
 import type { TypeNode } from 'typescript'
-import type { Validation, Validator } from './types'
+import type { Validation, Validator } from './types.ts'
 
 /* Our "main" validators */
 const coreValidators = new Set<Validator>([
@@ -192,7 +192,7 @@ export function generateDeclarations(validations: Record<string, Validation>): s
     /* Get output and input types, asserting their existance */
     const outputType = outputTypes.get(output)
     const inputType = inputTypes.get(input)
-    const validation = validations[name]
+    const validation = validations[name]!
     const validator = outputValidators.get(output)
     assertSchema(!! outputType, `No output type "${output}" generated for validation "${name}"`)
     assertSchema(!! inputType, `No input type "${input}" generated for validation "${name}"`)
@@ -480,12 +480,12 @@ registerTypeGenerator(ArrayValidator, (validator, references, isInput) => {
   return ts.factory.createArrayTypeNode(itemType)
 })
 
-registerTypeGenerator(BigIntValidator, (validator: BigIntValidator, _references, isInput) => {
+registerTypeGenerator(BigIntValidator, (validator, _references, isInput) => {
   if (isInput) {
     const types: ts.TypeNode[] = [ bigintType ]
     if (validator.fromNumber) types.push(numberType)
     if (validator.fromString) types.push(stringType)
-    return types.length === 1 ? types[0] : ts.factory.createUnionTypeNode(types)
+    return types.length === 1 ? types[0]! : ts.factory.createUnionTypeNode(types)
   }
 
   if (! validator.brand) return bigintType

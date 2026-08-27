@@ -1,4 +1,4 @@
-import { AbstractValidator } from '../types'
+import { AbstractValidator } from '../types.ts'
 
 /** A `Validator` validating _anything_. */
 export class AnyValidator extends AbstractValidator<any> {

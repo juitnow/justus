@@ -1,7 +1,7 @@
-import { assertSchema, assertValidation, ValidationError } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
+import { assertSchema, assertValidation, ValidationError } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
 
-import type { Branding, Validator } from '../types'
+import type { Branding, Validator } from '../types.ts'
 
 /* ========================================================================== */
 
@@ -13,7 +13,7 @@ function countDecimals(n: number): number {
   const match = n.toExponential().match(/^\d+(\.\d+)?e([+-]\d+)$/)
   if (! match) throw new RangeError(`Can't calculate digits for number "${n}"`)
   // number of digits in the absolute value, minus whatever is the exp
-  const digits = ((match[1] || '.').length - 1) - (parseInt(match[2]))
+  const digits = ((match[1] || '.').length - 1) - (parseInt(match[2]!))
   return digits < 0 ? 0 : digits
 }
 

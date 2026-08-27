@@ -1,8 +1,8 @@
-import { assertSchema } from './errors'
+import { assertSchema } from './errors.ts'
 
-import type { ConstantValidator } from './validators/constant'
-import type { ObjectValidator } from './validators/object'
-import type { TupleValidator } from './validators/tuple'
+import type { ConstantValidator } from './validators/constant.ts'
+import type { ObjectValidator } from './validators/object.ts'
+import type { TupleValidator } from './validators/tuple.ts'
 
 type RegistryTypes = {
   constant: typeof ConstantValidator,

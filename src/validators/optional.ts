@@ -1,7 +1,7 @@
-import { AbstractValidator } from '../types'
-import { getValidator } from '../utilities'
+import { AbstractValidator } from '../types.ts'
+import { getValidator } from '../utilities.ts'
 
-import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types'
+import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types.ts'
 
 /**
  * A `Validator` for _optional_ properties (that is `type | undefined`).
@@ -12,7 +12,7 @@ export class OptionalValidator<
   D = undefined, // the default value (or undefined)
 > extends AbstractValidator<D extends undefined ? T | undefined : T, I | undefined> {
   validator: Validator<T>
-  defaultValue: T | undefined
+  override defaultValue: T | undefined
 
   constructor(validator: Validator<T>)
   constructor(validator: Validator<T>, defaultValue: D)

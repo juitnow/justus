@@ -1,4 +1,4 @@
-import { any, bigint, BigIntValidator, boolean, constant, number, NumberValidator, string, StringValidator, validate, ValidationError } from '../src'
+import { any, bigint, BigIntValidator, boolean, constant, number, NumberValidator, string, StringValidator, validate, ValidationError } from '../src/index.ts'
 
 describe('Primitive validators', () => {
   describe('any', () => {

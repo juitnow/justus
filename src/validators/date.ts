@@ -1,5 +1,5 @@
-import { assertSchema, assertValidation, ValidationError } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
+import { assertSchema, assertValidation, ValidationError } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
 
 /** Lifted from AngularJS: matches a valid RFC 3339 string. */
 const ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))?)?$/

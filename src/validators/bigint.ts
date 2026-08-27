@@ -1,7 +1,7 @@
-import { assertSchema, assertValidation, ValidationError } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
+import { assertSchema, assertValidation, ValidationError } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
 
-import type { Branding, Validator } from '../types'
+import type { Branding, Validator } from '../types.ts'
 
 /* ========================================================================== */
 

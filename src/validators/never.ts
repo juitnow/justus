@@ -1,11 +1,11 @@
-import { ValidationError } from '../errors'
-import { AbstractValidator } from '../types'
+import { ValidationError } from '../errors.ts'
+import { AbstractValidator } from '../types.ts'
 
-import type { ValidationOptions } from '../types'
+import type { ValidationOptions } from '../types.ts'
 
 /** A `Validator` validating _nothing_. */
 export class NeverValidator extends AbstractValidator<never> {
-  optional = true as const
+  override optional = true as const
 
   validate(value: unknown, options: ValidationOptions = {}): never {
     const { stripForbiddenProperties } = options

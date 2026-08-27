@@ -1,5 +1,5 @@
-import { ValidationError, validate } from '../src'
-import { arn, parseArn } from '../src/extra/arn'
+import { arn, parseArn } from '../src/extra/arn.ts'
+import { ValidationError, validate } from '../src/index.ts'
 
 describe('Extra UUID validator', () => {
   describe('Parsed ARNs', () => {

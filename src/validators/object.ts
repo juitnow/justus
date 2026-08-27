@@ -1,14 +1,14 @@
-import { assertValidation, ValidationErrorBuilder } from '../errors'
-import { registry } from '../registry'
-import { AbstractValidator, makeValidatorFactory } from '../types'
-import { getValidator } from '../utilities'
+import { assertValidation, ValidationErrorBuilder } from '../errors.ts'
+import { registry } from '../registry.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
+import { getValidator } from '../utilities.ts'
 
 import type {
   InferInputSchema,
   InferSchema, InferValidation, Schema, TupleRestParameter, Validation,
   ValidationOptions,
   Validator,
-} from '../types'
+} from '../types.ts'
 
 /* ========================================================================== *
  * OBJECT VALIDATOR                                                           *
@@ -37,7 +37,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
     if (additional) this.additionalProperties = additional
 
     for (const key of Object.keys(properties)) {
-      this.validators.set(key, getValidator(properties[key]))
+      this.validators.set(key, getValidator(properties[key]!))
     }
 
     this.schema = schema

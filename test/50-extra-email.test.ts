@@ -1,5 +1,5 @@
-import { ValidationError, validate } from '../src'
-import { email } from '../src/extra/email'
+import { email } from '../src/extra/email.ts'
+import { ValidationError, validate } from '../src/index.ts'
 
 describe('Extra Email validator', () => {
   it('should validate and normalize an email', () => {

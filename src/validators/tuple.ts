@@ -1,7 +1,7 @@
-import { assertValidation, ValidationError } from '../errors'
-import { registry } from '../registry'
-import { AbstractValidator } from '../types'
-import { getValidator } from '../utilities'
+import { assertValidation, ValidationError } from '../errors.ts'
+import { registry } from '../registry.ts'
+import { AbstractValidator } from '../types.ts'
+import { getValidator } from '../utilities.ts'
 
 import type {
   InferInputTuple,
@@ -11,7 +11,7 @@ import type {
   Validation,
   ValidationOptions,
   Validator,
-} from '../types'
+} from '../types.ts'
 
 export interface TupleMember {
   single: boolean, validator: Validator
@@ -54,20 +54,20 @@ export class TupleValidator<T extends Tuple> extends AbstractValidator<InferTupl
     const clone = new Array(value.length)
     let needle = 0
     let haystack = 0
-    let { single, validator } = this.members[needle]
+    let { single, validator } = this.members[needle]!
 
     while ((needle < this.members.length) && (haystack < value.length)) {
       try {
         clone[haystack] = validator.validate(value[haystack], options)
-        if (single) ({ single, validator } = this.members[++ needle] || {})
+        if (single) ({ single, validator } = this.members[++ needle]! || {})
         haystack ++
       } catch (error) {
         if (single) throw new ValidationError(error, [ haystack ])
-        else ({ single, validator } = this.members[++ needle] || {})
+        else ({ single, validator } = this.members[++ needle]! || {})
       }
     }
 
-    while ((needle < this.members.length) && (this.members[needle].single === false)) {
+    while ((needle < this.members.length) && (this.members[needle]!.single === false)) {
       needle ++
     }
 

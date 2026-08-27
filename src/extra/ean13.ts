@@ -1,5 +1,5 @@
-import { assertValidation } from '../errors'
-import { StringValidator } from '../validators/string'
+import { assertValidation } from '../errors.ts'
+import { StringValidator } from '../validators/string.ts'
 
 export type EAN13String = string & { __ean_13: never }
 
@@ -8,8 +8,8 @@ export class EAN13Validator extends StringValidator<EAN13String, string | number
     super({ minLength: 13, maxLength: 13, pattern: /^\d{13}$/ })
   }
 
-  validate(value: unknown): EAN13String
-  validate(value: unknown): string {
+  override validate(value: unknown): EAN13String
+  override validate(value: unknown): string {
     if (typeof value === 'number') value = `${value}`
     const ean13 = super.validate(value).toLowerCase()
 

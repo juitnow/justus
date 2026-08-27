@@ -16,7 +16,7 @@ export class ValidationError extends Error {
   /** An `Array` of validation errors encountered while validating */
   readonly errors!: ValidationErrors
   /** Our stack, always present as we enforce it in the constructor */
-  readonly stack!: string
+  override readonly stack!: string
 
   /**
    * Create a new `ValidationError` instance from a `ValidationErrorBuilder`

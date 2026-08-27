@@ -9,7 +9,7 @@ import {
   number,
   string,
   validate,
-} from '../src'
+} from '../src/index.ts'
 
 printType('__file_marker__')
 

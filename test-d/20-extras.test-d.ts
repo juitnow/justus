@@ -1,14 +1,14 @@
 import { expectType, printType } from 'tsd'
 
-import { validate } from '../src'
-import { arn, parseArn } from '../src/extra/arn'
-import { ean13 } from '../src/extra/ean13'
-import { uuid } from '../src/extra/uuid'
+import { arn, parseArn } from '../src/extra/arn.ts'
+import { ean13 } from '../src/extra/ean13.ts'
+import { uuid } from '../src/extra/uuid.ts'
+import { validate } from '../src/index.ts'
 
-import type { InferInput } from '../src'
-import type { ArnString, ParsedArn } from '../src/extra/arn'
-import type { EAN13String } from '../src/extra/ean13'
-import type { UUIDString } from '../src/extra/uuid'
+import type { ArnString, ParsedArn } from '../src/extra/arn.ts'
+import type { EAN13String } from '../src/extra/ean13.ts'
+import type { UUIDString } from '../src/extra/uuid.ts'
+import type { InferInput } from '../src/index.ts'
 
 printType('__file_marker__')
 

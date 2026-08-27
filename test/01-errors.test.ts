@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { assertSchema, assertValidation, ValidationError, ValidationErrorBuilder } from '../src'
+import { assertSchema, assertValidation, ValidationError, ValidationErrorBuilder } from '../src/index.ts'
 
 describe('Errors', () => {
   describe('ValidationError', () => {
