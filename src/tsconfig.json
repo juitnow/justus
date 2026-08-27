@@ -1,0 +1,15 @@
+{
+  // Inherit options from the root configuration file
+  "extends": "../tsconfig.json",
+  // Make sure we actually emit the transpiled files from here
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": false,
+    "declaration": true,
+    "sourceMap": true,
+    "declarationMap": true,
+    "outDir": "../dist"
+  },
+  // Only include what's in the sources here
+  "include": ["."]
+}
