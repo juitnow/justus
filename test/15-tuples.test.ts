@@ -126,4 +126,18 @@ describe('Tuple validator', () => {
     expect(validate(v1, [ 123, { foo: 'bar' }, { foo: 'baz' }, true ]))
         .toEqual([ 123, { foo: 'bar' }, { foo: 'baz' }, true ])
   })
+
+  it('should validate a straight tuple', () => {
+    const o1 = object({ foo: string } as const)
+    const v1 = [ number, ...o1, boolean ] as const
+
+    expect(validate(v1, [ 123, true ]))
+        .toEqual([ 123, true ])
+
+    expect(validate(v1, [ 123, { foo: 'bar' }, true ]))
+        .toEqual([ 123, { foo: 'bar' }, true ])
+
+    expect(validate(v1, [ 123, { foo: 'bar' }, { foo: 'baz' }, true ]))
+        .toEqual([ 123, { foo: 'bar' }, { foo: 'baz' }, true ])
+  })
 })
