@@ -750,9 +750,42 @@ describe('DTS Generation', () => {
           .split('\n').slice(1).map((s) => s.trim()))
     })
 
-    it('should fail generating a full type declaration including straight tuples', () => {
-      expect(() => generateDeclarations({ noTuples: [ string ] }))
-          .toThrowError(TypeError, 'Unable to generate variable declaration for TupleValidator')
+    it('should generate a full type declaration for straight tuples', () => {
+      const result1 = generateDeclarations({ myTuple: [ string ] })
+      log.info(result1)
+
+      expect(result1.split('\n').map((s) => s.trim())).toEqual(`
+        /* ----- myTuple ------------------------------------------------------------ */
+        /** Validated type for {@link myTuple} */
+        export type MyTuple = [
+          string
+        ];
+        /** Input type for {@link myTuple} */
+        export type MyTupleInput = MyTuple;
+        /** The \`myTuple\` validator */
+        export const myTuple: import("justus").Validator<MyTuple, MyTupleInput>;`
+          .split('\n').slice(1).map((s) => s.trim()))
+
+
+      const o = object({ foo: string } as const)
+      const result2 = generateDeclarations({ myTuple: [ number, ...o, boolean ] })
+      log.info(result2)
+
+      expect(result2.split('\n').map((s) => s.trim())).toEqual(`
+        /* ----- myTuple ------------------------------------------------------------ */
+        /** Validated type for {@link myTuple} */
+        export type MyTuple = [
+          number,
+          ...{
+            foo: string;
+          }[],
+          boolean
+        ];
+        /** Input type for {@link myTuple} */
+        export type MyTupleInput = MyTuple;
+        /** The \`myTuple\` validator */
+        export const myTuple: import("justus").Validator<MyTuple, MyTupleInput>;`
+          .split('\n').slice(1).map((s) => s.trim()))
     })
   })
 })

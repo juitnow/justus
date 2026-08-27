@@ -275,14 +275,15 @@ export function generateDeclarations(validations: Record<string, Validation>): s
  * VALIDATOR CONSTANT DECLARATIONS                                            *
  * ========================================================================== */
 
-/** Check if the specified Validation (or function) is a Validator */
-function isValidator(validation: Validation | Function): validation is Validator {
+/** Check if the specified Validation is a Validator */
+function isValidator(validation: Validation): validation is Validator {
   assertSchema(validation !== undefined, 'Found "undefined" validation in tree')
 
-  /* Accept only non-null objects or functions */
-  if (validation === null) return false
-  if ((typeof validation !== 'function') && (typeof validation !== 'object')) {
+  /* Accept only non-null objects */
+  if (typeof validation !== 'object') {
     return false
+  } else if (validation === null) {
+    return false  
   }
 
   /* Arrays (tuples) are never a validator */
@@ -290,11 +291,7 @@ function isValidator(validation: Validation | Function): validation is Validator
 
   /* We must have a "validate" function which is NOT a validator itself: this
    * is an edge case when a schema is defined as { validate: string } */
-  if (('validate' in validation) && (typeof validation.validate === 'function')) {
-    return ! isValidator(validation.validate)
-  } else {
-    return false
-  }
+  return ('validate' in validation) && (typeof validation.validate === 'function')
 }
 
 /** Generate an inline type import from "justus" */
@@ -369,8 +366,10 @@ function generateVariableDeclarationType(
     return ts.factory.createTypeLiteralNode(properties)
   }
 
-  /* Still to do: tuples */
-  assertSchema(false, `Unable to generate variable declaration for ${validator.constructor.name}`)
+  /* For anything else (including tuples) we use our generic validator handling */
+  const validatedType = generateTypeNode(validator, outputReferences, false)
+  const validatedInput = generateTypeNode(validator, inputReferences, true)
+  return generateJustusTypeImport('Validator', [ validatedType, validatedInput ])
 }
 
 /* ========================================================================== *
