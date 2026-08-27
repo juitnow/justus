@@ -283,7 +283,7 @@ function isValidator(validation: Validation): validation is Validator {
   if (typeof validation !== 'object') {
     return false
   } else if (validation === null) {
-    return false  
+    return false
   }
 
   /* Arrays (tuples) are never a validator */
