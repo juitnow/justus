@@ -23,7 +23,9 @@ const localBuild = plugjs({
     await this.transpile()
 
     banner('Testing type definitions')
-    await find('**/*.test-d.ts', { directory: 'test-d' }).tsd()
+    await find('**/*.test-d.ts', { directory: 'test-d' }).tsd({
+      cwd: 'test-d',
+    })
   },
 
   /** Text compilation of *dependant* packages */
