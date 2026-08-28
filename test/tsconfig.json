@@ -7,5 +7,5 @@
     "rootDir": ".."
   },
   // Include only tests, but exclude resources (intentionally broken)
-  "include": ["."],
+  "include": ["."]
 }

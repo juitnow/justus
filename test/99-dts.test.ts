@@ -35,471 +35,713 @@ import {
 describe('DTS Generation', () => {
   describe('Validated types', () => {
     it('should generate the validated type for some basic types', () => {
-      expect(generateTypes({
-        test: any,
-      })).toStrictlyEqual('export type test = any;')
+      expect(
+        generateTypes({
+          test: any,
+        }),
+      ).toStrictlyEqual('export type test = any;')
 
-      expect(generateTypes({
-        test: array,
-      })).toStrictlyEqual('export type test = any[];')
+      expect(
+        generateTypes({
+          test: array,
+        }),
+      ).toStrictlyEqual('export type test = any[];')
 
-      expect(generateTypes({
-        test: number,
-      })).toStrictlyEqual('export type test = number;')
+      expect(
+        generateTypes({
+          test: number,
+        }),
+      ).toStrictlyEqual('export type test = number;')
 
-      expect(generateTypes({
-        test: object,
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { [key in string]: any; };')
+      expect(
+        generateTypes({
+          test: object,
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { [key in string]: any; };')
 
-      expect(generateTypes({
-        test: string,
-      })).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes({
+          test: string,
+        }),
+      ).toStrictlyEqual('export type test = string;')
 
-      expect(generateTypes({
-        test: boolean,
-      })).toStrictlyEqual('export type test = boolean;')
+      expect(
+        generateTypes({
+          test: boolean,
+        }),
+      ).toStrictlyEqual('export type test = boolean;')
 
-      expect(generateTypes({
-        test: bigint,
-      })).toStrictlyEqual('export type test = bigint;')
+      expect(
+        generateTypes({
+          test: bigint,
+        }),
+      ).toStrictlyEqual('export type test = bigint;')
 
-      expect(generateTypes({
-        test: date,
-      })).toStrictlyEqual('export type test = Date;')
+      expect(
+        generateTypes({
+          test: date,
+        }),
+      ).toStrictlyEqual('export type test = Date;')
 
-      expect(generateTypes({
-        test: never,
-      })).toStrictlyEqual('export type test = undefined;')
+      expect(
+        generateTypes({
+          test: never,
+        }),
+      ).toStrictlyEqual('export type test = undefined;')
     })
 
     it('should generate the validated type for some basic validators', () => {
-      expect(generateTypes({
-        test: new AnyValidator(),
-      })).toStrictlyEqual('export type test = any;')
+      expect(
+        generateTypes({
+          test: new AnyValidator(),
+        }),
+      ).toStrictlyEqual('export type test = any;')
 
-      expect(generateTypes({
-        test: new AnyArrayValidator(),
-      })).toStrictlyEqual('export type test = any[];')
+      expect(
+        generateTypes({
+          test: new AnyArrayValidator(),
+        }),
+      ).toStrictlyEqual('export type test = any[];')
 
-      expect(generateTypes({
-        test: new AnyBigIntValidator(),
-      })).toStrictlyEqual('export type test = bigint;')
+      expect(
+        generateTypes({
+          test: new AnyBigIntValidator(),
+        }),
+      ).toStrictlyEqual('export type test = bigint;')
 
-      expect(generateTypes({
-        test: new AnyNumberValidator(),
-      })).toStrictlyEqual('export type test = number;')
+      expect(
+        generateTypes({
+          test: new AnyNumberValidator(),
+        }),
+      ).toStrictlyEqual('export type test = number;')
 
-      expect(generateTypes({
-        test: new AnyObjectValidator(),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { [key in string]: any; };')
+      expect(
+        generateTypes({
+          test: new AnyObjectValidator(),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { [key in string]: any; };')
 
-      expect(generateTypes({
-        test: new AnyStringValidator(),
-      })).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes({
+          test: new AnyStringValidator(),
+        }),
+      ).toStrictlyEqual('export type test = string;')
 
-      expect(generateTypes({
-        test: new BooleanValidator(),
-      })).toStrictlyEqual('export type test = boolean;')
+      expect(
+        generateTypes({
+          test: new BooleanValidator(),
+        }),
+      ).toStrictlyEqual('export type test = boolean;')
 
-      expect(generateTypes({
-        test: new BigIntValidator(),
-      })).toStrictlyEqual('export type test = bigint;')
+      expect(
+        generateTypes({
+          test: new BigIntValidator(),
+        }),
+      ).toStrictlyEqual('export type test = bigint;')
 
-      expect(generateTypes({
-        test: new DateValidator(),
-      })).toStrictlyEqual('export type test = Date;')
+      expect(
+        generateTypes({
+          test: new DateValidator(),
+        }),
+      ).toStrictlyEqual('export type test = Date;')
 
-      expect(generateTypes({
-        test: new NeverValidator(),
-      })).toStrictlyEqual('export type test = undefined;')
+      expect(
+        generateTypes({
+          test: new NeverValidator(),
+        }),
+      ).toStrictlyEqual('export type test = undefined;')
     })
 
     it('should generate the validated type for arrays', () => {
-      expect(generateTypes({
-        test: array,
-      })).toStrictlyEqual('export type test = any[];')
+      expect(
+        generateTypes({
+          test: array,
+        }),
+      ).toStrictlyEqual('export type test = any[];')
 
-      expect(generateTypes({
-        test: arrayOf(string),
-      })).toStrictlyEqual('export type test = string[];')
+      expect(
+        generateTypes({
+          test: arrayOf(string),
+        }),
+      ).toStrictlyEqual('export type test = string[];')
 
-      expect(generateTypes({
-        test: arrayOf(url),
-      })).toStrictlyEqual('export type test = URL[];')
+      expect(
+        generateTypes({
+          test: arrayOf(url),
+        }),
+      ).toStrictlyEqual('export type test = URL[];')
     })
 
     it('should generate the validated type for constants', () => {
-      expect(generateTypes({
-        test: 'a string',
-      })).toStrictlyEqual('export type test = "a string";')
+      expect(
+        generateTypes({
+          test: 'a string',
+        }),
+      ).toStrictlyEqual('export type test = "a string";')
 
-      expect(generateTypes({
-        test: 12345,
-      })).toStrictlyEqual('export type test = 12345;')
+      expect(
+        generateTypes({
+          test: 12345,
+        }),
+      ).toStrictlyEqual('export type test = 12345;')
 
-      expect(generateTypes({
-        test: 1234n,
-      })).toStrictlyEqual('export type test = 1234n;')
+      expect(
+        generateTypes({
+          test: 1234n,
+        }),
+      ).toStrictlyEqual('export type test = 1234n;')
 
-      expect(generateTypes({
-        test: false,
-      })).toStrictlyEqual('export type test = false;')
+      expect(
+        generateTypes({
+          test: false,
+        }),
+      ).toStrictlyEqual('export type test = false;')
 
-      expect(generateTypes({
-        test: true,
-      })).toStrictlyEqual('export type test = true;')
+      expect(
+        generateTypes({
+          test: true,
+        }),
+      ).toStrictlyEqual('export type test = true;')
 
-      expect(generateTypes({
-        test: null,
-      })).toStrictlyEqual('export type test = null;')
+      expect(
+        generateTypes({
+          test: null,
+        }),
+      ).toStrictlyEqual('export type test = null;')
 
-      expect(() => generateTypes({
-        test: constant(<any> { toString: () => 'foo' }),
-      })).toThrowError(TypeError, 'Invalid constant "foo"')
+      expect(() =>
+        generateTypes({
+          test: constant(<any>{ toString: () => 'foo' }),
+        }),
+      ).toThrowError(TypeError, 'Invalid constant "foo"')
     })
 
     it('should generate the validated type for (branded) bigints', () => {
-      expect(generateTypes({
-        test: bigint({}),
-      })).toStrictlyEqual('export type test = bigint;')
+      expect(
+        generateTypes({
+          test: bigint({}),
+        }),
+      ).toStrictlyEqual('export type test = bigint;')
 
-      expect(generateTypes({
-        test: bigint({ brand: 'foo' }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = bigint & { __brand_foo: never; };')
+      expect(
+        generateTypes({
+          test: bigint({ brand: 'foo' }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = bigint & { __brand_foo: never; };')
     })
 
     it('should generate the validated type for (branded) numbers', () => {
-      expect(generateTypes({
-        test: number({}),
-      })).toStrictlyEqual('export type test = number;')
+      expect(
+        generateTypes({
+          test: number({}),
+        }),
+      ).toStrictlyEqual('export type test = number;')
 
-      expect(generateTypes({
-        test: number({ brand: 'foo' }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = number & { __brand_foo: never; };')
+      expect(
+        generateTypes({
+          test: number({ brand: 'foo' }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = number & { __brand_foo: never; };')
     })
 
     it('should generate the validated type for (branded) strings', () => {
-      expect(generateTypes({
-        test: string({}),
-      })).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes({
+          test: string({}),
+        }),
+      ).toStrictlyEqual('export type test = string;')
 
-      expect(generateTypes({
-        test: string({ brand: 'foo' }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = string & { __brand_foo: never; };')
+      expect(
+        generateTypes({
+          test: string({ brand: 'foo' }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = string & { __brand_foo: never; };')
     })
 
     it('should generate the validated type for tuples', () => {
-      expect(generateTypes({
-        test: [],
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = [ ];')
+      expect(
+        generateTypes({
+          test: [],
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = [ ];')
 
-      expect(generateTypes({
-        test: [ number, string, boolean ],
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = [ number, string, boolean ];')
+      expect(
+        generateTypes({
+          test: [number, string, boolean],
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = [ number, string, boolean ];')
 
-      expect(generateTypes({
-        test: [ 12345, 'foo', null ],
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = [ 12345, "foo", null ];')
+      expect(
+        generateTypes({
+          test: [12345, 'foo', null],
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = [ 12345, "foo", null ];')
 
-      expect(generateTypes({
-        test: [ number, ...string, boolean ],
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = [ number, ...string[], boolean ];')
+      expect(
+        generateTypes({
+          test: [number, ...string, boolean],
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = [ number, ...string[], boolean ];')
 
       // combine types in unions when multiple rest parameters exist..
 
-      expect(generateTypes({
-        test: [ ...number, string, ...boolean ],
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = [ ...(number | string | boolean)[] ];')
+      expect(
+        generateTypes({
+          test: [...number, string, ...boolean],
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = [ ...(number | string | boolean)[] ];')
 
-      expect(generateTypes({
-        test: [ 'foo', ...number, string, ...boolean, 'bar' ],
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = [ "foo", ...(number | string | boolean)[], "bar" ];')
+      expect(
+        generateTypes({
+          test: ['foo', ...number, string, ...boolean, 'bar'],
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = [ "foo", ...(number | string | boolean)[], "bar" ];')
     })
 
     it('should generate the validated type for unions', () => {
-      expect(generateTypes({
-        test: allOf(string, number, boolean),
-      })).toStrictlyEqual('export type test = string & number & boolean;')
+      expect(
+        generateTypes({
+          test: allOf(string, number, boolean),
+        }),
+      ).toStrictlyEqual('export type test = string & number & boolean;')
 
-      expect(generateTypes({
-        test: oneOf(string, number, boolean),
-      })).toStrictlyEqual('export type test = string | number | boolean;')
+      expect(
+        generateTypes({
+          test: oneOf(string, number, boolean),
+        }),
+      ).toStrictlyEqual('export type test = string | number | boolean;')
     })
 
     it('should generate the validated type for optionals', () => {
-      expect(generateTypes({
-        hasDefault: optional(string, 'foobar'),
-        noDefault: optional(number),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type hasDefault = string; export type noDefault = number | undefined;')
+      expect(
+        generateTypes({
+          hasDefault: optional(string, 'foobar'),
+          noDefault: optional(number),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type hasDefault = string; export type noDefault = number | undefined;')
 
-      expect(generateTypes({
-        test: {
-          hasDefault: optional(oneOf('foo', 'bar'), 'foo'),
-          noDefault: optional(oneOf('foo', 'bar')),
-        },
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { hasDefault: "foo" | "bar"; noDefault?: "foo" | "bar" | undefined; };')
+      expect(
+        generateTypes({
+          test: {
+            hasDefault: optional(oneOf('foo', 'bar'), 'foo'),
+            noDefault: optional(oneOf('foo', 'bar')),
+          },
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { hasDefault: "foo" | "bar"; noDefault?: "foo" | "bar" | undefined; };')
     })
 
     it('should generate the validated type for optionals in input mode', () => {
-      expect(generateTypes({
-        hasDefault: optional(string, 'foobar'),
-        noDefault: optional(number),
-      }, true).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type hasDefault = string | undefined; export type noDefault = number | undefined;')
+      expect(
+        generateTypes(
+          {
+            hasDefault: optional(string, 'foobar'),
+            noDefault: optional(number),
+          },
+          true,
+        ).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type hasDefault = string | undefined; export type noDefault = number | undefined;')
 
-      expect(generateTypes({
-        test: {
-          hasDefault: optional(oneOf('foo', 'bar'), 'foo'),
-          noDefault: optional(oneOf('foo', 'bar')),
-        },
-      }, true).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { hasDefault?: "foo" | "bar" | undefined; noDefault?: "foo" | "bar" | undefined; };')
+      expect(
+        generateTypes(
+          {
+            test: {
+              hasDefault: optional(oneOf('foo', 'bar'), 'foo'),
+              noDefault: optional(oneOf('foo', 'bar')),
+            },
+          },
+          true,
+        ).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual(
+        'export type test = { hasDefault?: "foo" | "bar" | undefined; noDefault?: "foo" | "bar" | undefined; };',
+      )
     })
 
     it('should generate the validated type for objects', () => {
-      expect(generateTypes({
-        test: object,
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { [key in string]: any; };')
+      expect(
+        generateTypes({
+          test: object,
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { [key in string]: any; };')
 
-      expect(generateTypes({
-        test: object({}),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = {};')
+      expect(
+        generateTypes({
+          test: object({}),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = {};')
 
-      expect(generateTypes({
-        test: object({
-          s: string,
-          n: number,
-          b: boolean,
-          x: null,
-        }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { s: string; n: number; b: boolean; x: null; };')
+      expect(
+        generateTypes({
+          test: object({
+            s: string,
+            n: number,
+            b: boolean,
+            x: null,
+          }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { s: string; n: number; b: boolean; x: null; };')
 
-      expect(generateTypes({
-        test: object({
-          n: optional(number),
-          x: never,
-        }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { n?: number | undefined; x?: undefined; };')
+      expect(
+        generateTypes({
+          test: object({
+            n: optional(number),
+            x: never,
+          }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { n?: number | undefined; x?: undefined; };')
 
-      expect(generateTypes({
-        test: object({
-          s: string,
-          ...allowAdditionalProperties,
-        }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { s: string; } & { [key in string]: any; };')
+      expect(
+        generateTypes({
+          test: object({
+            s: string,
+            ...allowAdditionalProperties,
+          }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { s: string; } & { [key in string]: any; };')
 
-      expect(generateTypes({
-        test: object({
-          s: string,
-          ...allowAdditionalProperties(),
-        }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { s: string; } & { [key in string]: any; };')
+      expect(
+        generateTypes({
+          test: object({
+            s: string,
+            ...allowAdditionalProperties(),
+          }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { s: string; } & { [key in string]: any; };')
 
-      expect(generateTypes({
-        test: object({
-          s: string,
-          ...allowAdditionalProperties(number),
-        }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { s: string; } & { [key in string]: number; };')
+      expect(
+        generateTypes({
+          test: object({
+            s: string,
+            ...allowAdditionalProperties(number),
+          }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { s: string; } & { [key in string]: number; };')
 
-      expect(generateTypes({
-        test: object({
-          ...allowAdditionalProperties(number),
-        }),
-      }).replace(/\s+/gm, ' '))
-          .toStrictlyEqual('export type test = { [key in string]: number; };')
+      expect(
+        generateTypes({
+          test: object({
+            ...allowAdditionalProperties(number),
+          }),
+        }).replace(/\s+/gm, ' '),
+      ).toStrictlyEqual('export type test = { [key in string]: number; };')
     })
   })
 
   describe('Input types', () => {
     it('should generate the input type for booleans', () => {
-      expect(generateTypes({
-        test: boolean,
-      }, true)).toStrictlyEqual('export type test = boolean;')
+      expect(
+        generateTypes(
+          {
+            test: boolean,
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = boolean;')
 
-      expect(generateTypes({
-        test: boolean({ fromString: true }),
-      }, true)).toStrictlyEqual('export type test = boolean | "true" | "false";')
+      expect(
+        generateTypes(
+          {
+            test: boolean({ fromString: true }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = boolean | "true" | "false";')
     })
 
     it('should generate the input type for arrays', () => {
-      expect(generateTypes({
-        test: array,
-      }, true)).toStrictlyEqual('export type test = any[];')
+      expect(
+        generateTypes(
+          {
+            test: array,
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = any[];')
 
-      expect(generateTypes({
-        test: arrayOf(string),
-      }, true)).toStrictlyEqual('export type test = string[];')
+      expect(
+        generateTypes(
+          {
+            test: arrayOf(string),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string[];')
 
-      expect(generateTypes({
-        test: arrayOf(url),
-      }, true)).toStrictlyEqual('export type test = (URL | string)[];')
+      expect(
+        generateTypes(
+          {
+            test: arrayOf(url),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = (URL | string)[];')
     })
 
     it('should generate the input type for (branded) bigints', () => {
-      expect(generateTypes({
-        test: bigint({}),
-      }, true)).toStrictlyEqual('export type test = bigint | number;')
+      expect(
+        generateTypes(
+          {
+            test: bigint({}),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = bigint | number;')
 
-      expect(generateTypes({
-        test: bigint({ fromString: true }),
-      }, true)).toStrictlyEqual('export type test = bigint | number | string;')
+      expect(
+        generateTypes(
+          {
+            test: bigint({ fromString: true }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = bigint | number | string;')
 
-      expect(generateTypes({
-        test: bigint({ fromNumber: false }),
-      }, true)).toStrictlyEqual('export type test = bigint;')
+      expect(
+        generateTypes(
+          {
+            test: bigint({ fromNumber: false }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = bigint;')
 
-      expect(generateTypes({
-        test: bigint({ brand: 'foo' }),
-      }, true)).toStrictlyEqual('export type test = bigint | number;')
+      expect(
+        generateTypes(
+          {
+            test: bigint({ brand: 'foo' }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = bigint | number;')
     })
 
     it('should generate the input type for (branded) numbers', () => {
-      expect(generateTypes({
-        test: number({}),
-      }, true)).toStrictlyEqual('export type test = number;')
+      expect(
+        generateTypes(
+          {
+            test: number({}),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = number;')
 
-      expect(generateTypes({
-        test: number({ fromString: true }),
-      }, true)).toStrictlyEqual('export type test = number | string;')
+      expect(
+        generateTypes(
+          {
+            test: number({ fromString: true }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = number | string;')
 
-      expect(generateTypes({
-        test: number({ brand: 'foo' }),
-      }, true)).toStrictlyEqual('export type test = number;')
+      expect(
+        generateTypes(
+          {
+            test: number({ brand: 'foo' }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = number;')
     })
 
     it('should generate the input type for (branded) strings', () => {
-      expect(generateTypes({
-        test: string({}),
-      }, true)).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes(
+          {
+            test: string({}),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string;')
 
-      expect(generateTypes({
-        test: string({ brand: 'foo' }),
-      }, true)).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes(
+          {
+            test: string({ brand: 'foo' }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string;')
     })
 
     it('should generate the input type for dates', () => {
-      expect(generateTypes({
-        test: date,
-      }, true)).toStrictlyEqual('export type test = Date | number | string;')
+      expect(
+        generateTypes(
+          {
+            test: date,
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = Date | number | string;')
 
-      expect(generateTypes({
-        test: date({ format: 'iso' }),
-      }, true)).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes(
+          {
+            test: date({ format: 'iso' }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string;')
 
-      expect(generateTypes({
-        test: date({ format: 'timestamp' }),
-      }, true)).toStrictlyEqual('export type test = number;')
+      expect(
+        generateTypes(
+          {
+            test: date({ format: 'timestamp' }),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = number;')
     })
   })
 
   describe('Extra validators', () => {
     it('ean 13', () => {
-      expect(generateTypes({
-        test: ean13,
-      }).replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual('export type test = string & { __ean_13: never; };')
+      expect(
+        generateTypes({
+          test: ean13,
+        })
+          .replace(/\s+/gm, ' ')
+          .trim(),
+      ).toStrictlyEqual('export type test = string & { __ean_13: never; };')
 
-      expect(generateTypes({
-        test: new EAN13Validator(),
-      }).replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual('export type test = string & { __ean_13: never; };')
+      expect(
+        generateTypes({
+          test: new EAN13Validator(),
+        })
+          .replace(/\s+/gm, ' ')
+          .trim(),
+      ).toStrictlyEqual('export type test = string & { __ean_13: never; };')
     })
 
     it('email', () => {
-      expect(generateTypes({
-        test: email,
-      }).replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual('export type test = string & { __email: never; };')
+      expect(
+        generateTypes({
+          test: email,
+        })
+          .replace(/\s+/gm, ' ')
+          .trim(),
+      ).toStrictlyEqual('export type test = string & { __email: never; };')
 
-      expect(generateTypes({
-        test: new EmailValidator(),
-      }).replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual('export type test = string & { __email: never; };')
+      expect(
+        generateTypes({
+          test: new EmailValidator(),
+        })
+          .replace(/\s+/gm, ' ')
+          .trim(),
+      ).toStrictlyEqual('export type test = string & { __email: never; };')
     })
 
     it('url', () => {
-      expect(generateTypes({
-        test: url,
-      })).toStrictlyEqual('export type test = URL;')
+      expect(
+        generateTypes({
+          test: url,
+        }),
+      ).toStrictlyEqual('export type test = URL;')
 
-      expect(generateTypes({
-        test: new URLValidator(),
-      })).toStrictlyEqual('export type test = URL;')
+      expect(
+        generateTypes({
+          test: new URLValidator(),
+        }),
+      ).toStrictlyEqual('export type test = URL;')
     })
 
     it('uuid', () => {
-      expect(generateTypes({
-        test: uuid,
-      }).replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual('export type test = string & { __uuid: never; };')
+      expect(
+        generateTypes({
+          test: uuid,
+        })
+          .replace(/\s+/gm, ' ')
+          .trim(),
+      ).toStrictlyEqual('export type test = string & { __uuid: never; };')
 
-      expect(generateTypes({
-        test: new UUIDValidator(),
-      }).replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual('export type test = string & { __uuid: never; };')
+      expect(
+        generateTypes({
+          test: new UUIDValidator(),
+        })
+          .replace(/\s+/gm, ' ')
+          .trim(),
+      ).toStrictlyEqual('export type test = string & { __uuid: never; };')
     })
   })
 
   describe('Extra validators input types', () => {
     it('ean 13', () => {
-      expect(generateTypes({
-        test: ean13,
-      }, true)).toStrictlyEqual('export type test = number | string;')
+      expect(
+        generateTypes(
+          {
+            test: ean13,
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = number | string;')
 
-      expect(generateTypes({
-        test: new EAN13Validator(),
-      }, true)).toStrictlyEqual('export type test = number | string;')
+      expect(
+        generateTypes(
+          {
+            test: new EAN13Validator(),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = number | string;')
     })
 
     it('email', () => {
-      expect(generateTypes({
-        test: email,
-      }, true)).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes(
+          {
+            test: email,
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string;')
 
-      expect(generateTypes({
-        test: new EmailValidator(),
-      }, true)).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes(
+          {
+            test: new EmailValidator(),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string;')
     })
 
     it('url', () => {
-      expect(generateTypes({
-        test: url,
-      }, true)).toStrictlyEqual('export type test = URL | string;')
+      expect(
+        generateTypes(
+          {
+            test: url,
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = URL | string;')
 
-      expect(generateTypes({
-        test: new URLValidator(),
-      }, true)).toStrictlyEqual('export type test = URL | string;')
+      expect(
+        generateTypes(
+          {
+            test: new URLValidator(),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = URL | string;')
     })
 
     it('uuid', () => {
-      expect(generateTypes({
-        test: uuid,
-      }, true)).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes(
+          {
+            test: uuid,
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string;')
 
-      expect(generateTypes({
-        test: new UUIDValidator(),
-      }, true)).toStrictlyEqual('export type test = string;')
+      expect(
+        generateTypes(
+          {
+            test: new UUIDValidator(),
+          },
+          true,
+        ),
+      ).toStrictlyEqual('export type test = string;')
     })
   })
 
@@ -523,14 +765,12 @@ describe('DTS Generation', () => {
           description: description;
         };
         export type description = string;`
-          .replace(/\s+/gm, ' ').trim()
+        .replace(/\s+/gm, ' ')
+        .trim()
 
       // run our little test...
-      expect(generateTypes({ ean, product, description })
-          .replace(/\s+/gm, ' ').trim())
-          .toStrictlyEqual(expected)
+      expect(generateTypes({ ean, product, description }).replace(/\s+/gm, ' ').trim()).toStrictlyEqual(expected)
     })
-
 
     it('should generate a full type declaration', () => {
       // this will be exported...
@@ -553,7 +793,8 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- ean ---------------------------------------------------------------- */
         /** Validated type for {@link ean} */
         export type Ean = string & {
@@ -600,7 +841,10 @@ describe('DTS Generation', () => {
         export type TestInput = EanInput;
         /** The \`testValidator\` validator */
         export const testValidator: import("justus").Validator<Ean, EanInput>;`
-          .split('\n').slice(1).map((s) => s.trim()))
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
     })
 
     it('should generate a full type declaration for constants', () => {
@@ -614,7 +858,8 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- nullValidator ------------------------------------------------------ */
         /** Validated type for {@link nullValidator} */
         export type Null = null;
@@ -650,7 +895,10 @@ describe('DTS Generation', () => {
         export type FalseInput = False;
         /** The \`falseValidator\` validator */
         export const falseValidator: False;`
-          .split('\n').slice(1).map((s) => s.trim()))
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
     })
 
     it('should generate a full type declaration a schema with additional properties', () => {
@@ -663,7 +911,8 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- myObjectValidator -------------------------------------------------- */
         /** Validated type for {@link myObjectValidator} */
         export type MyObject = {
@@ -677,7 +926,11 @@ describe('DTS Generation', () => {
         export const myObjectValidator: {
             readonly foo: import("justus").Validator<string, string>;
             readonly [Symbol.justusAdditionalValidator]: import("justus").Validator<any, any>;
-        };`.split('\n').slice(1).map((s) => s.trim()))
+        };`
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
     })
 
     it('should generate a full type declaration a schema with no additional properties', () => {
@@ -690,7 +943,8 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- myObjectValidator -------------------------------------------------- */
         /** Validated type for {@link myObjectValidator} */
         export type MyObject = {
@@ -701,7 +955,11 @@ describe('DTS Generation', () => {
         /** The \`myObjectValidator\` validator */
         export const myObjectValidator: {
             readonly foo: import("justus").Validator<string, string>;
-        };`.split('\n').slice(1).map((s) => s.trim()))
+        };`
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
     })
 
     it('should generate a full type declaration a schema with explicit additional properties', () => {
@@ -714,7 +972,8 @@ describe('DTS Generation', () => {
 
       log.info(result)
 
-      expect(result.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- myObjectValidator -------------------------------------------------- */
         /** Validated type for {@link myObjectValidator} */
         export type MyObject = {
@@ -728,15 +987,20 @@ describe('DTS Generation', () => {
         export const myObjectValidator: {
             readonly foo: import("justus").Validator<string, string>;
             readonly [Symbol.justusAdditionalValidator]: import("justus").Validator<number, number>;
-        };`.split('\n').slice(1).map((s) => s.trim()))
+        };`
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
     })
 
     it('should generate a full type declaration for wrapped tuples', () => {
-      const result = generateDeclarations({ myTuple: tuple([ string, number ]) })
+      const result = generateDeclarations({ myTuple: tuple([string, number]) })
 
       log.info(result)
 
-      expect(result.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- myTuple ------------------------------------------------------------ */
         /** Validated type for {@link myTuple} */
         export type MyTuple = [
@@ -747,14 +1011,18 @@ describe('DTS Generation', () => {
         export type MyTupleInput = MyTuple;
         /** The \`myTuple\` validator */
         export const myTuple: import("justus").Validator<MyTuple, MyTupleInput>;`
-          .split('\n').slice(1).map((s) => s.trim()))
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
     })
 
     it('should generate a full type declaration for straight tuples', () => {
-      const result1 = generateDeclarations({ myTuple: [ string ] })
+      const result1 = generateDeclarations({ myTuple: [string] })
       log.info(result1)
 
-      expect(result1.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result1.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- myTuple ------------------------------------------------------------ */
         /** Validated type for {@link myTuple} */
         export type MyTuple = [
@@ -764,14 +1032,17 @@ describe('DTS Generation', () => {
         export type MyTupleInput = MyTuple;
         /** The \`myTuple\` validator */
         export const myTuple: import("justus").Validator<MyTuple, MyTupleInput>;`
-          .split('\n').slice(1).map((s) => s.trim()))
-
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
 
       const o = object({ foo: string } as const)
-      const result2 = generateDeclarations({ myTuple: [ number, ...o, boolean ] })
+      const result2 = generateDeclarations({ myTuple: [number, ...o, boolean] })
       log.info(result2)
 
-      expect(result2.split('\n').map((s) => s.trim())).toEqual(`
+      expect(result2.split('\n').map((s) => s.trim())).toEqual(
+        `
         /* ----- myTuple ------------------------------------------------------------ */
         /** Validated type for {@link myTuple} */
         export type MyTuple = [
@@ -785,7 +1056,10 @@ describe('DTS Generation', () => {
         export type MyTupleInput = MyTuple;
         /** The \`myTuple\` validator */
         export const myTuple: import("justus").Validator<MyTuple, MyTupleInput>;`
-          .split('\n').slice(1).map((s) => s.trim()))
+          .split('\n')
+          .slice(1)
+          .map((s) => s.trim()),
+      )
     })
   })
 })

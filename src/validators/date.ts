@@ -12,11 +12,11 @@ export interface DateConstraints {
    * When the format is set to `unix-timestamp`, the validator will accept
    * numeric timestamps in seconds from the Epoch instead of milliseconds.
    */
-  format?: 'iso' | 'timestamp' | 'unix-timestamp',
+  format?: 'iso' | 'timestamp' | 'unix-timestamp'
   /** The earliest value a date can have */
-  from?: Date,
+  from?: Date
   /** The latest value a date can have */
-  until?: Date,
+  until?: Date
 }
 
 /** A `Validator` validating dates and converting them to `Date` instances. */
@@ -30,9 +30,11 @@ export class DateValidator extends AbstractValidator<Date, Date | string | numbe
 
     const { format, from, until } = constraints
 
-    if ((from != undefined) && (until !== undefined)) {
-      assertSchema(until.getTime() >= from.getTime(),
-          `Constraint "until" (${until.toISOString()}) must not be before "from" (${from.toISOString()})`)
+    if (from != undefined && until !== undefined) {
+      assertSchema(
+        until.getTime() >= from.getTime(),
+        `Constraint "until" (${until.toISOString()}) must not be before "from" (${from.toISOString()})`,
+      )
     }
 
     this.format = format
@@ -42,14 +44,18 @@ export class DateValidator extends AbstractValidator<Date, Date | string | numbe
 
   validate(value: unknown): Date {
     const date =
-      value instanceof Date ? new Date(value.getTime()) :
-      typeof value === 'string' ? new Date(value) :
-      typeof value === 'number'
-        ? this.format === 'timestamp' ? new Date(value)
-        : this.format === 'unix-timestamp' ? new Date(value * 1000)
-        : new Date(value) :
-        undefined
-    assertValidation(!! date, 'Value could not be converted to a "Date"')
+      value instanceof Date
+        ? new Date(value.getTime())
+        : typeof value === 'string'
+          ? new Date(value)
+          : typeof value === 'number'
+            ? this.format === 'timestamp'
+              ? new Date(value)
+              : this.format === 'unix-timestamp'
+                ? new Date(value * 1000)
+                : new Date(value)
+            : undefined
+    assertValidation(!!date, 'Value could not be converted to a "Date"')
 
     if (isNaN(date.getTime())) throw new ValidationError('Invalid date')
 

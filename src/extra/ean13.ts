@@ -15,7 +15,7 @@ export class EAN13Validator extends StringValidator<EAN13String, string | number
 
     /* Calculate the weighted sum for the first 12 digits */
     let sum = 0
-    for (let i = 0, w = 1; i < 12; i ++, w = i % 2 ? 3 : 1) {
+    for (let i = 0, w = 1; i < 12; i++, w = i % 2 ? 3 : 1) {
       sum += (ean13.charCodeAt(i) - 0x30) * w
     }
 

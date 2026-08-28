@@ -11,9 +11,9 @@ const MULTIPLIER = Math.pow(10, PRECISION) // multiplier for precision
 function countDecimals(n: number): number {
   // match the parts of the exponential form of the number
   const match = n.toExponential().match(/^\d+(\.\d+)?e([+-]\d+)$/)
-  if (! match) throw new RangeError(`Can't calculate digits for number "${n}"`)
+  if (!match) throw new RangeError(`Can't calculate digits for number "${n}"`)
   // number of digits in the absolute value, minus whatever is the exp
-  const digits = ((match[1] || '.').length - 1) - (parseInt(match[2]!))
+  const digits = (match[1] || '.').length - 1 - parseInt(match[2]!)
   return digits < 0 ? 0 : digits
 }
 
@@ -22,19 +22,19 @@ function countDecimals(n: number): number {
 /** Constraints to validate a `number` with. */
 export interface NumberConstraints {
   /** The value for which a `number` must be multiple of for it to be valid */
-  multipleOf?: number,
+  multipleOf?: number
   /** The _inclusive_ maximum value for a valid `number`: `value <= maximum` */
-  maximum?: number,
+  maximum?: number
   /** The _inclusive_ minimum value for a valid `number`: `value >= minimum` */
-  minimum?: number,
+  minimum?: number
   /** The _exclusive_ maximum value for a valid `number`: `value < exclusiveMaximum` */
-  exclusiveMaximum?: number,
+  exclusiveMaximum?: number
   /** The _exclusive_ minimum value for a valid `number`: `value > exclusiveMaximum` */
-  exclusiveMinimum?: number,
+  exclusiveMinimum?: number
   /** Allow numbers to be parsed from strings (e.g. `123.456` or `0x0CAFE`, default: `false`) */
-  fromString?: boolean,
+  fromString?: boolean
   /** Whether to allow `NaN` or not (default: `false`) */
-  allowNaN?: boolean,
+  allowNaN?: boolean
 }
 
 /** Constraints to validate a `number` with extra branding information. */
@@ -47,14 +47,14 @@ export interface BrandedNumberConstraints<B extends string> extends NumberConstr
 export class AnyNumberValidator extends AbstractValidator<number> {
   validate(value: unknown): number {
     assertValidation(typeof value === 'number', 'Value is not a "number"')
-    assertValidation(! isNaN(value), 'Number is "NaN"')
+    assertValidation(!isNaN(value), 'Number is "NaN"')
     return value
   }
 }
 
 /** A `Validator` validating `number`s with constaints. */
 export class NumberValidator<N extends number = number> extends AbstractValidator<N, number> {
-  #isMultipleOf?: ((value: number) => boolean)
+  #isMultipleOf?: (value: number) => boolean
 
   readonly allowNaN: boolean
   readonly exclusiveMaximum?: number
@@ -78,23 +78,29 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
       multipleOf,
     } = constraints
 
-    if ('brand' in constraints) this.brand = (<any> constraints).brand
+    if ('brand' in constraints) this.brand = (<any>constraints).brand
 
     assertSchema(maximum >= minimum, `Constraint "minimum" (${minimum}) is greater than "maximum" (${maximum})`)
 
     if (exclusiveMaximum !== undefined) {
-      assertSchema(exclusiveMaximum > minimum,
-          `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "minimum" (${minimum})`)
+      assertSchema(
+        exclusiveMaximum > minimum,
+        `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "minimum" (${minimum})`,
+      )
     }
 
     if (exclusiveMinimum !== undefined) {
-      assertSchema(maximum > exclusiveMinimum,
-          `Constraint "maximum" (${maximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`)
+      assertSchema(
+        maximum > exclusiveMinimum,
+        `Constraint "maximum" (${maximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`,
+      )
     }
 
-    if ((exclusiveMinimum != undefined) && (exclusiveMaximum !== undefined)) {
-      assertSchema(exclusiveMaximum > exclusiveMinimum,
-          `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`)
+    if (exclusiveMinimum != undefined && exclusiveMaximum !== undefined) {
+      assertSchema(
+        exclusiveMaximum > exclusiveMinimum,
+        `Constraint "exclusiveMaximum" (${exclusiveMaximum}) must be greater than "exclusiveMinimum" (${exclusiveMinimum})`,
+      )
     }
 
     if (multipleOf !== undefined) {
@@ -103,13 +109,13 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
 
       if (decimals === 0) {
         // Easy case is when we only have to deal with integers...
-        this.#isMultipleOf = (value): boolean => ! (value % multipleOf)
+        this.#isMultipleOf = (value): boolean => !(value % multipleOf)
       } else if (decimals <= PRECISION) {
         // We have some "decimal" part (max 6 decimal digits), multiply...
         this.#isMultipleOf = (value): boolean => {
           try {
             if (countDecimals(value) > PRECISION) return false
-            return ! ((value * MULTIPLIER) % (multipleOf * MULTIPLIER))
+            return !((value * MULTIPLIER) % (multipleOf * MULTIPLIER))
           } catch (error: any) {
             throw new ValidationError(error.message)
           }
@@ -131,9 +137,9 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
 
   validate(value: unknown): N {
     // Allow parsing from strings
-    if ((typeof value === 'string') && (this.fromString)) {
+    if (typeof value === 'string' && this.fromString) {
       const parsed = +`${value}`
-      assertValidation(! isNaN(parsed), 'Number can not be parsed from string')
+      assertValidation(!isNaN(parsed), 'Number can not be parsed from string')
       value = parsed
     }
 
@@ -147,14 +153,20 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
     assertValidation(value >= this.minimum, `Number is less than ${this.minimum}`)
     assertValidation(value <= this.maximum, `Number is greater than ${this.maximum}`)
 
-    assertValidation((this.exclusiveMinimum === undefined) || (value > this.exclusiveMinimum),
-        `Number is less than or equal to ${this.exclusiveMinimum}`)
+    assertValidation(
+      this.exclusiveMinimum === undefined || value > this.exclusiveMinimum,
+      `Number is less than or equal to ${this.exclusiveMinimum}`,
+    )
 
-    assertValidation((this.exclusiveMaximum === undefined) || (value < this.exclusiveMaximum),
-        `Number is greater than or equal to ${this.exclusiveMaximum}`)
+    assertValidation(
+      this.exclusiveMaximum === undefined || value < this.exclusiveMaximum,
+      `Number is greater than or equal to ${this.exclusiveMaximum}`,
+    )
 
-    assertValidation(this.#isMultipleOf ? this.#isMultipleOf(value) : true,
-        `Number is not a multiple of ${this.multipleOf}`)
+    assertValidation(
+      this.#isMultipleOf ? this.#isMultipleOf(value) : true,
+      `Number is not a multiple of ${this.multipleOf}`,
+    )
 
     return value as N
   }
@@ -162,7 +174,9 @@ export class NumberValidator<N extends number = number> extends AbstractValidato
 
 export function numberValidatorFactory(constraints: NumberConstraints): NumberValidator<number>
 export function numberValidatorFactory<N extends number>(constraints: NumberConstraints): NumberValidator<N>
-export function numberValidatorFactory<B extends string>(constraints: BrandedNumberConstraints<B>): NumberValidator<number & Branding<B>>
+export function numberValidatorFactory<B extends string>(
+  constraints: BrandedNumberConstraints<B>,
+): NumberValidator<number & Branding<B>>
 export function numberValidatorFactory(constraints: NumberConstraints): Validator<number> {
   return new NumberValidator(constraints)
 }

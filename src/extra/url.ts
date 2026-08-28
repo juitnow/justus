@@ -28,34 +28,34 @@ const OPTIONS: ValidationOptions = {
 /** Constraints to validate a `URL` with. */
 export interface URLConstraints {
   /** Constraint to validate the `href` component of the `URL`. */
-  href?: string | Validator<string>,
+  href?: string | Validator<string>
   /** Constraint to validate the `origin` component of the `URL`. */
-  origin?: string | Validator<string>,
+  origin?: string | Validator<string>
   /** Constraint to validate the `protocol` component of the `URL`. */
-  protocol?: string | Validator<string>,
+  protocol?: string | Validator<string>
   /** Constraint to validate the `username` component of the `URL`. */
-  username?: string | Validator<string>,
+  username?: string | Validator<string>
   /** Constraint to validate the `password` component of the `URL`. */
-  password?: string | Validator<string>,
+  password?: string | Validator<string>
   /** Constraint to validate the `host` (`hostname:port`) component of the `URL`. */
-  host?: string | Validator<string>,
+  host?: string | Validator<string>
   /** Constraint to validate the `hostname` component of the `URL`. */
-  hostname?: string | Validator<string>,
+  hostname?: string | Validator<string>
   /** Constraint to validate the `port` component of the `URL`. */
-  port?: string | Validator<string>,
+  port?: string | Validator<string>
   /** Constraint to validate the `pathname` component of the `URL`. */
-  pathname?: string | Validator<string>,
+  pathname?: string | Validator<string>
   /** Constraint to validate the `search` component of the `URL` as a string. */
-  search?: string | Validator<string>,
+  search?: string | Validator<string>
   /** Constraint to validate the `hash` component of the `URL`. */
-  hash?: string | Validator<string>,
+  hash?: string | Validator<string>
   /**
    * Schema used to validate the `searchParams` component of the `URL`.
    *
    * The `searchParams` will be normalized in a `Record<string, string>`, where
    * only the _first_ value associated with a search parameter will be checked.
    */
-  searchParams?: Schema,
+  searchParams?: Schema
 }
 
 /** A `Validator` validating URLs and converting them to `URL` instances. */
@@ -114,7 +114,7 @@ export class URLValidator extends AbstractValidator<URL, URL | string> {
 
     if (this.searchParams) {
       const parameters: Record<string, string> = {}
-      url.searchParams.forEach((value, key) => parameters[key] = value)
+      url.searchParams.forEach((value, key) => (parameters[key] = value))
 
       try {
         this.searchParams.validate(parameters, OPTIONS)

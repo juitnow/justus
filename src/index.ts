@@ -48,9 +48,9 @@ import type { InferValidation, Validation, ValidationOptions } from './types.ts'
  * reported as an error.
  */
 export function validate<V extends Validation>(
-    validation: V,
-    value: any,
-    options?: ValidationOptions,
+  validation: V,
+  value: any,
+  options?: ValidationOptions,
 ): InferValidation<V> {
   const opts: ValidationOptions = {
     partialValidation: false,
@@ -78,9 +78,9 @@ export function validate<V extends Validation>(
  * ```
  */
 export function strip<V extends Validation>(
-    validation: V,
-    value: any,
-    options?: ValidationOptions,
+  validation: V,
+  value: any,
+  options?: ValidationOptions,
 ): InferValidation<V> {
   const opts: ValidationOptions = {
     partialValidation: false,
@@ -113,9 +113,9 @@ export function strip<V extends Validation>(
  * `Partial<...>` type.
  */
 export function partial<V extends Validation>(
-    validation: V,
-    value: any,
-    options?: ValidationOptions,
+  validation: V,
+  value: any,
+  options?: ValidationOptions,
 ): Partial<InferValidation<V>> {
   return getValidator(validation).validate(value, {
     partialValidation: true,

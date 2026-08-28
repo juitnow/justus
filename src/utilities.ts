@@ -16,8 +16,8 @@ export function getValidator(validation: Validation): Validator {
   if (validation === null) return new (registry.get('constant'))(null)
 
   // Anything with a validor associated with
-  if ((<any> validation)[Symbol.justusValidator]) {
-    return (<any> validation)[Symbol.justusValidator] as Validator
+  if ((<any>validation)[Symbol.justusValidator]) {
+    return (<any>validation)[Symbol.justusValidator] as Validator
   }
 
   // Other types

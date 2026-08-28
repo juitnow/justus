@@ -2,11 +2,11 @@ import { arrayOf, date, object, tuple, validate } from '../src/index.ts'
 
 describe('Type conversion', () => {
   it('should convert types in arrays', () => {
-    const src = [ 0 ]
+    const src = [0]
     const tgt = validate(arrayOf(date), src)
 
     expect(src).not.toStrictlyEqual(tgt)
-    expect(src).toEqual([ 0 ])
+    expect(src).toEqual([0])
 
     expect(tgt).toBeA('array').toHaveLength(1)
     expect(tgt[0]).toBeInstanceOf(Date)
@@ -14,11 +14,11 @@ describe('Type conversion', () => {
   })
 
   it('should convert types in tuples', () => {
-    const src = [ 0 ]
-    const tgt = validate(tuple([ date ]), src)
+    const src = [0]
+    const tgt = validate(tuple([date]), src)
 
     expect(src).not.toStrictlyEqual(tgt)
-    expect(src).toEqual([ 0 ])
+    expect(src).toEqual([0])
 
     expect(tgt).toBeA('array').toHaveLength(1)
     expect(tgt[0]).toBeInstanceOf(Date)

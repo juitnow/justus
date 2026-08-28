@@ -9,9 +9,8 @@ export interface BooleanConstraints {
    * The string in question _MUST_ be either `true` or `false`, and will be
    * compared regardless of case.
    */
-  fromString?: boolean,
+  fromString?: boolean
 }
-
 
 /** A `Validator` validating `boolean`s. */
 export class BooleanValidator extends AbstractValidator<boolean> {
@@ -25,7 +24,7 @@ export class BooleanValidator extends AbstractValidator<boolean> {
 
   validate(value: unknown): boolean {
     // Allow parsing from strings
-    if ((typeof value === 'string') && (this.fromString)) {
+    if (typeof value === 'string' && this.fromString) {
       const string = value.toLowerCase()
       const parsed = string === 'true' ? true : string === 'false' ? false : undefined
       assertValidation(parsed !== undefined, 'Boolean can not be parsed from string')

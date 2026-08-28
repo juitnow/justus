@@ -5,7 +5,11 @@ import { getValidator } from '../utilities.ts'
 
 import type {
   InferInputSchema,
-  InferSchema, InferValidation, Schema, TupleRestParameter, Validation,
+  InferSchema,
+  InferValidation,
+  Schema,
+  TupleRestParameter,
+  Validation,
   ValidationOptions,
   Validator,
 } from '../types.ts'
@@ -49,16 +53,16 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
 
     const { stripAdditionalProperties, stripOptionalNulls, partialValidation } = options
 
-    const record: { [ k in string | number | symbol ]?: unknown } = value
+    const record: { [k in string | number | symbol]?: unknown } = value
     const builder = new ValidationErrorBuilder()
     const clone: Record<string, any> = {}
 
-    for (const [ key, validator ] of this.validators.entries()) {
-      const optional = (!! validator.optional) || (!! partialValidation)
+    for (const [key, validator] of this.validators.entries()) {
+      const optional = !!validator.optional || !!partialValidation
       const original = record[key]
 
       // strip any optional "null" value if told to do so
-      if (stripOptionalNulls && optional && (original === null)) {
+      if (stripOptionalNulls && optional && original === null) {
         continue
       }
 
@@ -73,7 +77,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
           // try to validate, the validator _might_ be giving us a value
           const validated = validator.validate(original, options)
           // put the validated value in the clone, unless optional and undefined
-          if (! (optional && (validated === undefined))) clone[key] = validated
+          if (!(optional && validated === undefined)) clone[key] = validated
         } catch {
           if (optional) continue // original was undefined, so we can skip!
           builder.record('Required property missing', key)
@@ -86,7 +90,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
       try {
         const validated = validator.validate(original, options)
         // put the validated value in the clone, unless optional and undefined
-        if (! (optional && (validated === undefined))) clone[key] = validated
+        if (!(optional && validated === undefined)) clone[key] = validated
       } catch (error) {
         builder.record(error, key)
       }
@@ -105,7 +109,7 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
           builder.record(error, key)
         }
       })
-    } else if (! stripAdditionalProperties) {
+    } else if (!stripAdditionalProperties) {
       additionalKeys.forEach((key) => {
         if (record[key] !== undefined) builder.record('Unknown property', key)
       })
@@ -115,7 +119,9 @@ export class ObjectValidator<S extends Schema> extends AbstractValidator<InferSc
   }
 }
 
-export function objectValidatorFactory<S extends Schema>(schema: S): S & {
+export function objectValidatorFactory<S extends Schema>(
+  schema: S,
+): S & {
   [Symbol.iterator](): Generator<TupleRestParameter<InferSchema<S>, InferInputSchema<S>>>
 } {
   const validator = new ObjectValidator(schema)

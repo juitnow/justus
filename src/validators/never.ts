@@ -11,7 +11,7 @@ export class NeverValidator extends AbstractValidator<never> {
     const { stripForbiddenProperties } = options
 
     // @ts-expect-error the type declaration should never return, but we do!
-    if (stripForbiddenProperties || (value === undefined)) return
+    if (stripForbiddenProperties || value === undefined) return
     throw new ValidationError('Forbidden property')
   }
 }

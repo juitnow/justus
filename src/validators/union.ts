@@ -2,47 +2,41 @@ import { assertSchema, ValidationErrorBuilder } from '../errors.ts'
 import { AbstractValidator } from '../types.ts'
 import { getValidator } from '../utilities.ts'
 
-import type {
-  InferInput,
-  InferValidation,
-  Validation,
-  ValidationOptions,
-  Validator,
-} from '../types.ts'
+import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types.ts'
 
 /* -------------------------------------------------------------------------- */
 
 export type OneOfArguments = readonly Validation[]
 
-export type InferOneOfValidation<A extends OneOfArguments> =
-  A extends readonly [ infer First, ...infer Rest ] ?
-    First extends Validation ?
-      Rest extends OneOfArguments ?
-        InferValidation<First> | InferOneOfValidation<Rest> :
-        InferValidation<First> :
-      never :
-    A extends readonly (infer Type)[] ?
-      Type extends Validation ?
-        InferValidation<Type> :
-        never :
-      never
+export type InferOneOfValidation<A extends OneOfArguments> = A extends readonly [infer First, ...infer Rest]
+  ? First extends Validation
+    ? Rest extends OneOfArguments
+      ? InferValidation<First> | InferOneOfValidation<Rest>
+      : InferValidation<First>
+    : never
+  : A extends readonly (infer Type)[]
+    ? Type extends Validation
+      ? InferValidation<Type>
+      : never
+    : never
 
-export type InferOneOfInput<A extends OneOfArguments> =
-  A extends readonly [ infer First, ...infer Rest ] ?
-    First extends Validation ?
-      Rest extends OneOfArguments ?
-        InferInput<First> | InferOneOfInput<Rest> :
-        InferInput<First> :
-      never :
-    A extends readonly (infer Type)[] ?
-      Type extends Validation ?
-        InferInput<Type> :
-        never :
-      never
+export type InferOneOfInput<A extends OneOfArguments> = A extends readonly [infer First, ...infer Rest]
+  ? First extends Validation
+    ? Rest extends OneOfArguments
+      ? InferInput<First> | InferOneOfInput<Rest>
+      : InferInput<First>
+    : never
+  : A extends readonly (infer Type)[]
+    ? Type extends Validation
+      ? InferInput<Type>
+      : never
+    : never
 
 /** A `Validator` validating a value as _one of_ the specified arguments. */
-export class OneOfValidator<A extends OneOfArguments>
-  extends AbstractValidator<InferOneOfValidation<A>, InferOneOfInput<A>> {
+export class OneOfValidator<A extends OneOfArguments> extends AbstractValidator<
+  InferOneOfValidation<A>,
+  InferOneOfInput<A>
+> {
   readonly validators: readonly Validator[]
 
   constructor(args: A) {
@@ -71,29 +65,29 @@ export function oneOf<A extends OneOfArguments>(...args: A): OneOfValidator<A> {
 
 /* -------------------------------------------------------------------------- */
 
-export type AllOfArguments = readonly [ Validation, ...Validation[] ]
+export type AllOfArguments = readonly [Validation, ...Validation[]]
 
-export type InferAllOfValidation<A extends AllOfArguments> =
-  A extends readonly [ infer First, ...infer Rest ] ?
-    First extends Validation ?
-      Rest extends AllOfArguments ?
-        InferValidation<First> & InferAllOfValidation<Rest> :
-        InferValidation<First> :
-      never :
-    never
+export type InferAllOfValidation<A extends AllOfArguments> = A extends readonly [infer First, ...infer Rest]
+  ? First extends Validation
+    ? Rest extends AllOfArguments
+      ? InferValidation<First> & InferAllOfValidation<Rest>
+      : InferValidation<First>
+    : never
+  : never
 
-export type InferAllOfInput<A extends AllOfArguments> =
-  A extends readonly [ infer First, ...infer Rest ] ?
-    First extends Validation ?
-      Rest extends AllOfArguments ?
-        InferInput<First> & InferAllOfInput<Rest> :
-        InferInput<First> :
-      never :
-    never
+export type InferAllOfInput<A extends AllOfArguments> = A extends readonly [infer First, ...infer Rest]
+  ? First extends Validation
+    ? Rest extends AllOfArguments
+      ? InferInput<First> & InferAllOfInput<Rest>
+      : InferInput<First>
+    : never
+  : never
 
 /** A `Validator` validating a value as _all of_ the specified arguments. */
-export class AllOfValidator<A extends AllOfArguments>
-  extends AbstractValidator<InferAllOfValidation<A>, InferAllOfInput<A>> {
+export class AllOfValidator<A extends AllOfArguments> extends AbstractValidator<
+  InferAllOfValidation<A>,
+  InferAllOfInput<A>
+> {
   readonly validators: readonly Validator[]
 
   constructor(args: A) {

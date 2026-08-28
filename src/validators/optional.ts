@@ -3,9 +3,7 @@ import { getValidator } from '../utilities.ts'
 
 import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types.ts'
 
-/**
- * A `Validator` for _optional_ properties (that is `type | undefined`).
- */
+/** A `Validator` for _optional_ properties (that is `type | undefined`). */
 export class OptionalValidator<
   T = any, // the type of the "validation", that is the optional type to validate
   I = T, // the _input_ type of the "validation", that is anything acceptable
@@ -45,17 +43,19 @@ export class OptionalValidator<
  *
  * @param validation - A `Validation` to be marked as _optional_.
  */
-export function optional<
-  V extends Validation,
->(validation: V): OptionalValidator<InferValidation<V>, InferInput<V>, undefined>
+export function optional<V extends Validation>(
+  validation: V,
+): OptionalValidator<InferValidation<V>, InferInput<V>, undefined>
 
-export function optional<
-  V extends Validation, D,
->(validation: V, defaultValue: D): OptionalValidator<InferValidation<V>, InferInput<V>, D>
+export function optional<V extends Validation, D>(
+  validation: V,
+  defaultValue: D,
+): OptionalValidator<InferValidation<V>, InferInput<V>, D>
 
-export function optional<
-  V extends Validation, D,
->(validation: V, defaultValue?: D): OptionalValidator<InferValidation<V>, InferInput<V>, D> {
+export function optional<V extends Validation, D>(
+  validation: V,
+  defaultValue?: D,
+): OptionalValidator<InferValidation<V>, InferInput<V>, D> {
   const validator = getValidator(validation)
   return new OptionalValidator(validator, defaultValue)
 }
