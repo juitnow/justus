@@ -1,15 +1,6 @@
 import { expectType, printType } from 'tsd'
 
-import {
-  any,
-  array,
-  arrayOf,
-  boolean,
-  constant,
-  number,
-  string,
-  validate,
-} from '../src/index.ts'
+import { any, array, arrayOf, boolean, constant, number, string, validate } from '../src/index.ts'
 
 printType('__file_marker__')
 

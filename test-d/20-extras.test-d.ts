@@ -21,19 +21,12 @@ function inputType<T>(param: T): InferInput<T> {
 expectType<string & { __arn: never }>(validate(arn, 'foo'))
 expectType<string & ArnString>(validate(arn, 'foo'))
 
-expectType<(
-& string
-& { __arn: never }
-& { __arn_service_myservice: never }
-)>(validate(arn('myservice'), 'foo'))
+expectType<string & { __arn: never } & { __arn_service_myservice: never }>(validate(arn('myservice'), 'foo'))
 expectType<ArnString<'myservice'>>(validate(arn('myservice'), 'foo'))
 
-expectType<(
-& string
-& { __arn: never }
-& { __arn_service_myservice: never }
-& { __arn_resource_myresource: never }
-)>(validate(arn('myservice', 'myresource'), 'foo'))
+expectType<string & { __arn: never } & { __arn_service_myservice: never } & { __arn_resource_myresource: never }>(
+  validate(arn('myservice', 'myresource'), 'foo'),
+)
 expectType<ArnString<'myservice', 'myresource'>>(validate(arn('myservice', 'myresource'), 'foo'))
 
 expectType<ParsedArn<string>>(validate(parseArn, 'foo'))

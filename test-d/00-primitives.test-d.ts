@@ -1,14 +1,6 @@
 import { expectType, printType } from 'tsd'
 
-import {
-  any,
-  bigint,
-  boolean,
-  constant,
-  number,
-  string,
-  validate,
-} from '../src/index.ts'
+import { any, bigint, boolean, constant, number, string, validate } from '../src/index.ts'
 
 printType('__file_marker__')
 

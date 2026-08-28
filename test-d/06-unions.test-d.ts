@@ -1,15 +1,6 @@
 import { expectAssignable, expectError, expectType, printType } from 'tsd'
 
-import {
-  allOf,
-  boolean,
-  number,
-  object,
-  oneOf,
-  optional,
-  string,
-  validate,
-} from '../src/index.ts'
+import { allOf, boolean, number, object, oneOf, optional, string, validate } from '../src/index.ts'
 
 import type { InferValidation, Validator } from '../src/index.ts'
 
@@ -59,7 +50,7 @@ const allOf2 = allOf(t1, t2)
 expectAssignable<Validator<InferValidation<typeof t1 & typeof t2>>>(allOf2)
 
 const allOfR2 = validate(allOf2, null)
-expectAssignable<{ o1: string, o2: number }>(allOfR2)
+expectAssignable<{ o1: string; o2: number }>(allOfR2)
 
 expectType<string>(allOfR2.o1)
 expectType<number>(allOfR2.o2)

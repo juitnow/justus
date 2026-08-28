@@ -100,7 +100,7 @@ expectType<string | undefined>(inputType(optional(string, 'foo' as const)))
 expectType<string | undefined>(inputType(optional(string, 12345 as const)))
 
 expectType<number[] | undefined>(inputType(optional(arrayOf(number))))
-expectType<number[] | undefined>(inputType(optional(arrayOf(number), [ 1, 2, 3 ] as const)))
+expectType<number[] | undefined>(inputType(optional(arrayOf(number), [1, 2, 3] as const)))
 expectType<number[] | undefined>(inputType(optional(arrayOf(number), 12345 as const)))
 
 expectType<Date | string | number | undefined>(inputType(optional(date)))
