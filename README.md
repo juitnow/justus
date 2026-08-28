@@ -14,27 +14,26 @@ It focuses in providing an _easy_ and _terse_ syntax to define a simple schema,
 used to ensure that an object is _**correct**_ and from which _**proper**_
 typing can be inferred.
 
-* [Quick Start](#quick-start)
-* [Inferring Types](#inferring-types)
-* Validators
-  * [Strings](#string-validator)
-  * [Numbers](#number-validator)
-  * [Booleans](#boolean-validator)
-  * [Constants](#constant-validator)
-  * [Any](#any-validator)
-  * [Arrays](#array-validator)
-  * [Dates](#date-validator)
-  * [Tuples](#tuple-validator)
-  * [Objects](#object-validator) (yes, this is the important one!!!)
-  * [Optionals](#optional-validator)
-  * [Any of, all of](#union-validators)
-* [Extra Validators](#extra-validators)
-* [Validation Options](#validation-options)
-* [A (slightly more) complex example](#a-complex-example)
-* [Generating DTS files](#generating-dts-files)
-* [Copyright Notice](NOTICE.md)
-* [License](LICENSE.md)
-
+- [Quick Start](#quick-start)
+- [Inferring Types](#inferring-types)
+- Validators
+  - [Strings](#string-validator)
+  - [Numbers](#number-validator)
+  - [Booleans](#boolean-validator)
+  - [Constants](#constant-validator)
+  - [Any](#any-validator)
+  - [Arrays](#array-validator)
+  - [Dates](#date-validator)
+  - [Tuples](#tuple-validator)
+  - [Objects](#object-validator) (yes, this is the important one!!!)
+  - [Optionals](#optional-validator)
+  - [Any of, all of](#union-validators)
+- [Extra Validators](#extra-validators)
+- [Validation Options](#validation-options)
+- [A (slightly more) complex example](#a-complex-example)
+- [Generating DTS files](#generating-dts-files)
+- [Copyright Notice](NOTICE.md)
+- [License](LICENSE.md)
 
 Quick Start
 -----------
@@ -47,7 +46,6 @@ import { number, object, string, validate } from 'justus'
 
 // Create a validator, validating _objects_ with a specific schema
 const validator = object({
-
   // The "foo" property in the objects to validate must be a "string"
   // with a minimum length of one character
   foo: string({ minLength: 1 }),
@@ -55,7 +53,7 @@ const validator = object({
   // The "bar" property in the objects to validate must be a "number"
   bar: number,
 
-// Always use `as const`: it correctly infers types for constants, tuples, ...
+  // Always use `as const`: it correctly infers types for constants, tuples, ...
 } as const)
 
 // Use the validator to validate the object specified as the second argument
@@ -75,17 +73,19 @@ _shorthand_ inline syntax. From our example above:
 ```typescript
 import { number, string, validate } from 'justus'
 
-const validated = validate({
-  foo: string({ minLength: 1 }),
-  bar: number,
-} as const, {
-  foo: 'xyz',
-  bar: 123,
-})
+const validated = validate(
+  {
+    foo: string({ minLength: 1 }),
+    bar: number,
+  } as const,
+  {
+    foo: 'xyz',
+    bar: 123,
+  },
+)
 ```
 
 ... you get the drill! See below in each _validator_ for their shorthand syntax.
-
 
 Inferring Types
 ---------------
@@ -116,9 +116,9 @@ Similarly, it might be useful to have access to a minimal type required as a
 validation input. This obviously differs from the input for several reasons,
 like:
 
-* optionals with default: on input we should represent `optional(type, default)`
+- optionals with default: on input we should represent `optional(type, default)`
   as `type`, but on input this should be `type | undefined`
-* type conversions: the `date` validator converts numbers or strings always
+- type conversions: the `date` validator converts numbers or strings always
   into `Date` objects, but the input type should be `Date | string | number`
 
 The `InferInput` helps in this case:
@@ -142,7 +142,6 @@ type MyInputType = InferInput<typeof myTypeValidator>
 // }
 ```
 
-
 String Validator
 ----------------
 
@@ -157,9 +156,9 @@ const s2 = string({ minLength: 1 }) // validate non empty strings
 
 #### Options
 
-* `minLength?: number`: The _minimum_ length of a valid `string`
-* `maxLength?: number`: The _maximum_ length of a valid `string`
-* `pattern?: RegExp`: A `RegExp` enforcing a particular pattern for a valid `string`
+- `minLength?: number`: The _minimum_ length of a valid `string`
+- `maxLength?: number`: The _maximum_ length of a valid `string`
+- `pattern?: RegExp`: A `RegExp` enforcing a particular pattern for a valid `string`
 
 #### Branded strings
 
@@ -214,7 +213,6 @@ const validator = object({
 })
 ```
 
-
 Number Validator
 ----------------
 
@@ -230,13 +228,13 @@ const n3 = number({ fromString: true }) // parse strings like "12.34" or "0x0CAF
 
 #### Options
 
-* `multipleOf?: number`: The value for which a `number` must be multiple of for it to be valid
-* `maximum?: number`: The _inclusive_ maximum value for a valid `number`
-* `minimum?: number`: The _inclusive_ minimum value for a valid `number`
-* `exclusiveMaximum?: number`: The _exclusive_ maximum value for a valid `number`
-* `exclusiveMinimum?: number`: The _exclusive_ minimum value for a valid `number`
-* `allowNaN?: boolean`: Whether to allow `NaN` or not (default: `false`)
-* `fromString?: boolean`: Whether to parse numbers from strings or not (default: `false`)
+- `multipleOf?: number`: The value for which a `number` must be multiple of for it to be valid
+- `maximum?: number`: The _inclusive_ maximum value for a valid `number`
+- `minimum?: number`: The _inclusive_ minimum value for a valid `number`
+- `exclusiveMaximum?: number`: The _exclusive_ maximum value for a valid `number`
+- `exclusiveMinimum?: number`: The _exclusive_ minimum value for a valid `number`
+- `allowNaN?: boolean`: Whether to allow `NaN` or not (default: `false`)
+- `fromString?: boolean`: Whether to parse numbers from strings or not (default: `false`)
 
 #### Branded numbers
 
@@ -289,7 +287,6 @@ const validator = object({
 })
 ```
 
-
 Boolean Validator
 -----------------
 
@@ -316,8 +313,6 @@ const validator = object({
 // Here myValue can be a boolean or the string "true" or "false" (case insensitive)
 const bool = validate(validator, myValue)
 ```
-
-
 
 Constant Validator
 ------------------
@@ -358,7 +353,6 @@ result.baz // <- its type will be `false` (or "boolean" if you didn't use "as co
 result.nil // <- its type will be `null` (or "any" if you didn't use "as const")
 ```
 
-
 Any Validator
 -------------
 
@@ -368,14 +362,13 @@ The _any_ validator is represented by the `any` constant:
 import { any, object, validate } from 'justus'
 
 const validator = object({
-  foo: any // it's a constant, no options!
+  foo: any, // it's a constant, no options!
 })
 
 const result = validate(validator, something)
 
 result.foo // <- its type will be `any`
 ```
-
 
 Array Validator
 ---------------
@@ -392,10 +385,10 @@ const a3 = arrayOf(number) // array of numbers
 
 #### Options
 
-* `maxItems?: number`: The _maximum_ number of elements a valid `Array`
-* `minItems?: number`: The _minimum_ number of elements a valid `Array`
-* `uniqueItems?: boolean`: Indicates if the `Array`'s elements must be unique
-* `items?: V`: The _type_ of each individual item in the `Array` */
+- `maxItems?: number`: The _maximum_ number of elements a valid `Array`
+- `minItems?: number`: The _minimum_ number of elements a valid `Array`
+- `uniqueItems?: boolean`: Indicates if the `Array`'s elements must be unique
+- `items?: V`: The _type_ of each individual item in the `Array` */
 
 #### Shorthand syntax
 
@@ -420,7 +413,6 @@ const a1 = array({ items: string })
 const a2 = arrayOf(string) // same as above, just more readable
 ```
 
-
 Date Validator
 --------------
 
@@ -438,11 +430,11 @@ const d2 = date({ format: 'iso' }) // validate ISO dates
 
 #### Options
 
-* `format?: 'iso' | 'timestamp'`: The format for dates, `iso` for _ISO Dates_
+- `format?: 'iso' | 'timestamp'`: The format for dates, `iso` for _ISO Dates_
   (as outlined in RFC 3339) or `timestamp` for the number of milliseconds since
   the epoch
-* `from?: Date`: The earliest value a date can have
-* `until?: Date`: The latest value a date can have
+- `from?: Date`: The earliest value a date can have
+- `until?: Date`: The latest value a date can have
 
 #### Shorthand syntax
 
@@ -456,7 +448,6 @@ const validator = object({
 })
 ```
 
-
 Tuple Validator
 ---------------
 
@@ -468,11 +459,11 @@ Tuple validators are created using the `tuple` function:
 import { tuple, string, number, boolean } from 'justus'
 
 // Validates 3 elements tuple: (in order) a string, a number and a boolean
-const t1 = tuple([ string, number, boolean ])
+const t1 = tuple([string, number, boolean])
 
 // Validates a tuple whose first element is a string, followed by zero or more
 // numbers, and wholse last element is a boolean
-const t2 = tuple([ string, ...number, boolean ]) // yay! rest parameters!
+const t2 = tuple([string, ...number, boolean]) // yay! rest parameters!
 ```
 
 As shown above, any `Validator` (or one of its shorthands) can be used as a
@@ -489,7 +480,7 @@ const myObject = object({
 })
 
 // This is the silliest tuple ever written, but outlines our intentions:
-const sillyTuple = tuple([ 'start', ...myObject, 'end' ] as const)
+const sillyTuple = tuple(['start', ...myObject, 'end'] as const)
 
 // Validate using our tuple:
 validate(sillyTuple, [
@@ -499,7 +490,6 @@ validate(sillyTuple, [
   'end', // the last
 ])
 ```
-
 
 Object Validator
 ----------------
@@ -567,15 +557,15 @@ result2.baz // <-- additional property, this will be "boolean"
 Here `allowAdditionalProperties` is also a function, which can take some
 parameters to configure its behaviour:
 
-* `...allowAdditionalProperties`: default shorthand, allows additional
+- `...allowAdditionalProperties`: default shorthand, allows additional
   properties and will infer the `any` type for them.
-* `...allowAdditionalProperties()`: as a function, and same as above, it allows
+- `...allowAdditionalProperties()`: as a function, and same as above, it allows
   additional properties and will infer the `any` type for them.
-* `...allowAdditionalProperties(true)`: as a function, and same as above, it
+- `...allowAdditionalProperties(true)`: as a function, and same as above, it
   allows additional properties and will infer the `any` type for them.
-* `...allowAdditionalProperties(false)`: as a function, it _forbids_ any
+- `...allowAdditionalProperties(false)`: as a function, it _forbids_ any
   additional property in objects, useful when extending objects (see below)
-* `...allowAdditionalProperties(... type ...)`: as a function, it allows
+- `...allowAdditionalProperties(... type ...)`: as a function, it allows
   additional properties in objects and ensures their type is correct
 
 #### Extending objects
@@ -661,7 +651,6 @@ const o2 = objectOf({ test: number })
 // here "o2" will have the shape "Record<string, { test: number }>"
 ```
 
-
 Optional Validator
 ------------------
 
@@ -701,7 +690,6 @@ const r2 = validate(o1, { foo: 321 })
 // here "r2" will be "{ foo: 321 }" (overrides the default value)
 ```
 
-
 Union Validators
 ----------------
 
@@ -737,7 +725,6 @@ const result = validate(oneOf(number, string), something)
 result // <-- its type will be "number | string"
 ```
 
-
 Extra Validators
 ----------------
 
@@ -746,17 +733,16 @@ in order to reduce the bundle size when Justus is bundled in client apps.
 
 Those are:
 
-* `arn`: Validate an ARN (Amazon Resource Name) as a string
-  * `import { arn } from 'justus/extra/arn'`
-* `parseArn`: Validate an ARN (Amazon Resource Name) and parse its components
-  * `import { parseArn } from 'justus/extra/arn'`
-* `ean13`: Validate a standard _EAN-13_ barcode number (as a string)
-  * `import { ean13 } from 'justus/extra/ean13'`
-* `url`: Validate a string URL and converts it into a proper `URL` object
-  * `import { url } from 'justus/extra/url'`
-* `uuid`: Validate a string UUID plain and simple
-  * `import { uuid } from 'justus/extra/uuid'`
-
+- `arn`: Validate an ARN (Amazon Resource Name) as a string
+  - `import { arn } from 'justus/extra/arn'`
+- `parseArn`: Validate an ARN (Amazon Resource Name) and parse its components
+  - `import { parseArn } from 'justus/extra/arn'`
+- `ean13`: Validate a standard _EAN-13_ barcode number (as a string)
+  - `import { ean13 } from 'justus/extra/ean13'`
+- `url`: Validate a string URL and converts it into a proper `URL` object
+  - `import { url } from 'justus/extra/url'`
+- `uuid`: Validate a string UUID plain and simple
+  - `import { uuid } from 'justus/extra/uuid'`
 
 Validation Options
 ------------------
@@ -764,14 +750,14 @@ Validation Options
 The `validate(...)` function accepts (as a third parameter) some validation
 options. Those are:
 
-* `stripAdditionalProperties`: the `validate(...)` function will ignore any
+- `stripAdditionalProperties`: the `validate(...)` function will ignore any
   object property that was not declared in the schema, and will strip them
   out of the returned object (rather than failing).
-* `stripForbiddenProperties`: the `validate(...)` function will ignore any
+- `stripForbiddenProperties`: the `validate(...)` function will ignore any
   _forbidden_ property that was declared in the schema (for more info see
   [below](#ensure-properties-never-exist)), and will strip them out of the
   returned object (rather than failing).
-* `stripOptionalNulls`: the `validate(...)` function will ignore _optional_
+- `stripOptionalNulls`: the `validate(...)` function will ignore _optional_
   properties with `null` values and strip them out of the returned object.
   This is convenient when validating/stripping results coming from a database
   table, where columns are declared as _nullable_.
@@ -793,7 +779,6 @@ const result2 = validate(schema, object, {
 })
 ```
 
-
 A complex example
 -----------------
 
@@ -807,7 +792,7 @@ couple of different flavors, either V1 or V2 with some subtle differences:
 import { arrayOf, date, number, object, oneOf, string, tuple, validate } from 'justus'
 
 // Our V1 time-series tuple is simply a timestamp followed by a numeric value
-const entryv1 = tuple([ date, number ] as const)
+const entryv1 = tuple([date, number] as const)
 
 // Our V1 response from the time series database declares the version and data
 const responsev1 = object({
@@ -817,7 +802,7 @@ const responsev1 = object({
 
 // Our V2 time-series tuple is a timestamp, followed by a number and zero or
 // more strings indicating some remarks on the measurements
-const entryv2 = tuple([ date, number, ...string ] as const)
+const entryv2 = tuple([date, number, ...string] as const)
 
 // Response for V2 is the same as V1, with some extra stuff
 const responsev2 = object({
@@ -851,7 +836,6 @@ if (result.version === 1) {
   result.average // this will be a "number""
 }
 ```
-
 
 Generating DTS files
 --------------------
@@ -900,13 +884,13 @@ The resulting `dts` will be a `string` containing the DTS as follows:
 
 ```typescript
 export type UUID = string & {
-    __brand_uuid : never;
-};
+  __brand_uuid: never
+}
 export type Product = {
-    uuid: UUID;
-    price: number & {
-        __brand_price: never;
-    };
-    name: string;
-};
+  uuid: UUID
+  price: number & {
+    __brand_price: never
+  }
+  name: string
+}
 ```
