@@ -2,80 +2,75 @@
   "name": "justus",
   "version": "0.6.0",
   "description": "A JavaScript validation library, with types!",
-  "main": "./dist/index.mjs",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.mjs"
-    },
-    "./dts-generator": {
-      "types": "./dist/dts-generator.d.ts",
-      "require": "./dist/dts-generator.cjs",
-      "default": "./dist/dts-generator.mjs"
-    },
-    "./extra/arn": {
-      "types": "./dist/extra/arn.d.ts",
-      "require": "./dist/extra/arn.cjs",
-      "default": "./dist/extra/arn.mjs"
-    },
-    "./extra/ean13": {
-      "types": "./dist/extra/ean13.d.ts",
-      "require": "./dist/extra/ean13.cjs",
-      "default": "./dist/extra/ean13.mjs"
-    },
-    "./extra/email": {
-      "types": "./dist/extra/email.d.ts",
-      "require": "./dist/extra/email.cjs",
-      "default": "./dist/extra/email.mjs"
-    },
-    "./extra/url": {
-      "types": "./dist/extra/url.d.ts",
-      "require": "./dist/extra/url.cjs",
-      "default": "./dist/extra/url.mjs"
-    },
-    "./extra/uuid": {
-      "types": "./dist/extra/uuid.d.ts",
-      "require": "./dist/extra/uuid.cjs",
-      "default": "./dist/extra/uuid.mjs"
-    }
+  "keywords": [
+    "javascript",
+    "typescript",
+    "validation"
+  ],
+  "homepage": "https://github.com/juitnow/justus#readme",
+  "bugs": {
+    "url": "https://github.com/juitnow/justus/issues"
   },
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "plug",
-    "coverage": "plug coverage",
-    "dev": "plug coverage -w src -w test",
-    "lint": "plug lint",
-    "test": "plug test",
-    "transpile": "plug transpile"
-  },
-  "author": "Juit Developers <developers@juit.com>",
   "license": "Apache-2.0",
-  "devDependencies": {
-    "@plugjs/build": "^0.7.4",
-    "@plugjs/tsd": "^0.7.5",
-    "typescript": "<6"
-  },
-  "directories": {
-    "test": "test"
-  },
+  "author": "Juit Developers <developers@juit.com>",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/juitnow/justus.git"
   },
-  "keywords": [
-    "validation",
-    "typescript",
-    "javascript"
-  ],
-  "bugs": {
-    "url": "https://github.com/juitnow/justus/issues"
+  "directories": {
+    "test": "test"
   },
-  "homepage": "https://github.com/juitnow/justus#readme",
   "files": [
     "*.md",
     "dist/",
     "src/"
-  ]
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./dts-generator": {
+      "types": "./dist/dts-generator.d.ts",
+      "default": "./dist/dts-generator.js"
+    },
+    "./extra/arn": {
+      "types": "./dist/extra/arn.d.ts",
+      "default": "./dist/extra/arn.js"
+    },
+    "./extra/ean13": {
+      "types": "./dist/extra/ean13.d.ts",
+      "default": "./dist/extra/ean13.js"
+    },
+    "./extra/email": {
+      "types": "./dist/extra/email.d.ts",
+      "default": "./dist/extra/email.js"
+    },
+    "./extra/url": {
+      "types": "./dist/extra/url.d.ts",
+      "default": "./dist/extra/url.js"
+    },
+    "./extra/uuid": {
+      "types": "./dist/extra/uuid.d.ts",
+      "default": "./dist/extra/uuid.js"
+    }
+  },
+  "scripts": {
+    "build": "plug",
+    "dev": "plug -w src -w test -w test-d",
+    "lint": "plug lint",
+    "lintfix": "plug lint fix=true"
+  },
+  "devDependencies": {
+    "@plugjs/cov8": "^0.7.5",
+    "@plugjs/expect5": "^0.7.5",
+    "@plugjs/oxc": "^0.1.7",
+    "@plugjs/plug": "^0.7.5",
+    "@plugjs/tsd": "^0.7.5",
+    "@plugjs/tsgo": "^0.0.3",
+    "typescript": "<7"
+  }
 }
