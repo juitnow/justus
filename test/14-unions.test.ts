@@ -1,4 +1,4 @@
-import { allOf, number, oneOf, string, validate, ValidationError } from '../src'
+import { allOf, number, oneOf, string, validate, ValidationError } from '../src/index.ts'
 
 describe('Union validators', () => {
   it('should validate one of the given options', () => {
@@ -6,13 +6,15 @@ describe('Union validators', () => {
 
     expect(validate(validator, 'foo')).toStrictlyEqual('foo')
     expect(validate(validator, 12345)).toStrictlyEqual(12345)
-    expect(() => validate(validator, true))
-        .toThrow((assert) => assert
-            .toBeError(ValidationError, /^Found 2 validation errors/)
-            .toHaveProperty('errors', expect.toMatchContents([
-              { path: [], message: 'Value is not a "string"' },
-              { path: [], message: 'Value is not a "number"' },
-            ])))
+    expect(() => validate(validator, true)).toThrow((assert) =>
+      assert.toBeError(ValidationError, /^Found 2 validation errors/).toHaveProperty(
+        'errors',
+        expect.toMatchContents([
+          { path: [], message: 'Value is not a "string"' },
+          { path: [], message: 'Value is not a "number"' },
+        ]),
+      ),
+    )
   })
 
   it('should validate all of the given options', () => {
@@ -22,18 +24,22 @@ describe('Union validators', () => {
     const validator = allOf(s1, s2)
 
     expect(validate(validator, 'foo')).toStrictlyEqual('foo')
-    expect(() => validate(validator, ''))
-        .toThrow((assert) => assert
-            .toBeError(ValidationError, /^Found 1 validation error/)
-            .toHaveProperty('errors', expect.toMatchContents([
-              { path: [], message: 'String must have a minimum length of 3' },
-            ])))
+    expect(() => validate(validator, '')).toThrow((assert) =>
+      assert
+        .toBeError(ValidationError, /^Found 1 validation error/)
+        .toHaveProperty(
+          'errors',
+          expect.toMatchContents([{ path: [], message: 'String must have a minimum length of 3' }]),
+        ),
+    )
 
-    expect(() => validate(validator, 'foobar'))
-        .toThrow((assert) => assert
-            .toBeError(ValidationError, /^Found 1 validation error/)
-            .toHaveProperty('errors', expect.toMatchContents([
-              { path: [], message: 'String must have a maximum length of 3' },
-            ])))
+    expect(() => validate(validator, 'foobar')).toThrow((assert) =>
+      assert
+        .toBeError(ValidationError, /^Found 1 validation error/)
+        .toHaveProperty(
+          'errors',
+          expect.toMatchContents([{ path: [], message: 'String must have a maximum length of 3' }]),
+        ),
+    )
   })
 })

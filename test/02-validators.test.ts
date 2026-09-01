@@ -1,18 +1,23 @@
-import { AbstractValidator, any, ConstantValidator, getValidator, ObjectValidator, TupleValidator } from '../src'
+import {
+  AbstractValidator,
+  any,
+  ConstantValidator,
+  getValidator,
+  ObjectValidator,
+  TupleValidator,
+} from '../src/index.ts'
 
-import type { Schema } from '../src'
+import type { Schema } from '../src/index.ts'
 
 describe('Validators', () => {
-  const fakeValidator = new class extends AbstractValidator<never, never> {
+  const fakeValidator = new (class extends AbstractValidator<never, never> {
     validate(): never {
       throw new Error('Method not implemented.')
     }
-  }
+  })()
 
   it('null', () => {
-    expect(getValidator(null))
-        .toBeInstanceOf(ConstantValidator)
-        .toHaveProperty('constant', expect.toBeNull())
+    expect(getValidator(null)).toBeInstanceOf(ConstantValidator).toHaveProperty('constant', expect.toBeNull())
   })
 
   it('validators', () => {
@@ -21,44 +26,42 @@ describe('Validators', () => {
   })
 
   it('primitives', () => {
-    expect(getValidator(true))
-        .toBeInstanceOf(ConstantValidator)
-        .toHaveProperty('constant', expect.toBeTrue())
+    expect(getValidator(true)).toBeInstanceOf(ConstantValidator).toHaveProperty('constant', expect.toBeTrue())
 
     expect(getValidator(12345))
-        .toBeInstanceOf(ConstantValidator)
-        .toHaveProperty('constant', expect.toStrictlyEqual(12345))
+      .toBeInstanceOf(ConstantValidator)
+      .toHaveProperty('constant', expect.toStrictlyEqual(12345))
 
     expect(getValidator('Hello, world!'))
-        .toBeInstanceOf(ConstantValidator)
-        .toHaveProperty('constant', expect.toStrictlyEqual('Hello, world!'))
+      .toBeInstanceOf(ConstantValidator)
+      .toHaveProperty('constant', expect.toStrictlyEqual('Hello, world!'))
   })
 
   it('objects', () => {
     const objectValidator = getValidator({ foo: 'bar' })
     expect(objectValidator)
-        .toBeInstanceOf(ObjectValidator)
-        .toHaveProperty('schema', expect.toEqual({ foo: 'bar' }))
+      .toBeInstanceOf(ObjectValidator)
+      .toHaveProperty('schema', expect.toEqual({ foo: 'bar' }))
 
-    expect(getValidator({ [Symbol.justusValidator]: objectValidator } as Schema))
-        .toStrictlyEqual(objectValidator)
+    expect(getValidator({ [Symbol.justusValidator]: objectValidator } as Schema)).toStrictlyEqual(objectValidator)
   })
 
   it('tuples', () => {
-    expect(getValidator([ 1, 'foo' ]))
-        .toBeInstanceOf(TupleValidator)
-        .toHaveProperty('tuple', expect.toEqual([ 1, 'foo' ]))
+    expect(getValidator([1, 'foo']))
+      .toBeInstanceOf(TupleValidator)
+      .toHaveProperty('tuple', expect.toEqual([1, 'foo']))
   })
 
   it('others (error)', () => {
-    expect(() => getValidator(Symbol('foo') as any))
-        .toThrowError(TypeError, 'Invalid validation (type=symbol)')
+    expect(() => getValidator(Symbol('foo') as any)).toThrowError(TypeError, 'Invalid validation (type=symbol)')
   })
 
   it('validator iterator (tuple rest parameters)', () => {
-    const array = [ ...fakeValidator ]
-    expect(array).toEqual([ {
-      [Symbol.justusRestValidator]: fakeValidator,
-    } ])
+    const array = [...fakeValidator]
+    expect(array).toEqual([
+      {
+        [Symbol.justusRestValidator]: fakeValidator,
+      },
+    ])
   })
 })

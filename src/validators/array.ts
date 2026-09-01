@@ -1,9 +1,9 @@
-import { assertSchema, assertValidation, ValidationErrorBuilder } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
-import { getValidator } from '../utilities'
-import { any } from './any'
+import { assertSchema, assertValidation, ValidationErrorBuilder } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
+import { getValidator } from '../utilities.ts'
+import { any } from './any.ts'
 
-import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types'
+import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types.ts'
 
 /* ========================================================================== *
  * ARRAYS VALIDATION                                                           *
@@ -12,20 +12,20 @@ import type { InferInput, InferValidation, Validation, ValidationOptions, Valida
 /** Constraints to validate an `Array` with. */
 export interface ArrayConstraints<V extends Validation> {
   /** The _maximum_ number of elements a valid `Array`: `value.length <= maxItems` */
-  maxItems?: number,
+  maxItems?: number
   /** The _minimum_ number of elements a valid `Array`: `value.length >= minItems` */
-  minItems?: number,
+  minItems?: number
   /** A flag indicating whether an `Array`'s elements must be unique */
-  uniqueItems?: boolean,
+  uniqueItems?: boolean
   /** A `Validator` validating each individual item in an `Array` */
-  items?: V,
+  items?: V
 }
 
 /** Basic validator for `Array` instances. */
 export class AnyArrayValidator<T = any> extends AbstractValidator<T[]> {
   validate(value: unknown): T[] {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
-    return [ ...value ]
+    return [...value]
   }
 }
 
@@ -39,12 +39,7 @@ export class ArrayValidator<T, I = T> extends AbstractValidator<T[], I[]> {
   constructor(options: ArrayConstraints<Validator<T>> = {}) {
     super()
 
-    const {
-      items = any,
-      maxItems = Number.POSITIVE_INFINITY,
-      minItems = 0,
-      uniqueItems = false,
-    } = options
+    const { items = any, maxItems = Number.POSITIVE_INFINITY, minItems = 0, uniqueItems = false } = options
 
     assertSchema(minItems >= 0, `Constraint "minItems" (${minItems}) must be non-negative`)
     assertSchema(maxItems >= 0, `Constraint "maxItems" (${maxItems}) must be non-negative`)
@@ -59,14 +54,12 @@ export class ArrayValidator<T, I = T> extends AbstractValidator<T[], I[]> {
   validate(value: unknown, options?: ValidationOptions): T[] {
     assertValidation(Array.isArray(value), 'Value is not an "array"')
 
-    assertValidation(value.length >= this.minItems,
-        `Array must have a minimum length of ${this.minItems}`)
+    assertValidation(value.length >= this.minItems, `Array must have a minimum length of ${this.minItems}`)
 
-    assertValidation(value.length <= this.maxItems,
-        `Array must have a maximum length of ${this.maxItems}`)
+    assertValidation(value.length <= this.maxItems, `Array must have a maximum length of ${this.maxItems}`)
 
     const builder = new ValidationErrorBuilder()
-    const clone: any[] = new Array(value.length)
+    const clone: any[] = Array.from({ length: value.length })
 
     value.forEach((item, i) => {
       try {
@@ -90,7 +83,7 @@ export class ArrayValidator<T, I = T> extends AbstractValidator<T[], I[]> {
 /* -------------------------------------------------------------------------- */
 
 export function arrayValidatorFactory<V extends Validation>(
-    constraints: ArrayConstraints<V>,
+  constraints: ArrayConstraints<V>,
 ): ArrayValidator<InferValidation<V>, InferInput<V>> {
   const items = constraints.items ? getValidator(constraints.items) : any
   return new ArrayValidator<any>({ ...constraints, items })

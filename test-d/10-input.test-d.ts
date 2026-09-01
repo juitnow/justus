@@ -1,5 +1,6 @@
 import { expectAssignable, expectType, printType } from 'tsd'
 
+import { url } from '../src/extra/url.ts'
 import {
   allOf,
   any,
@@ -16,10 +17,9 @@ import {
   optional,
   string,
   validate,
-} from '../src'
-import { url } from '../src/extra/url'
+} from '../src/index.ts'
 
-import type { InferInput } from '../src'
+import type { InferInput } from '../src/index.ts'
 
 printType('__file_marker__')
 
@@ -100,7 +100,7 @@ expectType<string | undefined>(inputType(optional(string, 'foo' as const)))
 expectType<string | undefined>(inputType(optional(string, 12345 as const)))
 
 expectType<number[] | undefined>(inputType(optional(arrayOf(number))))
-expectType<number[] | undefined>(inputType(optional(arrayOf(number), [ 1, 2, 3 ] as const)))
+expectType<number[] | undefined>(inputType(optional(arrayOf(number), [1, 2, 3] as const)))
 expectType<number[] | undefined>(inputType(optional(arrayOf(number), 12345 as const)))
 
 expectType<Date | string | number | undefined>(inputType(optional(date)))

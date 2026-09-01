@@ -1,5 +1,5 @@
-import { constant, optional, string, validate, ValidationError } from '../src'
-import { url } from '../src/extra/url'
+import { url } from '../src/extra/url.ts'
+import { constant, optional, string, validate, ValidationError } from '../src/index.ts'
 
 describe('URL validator', () => {
   it('should validate a simple URL', () => {
@@ -9,8 +9,7 @@ describe('URL validator', () => {
   })
 
   it('should not validate a wrong URL', () => {
-    expect(() => validate(url, '/foo/bar'))
-        .toThrowError(ValidationError, /Value could not be converted to a "URL"/)
+    expect(() => validate(url, '/foo/bar')).toThrowError(ValidationError, /Value could not be converted to a "URL"/)
   })
 
   it('should validate an URL with some basic constraints', () => {
@@ -23,14 +22,16 @@ describe('URL validator', () => {
 
     expect(validator.validate('http://www/a/b/c#foo').href).toStrictlyEqual('http://www/a/b/c#foo')
 
-    expect(() => validator.validate('ftp://funet/fi'))
-        .toThrow((assert) => assert
-            .toBeError(ValidationError, /^Found 3 validation errors/)
-            .toHaveProperty('errors', expect.toMatchContents([
-              { path: [ 'protocol' ], message: 'String does not match required pattern /^https?:$/' },
-              { path: [ 'hostname' ], message: 'Value does not match constant "www" (string)' },
-              { path: [ 'pathname' ], message: 'Value does not match constant "/a/b/c" (string)' },
-            ])))
+    expect(() => validator.validate('ftp://funet/fi')).toThrow((assert) =>
+      assert.toBeError(ValidationError, /^Found 3 validation errors/).toHaveProperty(
+        'errors',
+        expect.toMatchContents([
+          { path: ['protocol'], message: 'String does not match required pattern /^https?:$/' },
+          { path: ['hostname'], message: 'Value does not match constant "www" (string)' },
+          { path: ['pathname'], message: 'Value does not match constant "/a/b/c" (string)' },
+        ]),
+      ),
+    )
   })
 
   it('should validate an URL with some search parameters constraints', () => {
@@ -42,12 +43,14 @@ describe('URL validator', () => {
     })
 
     expect(validator.validate('http://www/?foo=bar&baz=xyz').href).toEqual('http://www/?foo=bar&baz=xyz')
-    expect(() => validator.validate('http://www/?baz=abc').href)
-        .toThrow((assert) => assert
-            .toBeError(ValidationError, /^Found 2 validation errors/)
-            .toHaveProperty('errors', expect.toMatchContents([
-              { path: [ 'searchParams', 'foo' ], message: 'Required property missing' },
-              { path: [ 'searchParams', 'baz' ], message: 'Value does not match constant "xyz" (string)' },
-            ])))
+    expect(() => validator.validate('http://www/?baz=abc').href).toThrow((assert) =>
+      assert.toBeError(ValidationError, /^Found 2 validation errors/).toHaveProperty(
+        'errors',
+        expect.toMatchContents([
+          { path: ['searchParams', 'foo'], message: 'Required property missing' },
+          { path: ['searchParams', 'baz'], message: 'Value does not match constant "xyz" (string)' },
+        ]),
+      ),
+    )
   })
 })

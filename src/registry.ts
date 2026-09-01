@@ -1,13 +1,13 @@
-import { assertSchema } from './errors'
+import { assertSchema } from './errors.ts'
 
-import type { ConstantValidator } from './validators/constant'
-import type { ObjectValidator } from './validators/object'
-import type { TupleValidator } from './validators/tuple'
+import type { ConstantValidator } from './validators/constant.ts'
+import type { ObjectValidator } from './validators/object.ts'
+import type { TupleValidator } from './validators/tuple.ts'
 
 type RegistryTypes = {
-  constant: typeof ConstantValidator,
-  object: typeof ObjectValidator,
-  tuple: typeof TupleValidator,
+  constant: typeof ConstantValidator
+  object: typeof ObjectValidator
+  tuple: typeof TupleValidator
 }
 
 const _registry: Partial<RegistryTypes> = {}
@@ -22,7 +22,7 @@ export const registry = {
   /** Retrieves the specified validator constructor */
   get<K extends keyof RegistryTypes>(key: K): RegistryTypes[K] {
     const value = _registry[key]
-    assertSchema(!! value, `No validator found for "${key}"`)
+    assertSchema(!!value, `No validator found for "${key}"`)
     return value
   },
 }

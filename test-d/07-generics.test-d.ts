@@ -1,8 +1,8 @@
 import { expectAssignable, expectError, expectType, printType } from 'tsd'
 
-import { arrayOf, object, validate } from '../src'
+import { arrayOf, object, validate } from '../src/index.ts'
 
-import type { InferValidation, Validation } from '../src'
+import type { InferValidation, Validation } from '../src/index.ts'
 
 printType('__file_marker__')
 

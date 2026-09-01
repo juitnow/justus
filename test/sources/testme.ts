@@ -1,14 +1,4 @@
-import {
-  allowAdditionalProperties,
-  any,
-  array,
-  boolean,
-  date,
-  never,
-  number,
-  object,
-  string,
-} from 'justus'
+import { allowAdditionalProperties, any, array, boolean, date, never, number, object, string } from 'justus'
 import { url } from 'justus/extra/url'
 
 export const testKeywords = object({

@@ -1,26 +1,26 @@
-import { assertSchema, assertValidation, ValidationError } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
+import { assertSchema, assertValidation, ValidationError } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
 
-import type { Branding, Validator } from '../types'
+import type { Branding, Validator } from '../types.ts'
 
 /* ========================================================================== */
 
 /** Constraints to validate a `bigint` with. */
 export interface BigIntConstraints {
   /** The value for which a `bigint` must be multiple of for it to be valid */
-  multipleOf?: bigint | number,
+  multipleOf?: bigint | number
   /** The _inclusive_ maximum value for a valid `bigint`: `value <= maximum` */
-  maximum?: bigint | number,
+  maximum?: bigint | number
   /** The _inclusive_ minimum value for a valid `bigint`: `value >= minimum` */
-  minimum?: bigint | number,
+  minimum?: bigint | number
   /** The _exclusive_ maximum value for a valid `bigint`: `value < exclusiveMaximum` */
-  exclusiveMaximum?: bigint | number,
+  exclusiveMaximum?: bigint | number
   /** The _exclusive_ minimum value for a valid `bigint`: `value > exclusiveMaximum` */
-  exclusiveMinimum?: bigint | number,
+  exclusiveMinimum?: bigint | number
   /** Allow bigints to be parsed from strings (e.g. `123.456` or `0x0CAFE`, default: `false`) */
-  fromString?: boolean,
+  fromString?: boolean
   /** Allow bigints to be parsed from numbers (default: `true`) */
-  fromNumber?: boolean,
+  fromNumber?: boolean
 }
 
 /** Constraints to validate a `bigint` with extra branding information. */
@@ -68,7 +68,7 @@ export class BigIntValidator<N extends bigint = bigint> extends AbstractValidato
       fromNumber = true,
     } = constraints
 
-    if ('brand' in constraints) this.brand = (<any> constraints).brand
+    if ('brand' in constraints) this.brand = (<any>constraints).brand
     this.fromString = fromString
     this.fromNumber = fromNumber
 
@@ -78,23 +78,29 @@ export class BigIntValidator<N extends bigint = bigint> extends AbstractValidato
     const _minimum = minimum === undefined ? undefined : BigInt(minimum)
     const _multipleOf = multipleOf === undefined ? undefined : BigInt(multipleOf)
 
-    if ((_maximum !== undefined) && (_minimum !== undefined)) {
+    if (_maximum !== undefined && _minimum !== undefined) {
       assertSchema(_maximum >= _minimum, `Constraint "minimum" (${_minimum}) is greater than "maximum" (${_maximum})`)
     }
 
-    if ((_exclusiveMaximum !== undefined) && (_minimum !== undefined)) {
-      assertSchema(_exclusiveMaximum > _minimum,
-          `Constraint "exclusiveMaximum" (${_exclusiveMaximum}) must be greater than "minimum" (${_minimum})`)
+    if (_exclusiveMaximum !== undefined && _minimum !== undefined) {
+      assertSchema(
+        _exclusiveMaximum > _minimum,
+        `Constraint "exclusiveMaximum" (${_exclusiveMaximum}) must be greater than "minimum" (${_minimum})`,
+      )
     }
 
-    if ((_exclusiveMinimum !== undefined) && (_maximum != undefined)) {
-      assertSchema(_maximum > _exclusiveMinimum,
-          `Constraint "maximum" (${_maximum}) must be greater than "exclusiveMinimum" (${_exclusiveMinimum})`)
+    if (_exclusiveMinimum !== undefined && _maximum != undefined) {
+      assertSchema(
+        _maximum > _exclusiveMinimum,
+        `Constraint "maximum" (${_maximum}) must be greater than "exclusiveMinimum" (${_exclusiveMinimum})`,
+      )
     }
 
-    if ((_exclusiveMinimum != undefined) && (_exclusiveMaximum !== undefined)) {
-      assertSchema(_exclusiveMaximum > _exclusiveMinimum,
-          `Constraint "exclusiveMaximum" (${_exclusiveMaximum}) must be greater than "exclusiveMinimum" (${_exclusiveMinimum})`)
+    if (_exclusiveMinimum != undefined && _exclusiveMaximum !== undefined) {
+      assertSchema(
+        _exclusiveMaximum > _exclusiveMinimum,
+        `Constraint "exclusiveMaximum" (${_exclusiveMaximum}) must be greater than "exclusiveMinimum" (${_exclusiveMinimum})`,
+      )
     }
 
     if (_multipleOf !== undefined) {
@@ -110,8 +116,7 @@ export class BigIntValidator<N extends bigint = bigint> extends AbstractValidato
 
   validate(value: unknown): N {
     // Allow parsing from strings or numbers
-    if (((typeof value === 'string') && (this.fromString)) ||
-        ((typeof value === 'number') && (this.fromNumber))) {
+    if ((typeof value === 'string' && this.fromString) || (typeof value === 'number' && this.fromNumber)) {
       try {
         value = BigInt(value)
       } catch {
@@ -121,16 +126,20 @@ export class BigIntValidator<N extends bigint = bigint> extends AbstractValidato
 
     assertValidation(typeof value === 'bigint', 'Value is not a "bigint"')
 
-    assertValidation(((this.minimum === undefined) || (value >= this.minimum)),
-        `BigInt is less than ${this.minimum}`)
-    assertValidation(((this.maximum === undefined) || (value <= this.maximum)),
-        `BigInt is greater than ${this.maximum}`)
-    assertValidation((this.exclusiveMinimum === undefined) || (value > this.exclusiveMinimum),
-        `BigInt is less than or equal to ${this.exclusiveMinimum}`)
-    assertValidation((this.exclusiveMaximum === undefined) || (value < this.exclusiveMaximum),
-        `BigInt is greater than or equal to ${this.exclusiveMaximum}`)
-    assertValidation((this.multipleOf === undefined) || (!(value % this.multipleOf)),
-        `BigInt is not a multiple of ${this.multipleOf}`)
+    assertValidation(this.minimum === undefined || value >= this.minimum, `BigInt is less than ${this.minimum}`)
+    assertValidation(this.maximum === undefined || value <= this.maximum, `BigInt is greater than ${this.maximum}`)
+    assertValidation(
+      this.exclusiveMinimum === undefined || value > this.exclusiveMinimum,
+      `BigInt is less than or equal to ${this.exclusiveMinimum}`,
+    )
+    assertValidation(
+      this.exclusiveMaximum === undefined || value < this.exclusiveMaximum,
+      `BigInt is greater than or equal to ${this.exclusiveMaximum}`,
+    )
+    assertValidation(
+      this.multipleOf === undefined || !(value % this.multipleOf),
+      `BigInt is not a multiple of ${this.multipleOf}`,
+    )
 
     return value as N
   }
@@ -138,7 +147,9 @@ export class BigIntValidator<N extends bigint = bigint> extends AbstractValidato
 
 export function bigintValidatorFactory(constraints: BigIntConstraints): BigIntValidator<bigint>
 export function bigintValidatorFactory<N extends bigint>(constraints: BigIntConstraints): BigIntValidator<N>
-export function bigintValidatorFactory<B extends string>(constraints: BrandedBigIntConstraints<B>): BigIntValidator<bigint & Branding<B>>
+export function bigintValidatorFactory<B extends string>(
+  constraints: BrandedBigIntConstraints<B>,
+): BigIntValidator<bigint & Branding<B>>
 export function bigintValidatorFactory(constraints: BigIntConstraints): Validator<bigint> {
   return new BigIntValidator(constraints)
 }

@@ -1,45 +1,62 @@
 import { expectAssignable, expectError, expectType, printType } from 'tsd'
 
-import {
-  allowAdditionalProperties,
-  boolean,
-  never,
-  number,
-  object,
-  string,
-  validate,
-} from '../src'
+import { allowAdditionalProperties, boolean, never, number, object, string, validate } from '../src/index.ts'
 
 printType('__file_marker__')
 
 // -------------------------------------------------------------------------- //
 
-expectError(validate(object({
-  // no ...additionalProperties
-}), null).extra)
+expectError(
+  validate(
+    object({
+      // no ...additionalProperties
+    }),
+    null,
+  ).extra,
+)
 
-expectType<any>(validate(object({
-  ...allowAdditionalProperties, // as a function
-}), null).extra)
+expectType<any>(
+  validate(
+    object({
+      ...allowAdditionalProperties, // as a function
+    }),
+    null,
+  ).extra,
+)
 
-expectType<any>(validate(object({
-  ...allowAdditionalProperties(), // default = true
-}), null).extra)
+expectType<any>(
+  validate(
+    object({
+      ...allowAdditionalProperties(), // default = true
+    }),
+    null,
+  ).extra,
+)
 
-expectType<any>(validate(object({
-  ...allowAdditionalProperties(true),
-}), null).extra)
+expectType<any>(
+  validate(
+    object({
+      ...allowAdditionalProperties(true),
+    }),
+    null,
+  ).extra,
+)
 
-expectError(validate(object({
-  ...allowAdditionalProperties(false),
-}), null).extra)
+expectError(
+  validate(
+    object({
+      ...allowAdditionalProperties(false),
+    }),
+    null,
+  ).extra,
+)
 
 // -------------------------------------------------------------------------- //
 
-expectType<null>(validate(object({ ...allowAdditionalProperties(null) }), null).extra)
-expectType<Record<string, any>>(validate(object({ ...allowAdditionalProperties(object) }), null).extra)
-expectType<number>(validate(object({ ...allowAdditionalProperties(number) }), null).extra)
-expectType<'hello'>(validate(object({ ...allowAdditionalProperties('hello') }), null).extra)
+expectType<null | undefined>(validate(object({ ...allowAdditionalProperties(null) }), null).extra)
+expectType<Record<string, any> | undefined>(validate(object({ ...allowAdditionalProperties(object) }), null).extra)
+expectType<number | undefined>(validate(object({ ...allowAdditionalProperties(number) }), null).extra)
+expectType<'hello' | undefined>(validate(object({ ...allowAdditionalProperties('hello') }), null).extra)
 
 // -------------------------------------------------------------------------- //
 // combining schemas
@@ -66,7 +83,7 @@ const o1 = validate(s1, null)
 expectType<number>(o1.a)
 expectType<string>(o1.b)
 expectType<string>(o1.c)
-expectType<boolean>(o1.extra)
+expectType<boolean | undefined>(o1.extra)
 
 const o2 = validate(s2, null)
 
@@ -89,7 +106,7 @@ const o4 = validate(s4, null)
 expectType<number>(o4.a)
 expectType<never>(o4.b)
 expectType<string>(o4.c)
-expectAssignable<{ a: number, b?: undefined, c: string }>(o4)
+expectAssignable<{ a: number; b?: undefined; c: string }>(o4)
 expectError(o4.extra) // no additional properties
 
 // never with "additionalProperties"
@@ -106,5 +123,5 @@ const o5 = validate(s5, null)
 expectType<number>(o5.a)
 expectType<never>(o5.b) // forcedly removed from the resulting object
 expectType<string>(o5.c)
-expectAssignable<{ a: number, b?: undefined, c: string } & { [ k in string ]: boolean }>(o5)
-expectType<boolean>(o5.extra) // defined in additionalProperties
+expectAssignable<{ a: number; b?: undefined; c: string } & { [k in string]: boolean }>(o5)
+expectType<boolean | undefined>(o5.extra) // defined in additionalProperties

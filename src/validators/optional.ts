@@ -1,18 +1,16 @@
-import { AbstractValidator } from '../types'
-import { getValidator } from '../utilities'
+import { AbstractValidator } from '../types.ts'
+import { getValidator } from '../utilities.ts'
 
-import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types'
+import type { InferInput, InferValidation, Validation, ValidationOptions, Validator } from '../types.ts'
 
-/**
- * A `Validator` for _optional_ properties (that is `type | undefined`).
- */
+/** A `Validator` for _optional_ properties (that is `type | undefined`). */
 export class OptionalValidator<
   T = any, // the type of the "validation", that is the optional type to validate
   I = T, // the _input_ type of the "validation", that is anything acceptable
   D = undefined, // the default value (or undefined)
 > extends AbstractValidator<D extends undefined ? T | undefined : T, I | undefined> {
   validator: Validator<T>
-  defaultValue: T | undefined
+  override defaultValue: T | undefined
 
   constructor(validator: Validator<T>)
   constructor(validator: Validator<T>, defaultValue: D)
@@ -45,17 +43,19 @@ export class OptionalValidator<
  *
  * @param validation - A `Validation` to be marked as _optional_.
  */
-export function optional<
-  V extends Validation,
->(validation: V): OptionalValidator<InferValidation<V>, InferInput<V>, undefined>
+export function optional<V extends Validation>(
+  validation: V,
+): OptionalValidator<InferValidation<V>, InferInput<V>, undefined>
 
-export function optional<
-  V extends Validation, D,
->(validation: V, defaultValue: D): OptionalValidator<InferValidation<V>, InferInput<V>, D>
+export function optional<V extends Validation, D>(
+  validation: V,
+  defaultValue: D,
+): OptionalValidator<InferValidation<V>, InferInput<V>, D>
 
-export function optional<
-  V extends Validation, D,
->(validation: V, defaultValue?: D): OptionalValidator<InferValidation<V>, InferInput<V>, D> {
+export function optional<V extends Validation, D>(
+  validation: V,
+  defaultValue?: D,
+): OptionalValidator<InferValidation<V>, InferInput<V>, D> {
   const validator = getValidator(validation)
   return new OptionalValidator(validator, defaultValue)
 }

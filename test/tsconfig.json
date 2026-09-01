@@ -1,8 +1,11 @@
 {
+  // Inherit options from the root configuration file
   "extends": "../tsconfig.json",
+  // Add Expect5's own globals and make sure we can reference "../src"
   "compilerOptions": {
-    "types": [ "@plugjs/expect5/globals", "node" ],
-    "rootDir": "..",
+    "types": ["@plugjs/expect5/globals", "node"],
+    "rootDir": ".."
   },
-  "include": [ "." ],
+  // Include only tests, but exclude resources (intentionally broken)
+  "include": ["."]
 }

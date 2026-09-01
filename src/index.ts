@@ -3,43 +3,43 @@
  * ========================================================================== */
 
 // All our types and utilities
-export * from './errors'
-export * from './schema'
-export * from './types'
-export * from './utilities'
+export * from './errors.ts'
+export * from './schema.ts'
+export * from './types.ts'
+export * from './utilities.ts'
 
 // Validators
-export { AnyValidator, any } from './validators/any'
-export { AnyArrayValidator, ArrayValidator, array, arrayOf } from './validators/array'
-export { AnyBigIntValidator, BigIntValidator, bigint } from './validators/bigint'
-export { BooleanValidator, boolean } from './validators/boolean'
-export { ConstantValidator, constant } from './validators/constant'
-export { DateValidator, date } from './validators/date'
-export { NeverValidator, never } from './validators/never'
-export { AnyNumberValidator, NumberValidator, number } from './validators/number'
-export { AnyObjectValidator, ObjectValidator, object, objectOf } from './validators/object'
-export { OptionalValidator, optional } from './validators/optional'
-export { AnyStringValidator, StringValidator, string } from './validators/string'
-export { TupleValidator, tuple } from './validators/tuple'
-export { AllOfValidator, OneOfValidator, allOf, oneOf } from './validators/union'
+export { any, AnyValidator } from './validators/any.ts'
+export { AnyArrayValidator, array, arrayOf, ArrayValidator } from './validators/array.ts'
+export { AnyBigIntValidator, bigint, BigIntValidator } from './validators/bigint.ts'
+export { boolean, BooleanValidator } from './validators/boolean.ts'
+export { constant, ConstantValidator } from './validators/constant.ts'
+export { date, DateValidator } from './validators/date.ts'
+export { never, NeverValidator } from './validators/never.ts'
+export { AnyNumberValidator, number, NumberValidator } from './validators/number.ts'
+export { AnyObjectValidator, object, objectOf, ObjectValidator } from './validators/object.ts'
+export { optional, OptionalValidator } from './validators/optional.ts'
+export { AnyStringValidator, string, StringValidator } from './validators/string.ts'
+export { tuple, TupleValidator } from './validators/tuple.ts'
+export { allOf, AllOfValidator, oneOf, OneOfValidator } from './validators/union.ts'
 
 // Validator Types
-export type { ArrayConstraints, arrayValidatorFactory } from './validators/array'
-export type { BrandedBigIntConstraints, bigintValidatorFactory } from './validators/bigint'
-export type { BooleanConstraints, booleanValidatorFactory } from './validators/boolean'
-export type { DateConstraints, dateValidatorFactory } from './validators/date'
-export type { BrandedNumberConstraints, numberValidatorFactory } from './validators/number'
-export type { objectValidatorFactory } from './validators/object'
-export type { BrandedStringConstraints, StringConstraints, stringValidatorFactory } from './validators/string'
-export type { TupleMember } from './validators/tuple'
+export type { ArrayConstraints, arrayValidatorFactory } from './validators/array.ts'
+export type { bigintValidatorFactory, BrandedBigIntConstraints } from './validators/bigint.ts'
+export type { BooleanConstraints, booleanValidatorFactory } from './validators/boolean.ts'
+export type { DateConstraints, dateValidatorFactory } from './validators/date.ts'
+export type { BrandedNumberConstraints, numberValidatorFactory } from './validators/number.ts'
+export type { objectValidatorFactory } from './validators/object.ts'
+export type { BrandedStringConstraints, StringConstraints, stringValidatorFactory } from './validators/string.ts'
+export type { TupleMember } from './validators/tuple.ts'
 
 /* ========================================================================== *
  * VALIDATE FUNCTION (our main entry point)                                   *
  * ========================================================================== */
 
-import { getValidator } from './utilities'
+import { getValidator } from './utilities.ts'
 
-import type { InferValidation, Validation, ValidationOptions } from './types'
+import type { InferValidation, Validation, ValidationOptions } from './types.ts'
 
 /**
  * Validate a _value_ using the specified `Validation`.
@@ -48,9 +48,9 @@ import type { InferValidation, Validation, ValidationOptions } from './types'
  * reported as an error.
  */
 export function validate<V extends Validation>(
-    validation: V,
-    value: any,
-    options?: ValidationOptions,
+  validation: V,
+  value: any,
+  options?: ValidationOptions,
 ): InferValidation<V> {
   const opts: ValidationOptions = {
     partialValidation: false,
@@ -78,9 +78,9 @@ export function validate<V extends Validation>(
  * ```
  */
 export function strip<V extends Validation>(
-    validation: V,
-    value: any,
-    options?: ValidationOptions,
+  validation: V,
+  value: any,
+  options?: ValidationOptions,
 ): InferValidation<V> {
   const opts: ValidationOptions = {
     partialValidation: false,
@@ -113,9 +113,9 @@ export function strip<V extends Validation>(
  * `Partial<...>` type.
  */
 export function partial<V extends Validation>(
-    validation: V,
-    value: any,
-    options?: ValidationOptions,
+  validation: V,
+  value: any,
+  options?: ValidationOptions,
 ): Partial<InferValidation<V>> {
   return getValidator(validation).validate(value, {
     partialValidation: true,

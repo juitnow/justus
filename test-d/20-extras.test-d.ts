@@ -1,14 +1,14 @@
 import { expectType, printType } from 'tsd'
 
-import { validate } from '../src'
-import { arn, parseArn } from '../src/extra/arn'
-import { ean13 } from '../src/extra/ean13'
-import { uuid } from '../src/extra/uuid'
+import { arn, parseArn } from '../src/extra/arn.ts'
+import { ean13 } from '../src/extra/ean13.ts'
+import { uuid } from '../src/extra/uuid.ts'
+import { validate } from '../src/index.ts'
 
-import type { InferInput } from '../src'
-import type { ArnString, ParsedArn } from '../src/extra/arn'
-import type { EAN13String } from '../src/extra/ean13'
-import type { UUIDString } from '../src/extra/uuid'
+import type { ArnString, ParsedArn } from '../src/extra/arn.ts'
+import type { EAN13String } from '../src/extra/ean13.ts'
+import type { UUIDString } from '../src/extra/uuid.ts'
+import type { InferInput } from '../src/index.ts'
 
 printType('__file_marker__')
 
@@ -21,19 +21,12 @@ function inputType<T>(param: T): InferInput<T> {
 expectType<string & { __arn: never }>(validate(arn, 'foo'))
 expectType<string & ArnString>(validate(arn, 'foo'))
 
-expectType<(
-& string
-& { __arn: never }
-& { __arn_service_myservice: never }
-)>(validate(arn('myservice'), 'foo'))
+expectType<string & { __arn: never } & { __arn_service_myservice: never }>(validate(arn('myservice'), 'foo'))
 expectType<ArnString<'myservice'>>(validate(arn('myservice'), 'foo'))
 
-expectType<(
-& string
-& { __arn: never }
-& { __arn_service_myservice: never }
-& { __arn_resource_myresource: never }
-)>(validate(arn('myservice', 'myresource'), 'foo'))
+expectType<string & { __arn: never } & { __arn_service_myservice: never } & { __arn_resource_myresource: never }>(
+  validate(arn('myservice', 'myresource'), 'foo'),
+)
 expectType<ArnString<'myservice', 'myresource'>>(validate(arn('myservice', 'myresource'), 'foo'))
 
 expectType<ParsedArn<string>>(validate(parseArn, 'foo'))

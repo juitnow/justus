@@ -1,18 +1,9 @@
 import { expectError, printType } from 'tsd'
 
-import {
-  allOf,
-  date,
-  never,
-  number,
-  object,
-  oneOf,
-  optional,
-  string,
-} from '../src'
-import { url } from '../src/extra/url'
+import { url } from '../src/extra/url.ts'
+import { allOf, date, never, number, object, oneOf, optional, string } from '../src/index.ts'
 
-import type { InferInput, Validation } from '../src'
+import type { InferInput, Validation } from '../src/index.ts'
 
 printType('__file_marker__')
 

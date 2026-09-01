@@ -1,46 +1,37 @@
-import { assertValidation } from '../errors'
-import { AbstractValidator, makeValidatorFactory } from '../types'
+import { assertValidation } from '../errors.ts'
+import { AbstractValidator, makeValidatorFactory } from '../types.ts'
 
 /*  ===== TYPES ============================================================= */
 
 /** The type for a validated _string_ ARN (Amazon Resource Name) */
-export type ArnString<
-  Service extends string = string,
-  ResourceType extends string = string,
-> = string & { __arn: never }
-& ( string extends Service ? string : { [ k in `__arn_service_${Service}`] : never })
-& ( string extends ResourceType ? string : { [ k in `__arn_resource_${ResourceType}`] : never })
+export type ArnString<Service extends string = string, ResourceType extends string = string> = string & {
+  __arn: never
+} & (string extends Service ? string : { [k in `__arn_service_${Service}`]: never }) &
+  (string extends ResourceType ? string : { [k in `__arn_resource_${ResourceType}`]: never })
 
 /** The type for a _parsed_ ARN (Amazon Resource Name) */
-export interface ParsedArn<
-  Service extends string = string,
-  ResourceType extends string = string,
-> {
-  /** The full  */
-  Arn: ArnString<Service, ResourceType>,
-  Partition: string,
-  Service: Service,
-  Region: string,
-  Account: string,
-  Resource: [ ResourceType, ...string[] ],
+export interface ParsedArn<Service extends string = string, ResourceType extends string = string> {
+  /** The full */
+  Arn: ArnString<Service, ResourceType>
+  Partition: string
+  Service: Service
+  Region: string
+  Account: string
+  Resource: [ResourceType, ...string[]]
 }
 
 /* ===== INTERNALS ========================================================== */
 
-function assertComponent<T extends string>(
-    actual: string,
-    expected: T | undefined,
-    kind: string,
-): asserts actual is T {
+function assertComponent<T extends string>(actual: string, expected: T | undefined, kind: string): asserts actual is T {
   if (expected === undefined) return
   assertValidation(actual === expected, `ARN ${kind} "${actual}" mismatch (expected "${expected}")`)
 }
 
 /** Validate a string and convert it into into an {@link ParsedArn} */
 function parse<Service extends string, ResourceType extends string>(
-    value: unknown,
-    service?: Service,
-    type?: ResourceType,
+  value: unknown,
+  service?: Service,
+  type?: ResourceType,
 ): ParsedArn<Service, ResourceType> {
   assertValidation(typeof value === 'string', 'Value is not a "string"')
 
@@ -48,19 +39,17 @@ function parse<Service extends string, ResourceType extends string>(
 
   assertValidation(segments.length >= 6, 'Invalid components in ARN')
 
-  const [ pfx, prt, svc, rgn, act, ...res ] = segments
+  const [pfx, prt, svc, rgn, act, ...res] = segments
 
   assertValidation(pfx === 'arn', 'ARN must start with "arn:"')
-  assertValidation(!! prt, 'Missing partition in ARN')
-  assertValidation(!! svc, 'Missing service in ARN')
-  assertValidation(!! act, 'Missing account ID in ARN')
-  assertValidation(!! res[0], 'Missing resource ID in ARN')
+  assertValidation(!!prt, 'Missing partition in ARN')
+  assertValidation(!!svc, 'Missing service in ARN')
+  assertValidation(!!act, 'Missing account ID in ARN')
+  assertValidation(!!res[0], 'Missing resource ID in ARN')
 
-  const [ [ resType, ...resArray ], resString ] = res[0].includes('/') ?
-    [ res[0].split('/'), res[0] ] :
-    [ res, res.join(':') ]
+  const [[resType, ...resArray], resString] = res[0].includes('/') ? [res[0].split('/'), res[0]] : [res, res.join(':')]
 
-  assertValidation(!! resType, 'Invalid resource ID in ARN')
+  assertValidation(!!resType, 'Invalid resource ID in ARN')
 
   assertComponent(svc, service, 'Service')
   assertComponent(resType, type, 'Resource Type')
@@ -73,7 +62,7 @@ function parse<Service extends string, ResourceType extends string>(
     Service: svc, // as Service,
     Region: rgn || '',
     Account: act,
-    Resource: [ resType, ...resArray ], // as [ ResourceType, ...string[] ],
+    Resource: [resType, ...resArray], // as [ ResourceType, ...string[] ],
   }
 }
 
@@ -88,13 +77,16 @@ export class ParsedArnValidator<
    * Create a new {@link ParsedArnValidator} instance.
    *
    * @param service The (optional) service the ARN should be pointing to
-   *                (e.g. `iam` or `elasticloadbalancing`)
+   *   (e.g. `iam` or `elasticloadbalancing`)
    * @param resourceType The (optional) resource _type_ the ARN should be
-   *                     representing (e.g. `role` in the `iam` service, or
-   *                     `targetgroup` in the `elasticloadbalancing` service)
+   *   representing (e.g. `role` in the `iam` service, or
+   *   `targetgroup` in the `elasticloadbalancing` service)
    */
   constructor(service?: Service, resourceType?: ResourceType)
-  constructor(private _service?: Service, private _type?: ResourceType) {
+  constructor(
+    private _service?: Service,
+    private _type?: ResourceType,
+  ) {
     super()
   }
 
@@ -112,13 +104,16 @@ export class ArnValidator<
    * Create a new {@link ArnValidator} instance.
    *
    * @param service The (optional) service the ARN should be pointing to
-   *                (e.g. `iam` or `elasticloadbalancing`)
+   *   (e.g. `iam` or `elasticloadbalancing`)
    * @param resourceType The (optional) resource _type_ the ARN should be
-   *                     representing (e.g. `role` in the `iam` service, or
-   *                     `targetgroup` in the `elasticloadbalancing` service)
+   *   representing (e.g. `role` in the `iam` service, or
+   *   `targetgroup` in the `elasticloadbalancing` service)
    */
   constructor(service?: Service, resourceType?: ResourceType)
-  constructor(private _service?: Service, private _type?: ResourceType) {
+  constructor(
+    private _service?: Service,
+    private _type?: ResourceType,
+  ) {
     super()
   }
 
@@ -137,11 +132,9 @@ export class ArnValidator<
  * component of the ARN's resource (e.g. `role` in the `iam` service, or
  * `targetgroup` in the `elasticloadbalancing` service)
  */
-export function parseArnFactory<
-  Service extends string = string,
-  ResourceType extends string = string>(
-    service: Service,
-    resourceType?: ResourceType,
+export function parseArnFactory<Service extends string = string, ResourceType extends string = string>(
+  service: Service,
+  resourceType?: ResourceType,
 ): ParsedArnValidator<Service, ResourceType> {
   return new ParsedArnValidator(service, resourceType)
 }
@@ -154,11 +147,9 @@ export function parseArnFactory<
  * component of the ARN's resource (e.g. `role` in the `iam` service, or
  * `targetgroup` in the `elasticloadbalancing` service)
  */
-export function arnFactory<
-  Service extends string = string,
-  ResourceType extends string = string>(
-    service: Service,
-    resourceType?: ResourceType,
+export function arnFactory<Service extends string = string, ResourceType extends string = string>(
+  service: Service,
+  resourceType?: ResourceType,
 ): ArnValidator<Service, ResourceType> {
   return new ArnValidator(service, resourceType)
 }

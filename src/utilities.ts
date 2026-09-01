@@ -1,7 +1,7 @@
-import { assertSchema } from './errors'
-import { registry } from './registry'
+import { assertSchema } from './errors.ts'
+import { registry } from './registry.ts'
 
-import type { InferInput, InferValidation, Schema, Validation, Validator } from './types'
+import type { InferInput, InferValidation, Schema, Validation, Validator } from './types.ts'
 
 /* ========================================================================== *
  * UTILITY FUNCTIONS                                                          *
@@ -16,8 +16,8 @@ export function getValidator(validation: Validation): Validator {
   if (validation === null) return new (registry.get('constant'))(null)
 
   // Anything with a validor associated with
-  if ((<any> validation)[Symbol.justusValidator]) {
-    return (<any> validation)[Symbol.justusValidator] as Validator
+  if ((<any>validation)[Symbol.justusValidator]) {
+    return (<any>validation)[Symbol.justusValidator] as Validator
   }
 
   // Other types

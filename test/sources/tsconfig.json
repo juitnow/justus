@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "lib": [ "esnext", "webworker" ],
+    "lib": ["esnext", "webworker"],
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "bundler",
-    "types": [ ],
+    "types": [],
     "esModuleInterop": true,
 
     "noEmit": false,
@@ -21,9 +21,9 @@
     "verbatimModuleSyntax": true,
 
     "paths": {
-      "justus": [ "../.." ]
+      "justus": ["../.."]
     }
   },
-  "include": [ "*.ts", ],
-  "exclude": [ ]
+  "include": ["*.ts"],
+  "exclude": []
 }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-export type ValidationErrors = { path: (string | number)[], message: string }[]
+export type ValidationErrors = { path: (string | number)[]; message: string }[]
 
 /** Combine the components of a _path_ into a human readable string */
 function pathToString(path: (string | number)[]): string {
@@ -9,14 +9,12 @@ function pathToString(path: (string | number)[]): string {
   }, '')
 }
 
-/**
- * A `ValidationError` wraps one or more errors encountered during validation.
- */
+/** A `ValidationError` wraps one or more errors encountered during validation. */
 export class ValidationError extends Error {
   /** An `Array` of validation errors encountered while validating */
   readonly errors!: ValidationErrors
   /** Our stack, always present as we enforce it in the constructor */
-  readonly stack!: string
+  override readonly stack!: string
 
   /**
    * Create a new `ValidationError` instance from a `ValidationErrorBuilder`
@@ -29,41 +27,37 @@ export class ValidationError extends Error {
   constructor(cause: any, constructor?: Function)
   constructor(cause: any, path: (string | number)[], constructor?: Function)
 
-  constructor(
-      builderOrCause: any,
-      constructorOrPath?: Function | ((string | number)[]),
-      maybeConstructor?: Function,
-  ) {
+  constructor(builderOrCause: any, constructorOrPath?: Function | (string | number)[], maybeConstructor?: Function) {
     let constructor: Function
     let errors: ValidationErrors
 
     if (builderOrCause instanceof ValidationErrorBuilder) {
       errors = builderOrCause.errors
+      // oxlint-disable-next-line typescript/unbound-method
       constructor = builderOrCause.assert
     } else {
       const path = Array.isArray(constructorOrPath) ? constructorOrPath : []
 
       if (builderOrCause instanceof ValidationError) {
-        errors = builderOrCause.errors.map(({ path: subpath, message }) =>
-          ({ path: [ ...path, ...subpath ], message }))
+        errors = builderOrCause.errors.map(({ path: subpath, message }) => ({ path: [...path, ...subpath], message }))
       } else {
-        errors = [ { path, message: `${builderOrCause}` } ]
+        errors = [{ path, message: `${builderOrCause}` }]
       }
 
       constructor =
-        typeof maybeConstructor === 'function' ? maybeConstructor :
-        typeof constructorOrPath === 'function' ? constructorOrPath :
-        ValidationError
+        typeof maybeConstructor === 'function'
+          ? maybeConstructor
+          : typeof constructorOrPath === 'function'
+            ? constructorOrPath
+            : ValidationError
     }
 
     const details = errors
-        .map(({ path, message }) => ({ key: pathToString(path), message }))
-        .map(({ key, message }) => key ? `${key}: ${message}` : message)
-        .join('\n  ')
+      .map(({ path, message }) => ({ key: pathToString(path), message }))
+      .map(({ key, message }) => (key ? `${key}: ${message}` : message))
+      .join('\n  ')
 
-    const message = errors.length !== 1 ?
-      `Found ${errors.length} validation errors` :
-      'Found 1 validation error'
+    const message = errors.length !== 1 ? `Found ${errors.length} validation errors` : 'Found 1 validation error'
 
     super(`${message}\n  ${details}`)
 
@@ -74,9 +68,7 @@ export class ValidationError extends Error {
 
 ValidationError.prototype.name = 'ValidationError'
 
-/**
- * Helper class to build a `ValidationError` associated p
- */
+/** Helper class to build a `ValidationError` associated p */
 export class ValidationErrorBuilder {
   /** The current list of validation errors */
   readonly errors: ValidationErrors = []
@@ -85,15 +77,15 @@ export class ValidationErrorBuilder {
    * Record a validation error associated with the specified key.
    *
    * @param error - The error (normally a `string` or a `ValidationError`)
-   *                to record and associate with the given key
+   *   to record and associate with the given key
    * @param key - The key in an object, or index in an array where the
-   *              vaildation error was encountered
+   *   vaildation error was encountered
    */
   record(error: any, ...key: (string | number)[]): this {
-    const path = [ ...key ]
+    const path = [...key]
     if (error instanceof ValidationError) {
       error.errors.forEach(({ path: subpath, message }) => {
-        this.errors.push({ path: [ ...path, ...subpath ], message })
+        this.errors.push({ path: [...path, ...subpath], message })
       })
     } else {
       this.errors.push({ path, message: `${error}` })
@@ -113,11 +105,9 @@ export class ValidationErrorBuilder {
   }
 }
 
-/**
- * Simple assertion function throwing `ValidationError`(s) with an empty path
- */
+/** Simple assertion function throwing `ValidationError`(s) with an empty path */
 export function assertValidation(what: boolean | undefined, message: string): asserts what {
-  if (! what) throw new ValidationError(message, assertValidation)
+  if (!what) throw new ValidationError(message, assertValidation)
 }
 
 /**
@@ -125,5 +115,5 @@ export function assertValidation(what: boolean | undefined, message: string): as
  * constructing a `Validator` from a `Schema` or validation constraints.
  */
 export function assertSchema(what: boolean | undefined, message: string): asserts what {
-  if (! what) throw new TypeError(message)
+  if (!what) throw new TypeError(message)
 }
