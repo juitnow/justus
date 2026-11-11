@@ -125,3 +125,32 @@ export function partial<V extends Validation>(
     ...options,
   })
 }
+
+/**
+ * Returns a TypeScript type guard function for the specified validation.
+ *
+ * The returned function will return `true` if the value conforms to the
+ * validation, and `false` otherwise.
+ *
+ * The `strict` parameter controls whether extra properties are allowed
+ * (this is `false` by default) or disallowed (`true`).
+ */
+export function guard<V extends Validation>(
+  validation: V,
+  strict: boolean = false,
+): (value: unknown) => value is InferValidation<V> {
+  const validator = getValidator(validation)
+  return (value: unknown): value is InferValidation<V> => {
+    try {
+      validator.validate(value, {
+        partialValidation: false,
+        stripAdditionalProperties: !strict,
+        stripForbiddenProperties: false,
+        stripOptionalNulls: false,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+}
