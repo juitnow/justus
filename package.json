@@ -1,6 +1,6 @@
 {
   "name": "justus",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "description": "A JavaScript validation library, with types!",
   "keywords": [
     "javascript",
@@ -65,11 +65,11 @@
     "lintfix": "plug lint fix=true"
   },
   "devDependencies": {
-    "@plugjs/cov8": "^0.7.16",
-    "@plugjs/expect5": "^0.7.16",
+    "@plugjs/cov8": "^0.7.17",
+    "@plugjs/expect5": "^0.7.17",
     "@plugjs/oxc": "^0.1.17",
-    "@plugjs/plug": "^0.7.16",
-    "@plugjs/tsd": "^0.7.16",
+    "@plugjs/plug": "^0.7.17",
+    "@plugjs/tsd": "^0.7.17",
     "@plugjs/tsgo": "^0.1.4",
     "typescript": "<7"
   }
